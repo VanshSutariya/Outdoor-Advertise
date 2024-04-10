@@ -1,13 +1,17 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/signup.dto';
 import { Response, response } from 'express';
-import { log } from 'console';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    return await this.authService.getUsersById(id);
+  }
 
   @Post('/signup')
   signUp(@Body() signUpDto: SignUpDto): Promise<{ token: string }> {
@@ -18,9 +22,8 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginDto,
     @Res() response: Response,
-  ): Promise<{ token: string }> {
+  ): Promise<Response> {
     const token = await this.authService.login(loginDto);
-    console.log(token);
     const expirationTime = new Date();
     expirationTime.setDate(expirationTime.getDate() + 1); // 1 day
     response.cookie('Authentication', token, {
@@ -28,6 +31,15 @@ export class AuthController {
       httpOnly: true,
       expires: expirationTime,
     });
-    return { ...token };
+    console.log(
+      token,
+      response.cookie('Authentication', token, {
+        secure: true,
+        httpOnly: true,
+        expires: expirationTime,
+      }),
+    );
+
+    return response.json({ ...token });
   }
 }

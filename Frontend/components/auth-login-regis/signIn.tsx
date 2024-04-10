@@ -6,19 +6,20 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useState } from "react";
 
-export function SignIn() {
+const SignIn: React.FC = () => {
   const router = useRouter();
-  const [errorState, setErrorState] = useState(null);
+  const [errorState, setErrorState] = useState<string | null>(null);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
     password: Yup.string().required("Password is required").min(6),
   });
+
   const formOptions = { resolver: yupResolver(validationSchema) };
   const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  async function onSubmit(data) {
+  async function onSubmit(data: { email: string; password: string }) {
     const { email, password } = data;
     console.log(data);
     try {
@@ -32,7 +33,10 @@ export function SignIn() {
       if (!response.ok)
         throw new Error(resData.message || "Invalid Credentials");
 
+      document.cookie = `jwt=${resData.token}; path=/`;
+
       alert("Login Successfully");
+
       router.push("/");
     } catch (error) {
       setErrorState(error.message);
@@ -44,14 +48,8 @@ export function SignIn() {
     <section className="m-8 flex gap-4">
       <div className="w-full lg:w-3/5 mt-24">
         <div className="text-center">
-          <div variant="h2" className="font-bold mb-4 text-4xl">
-            LogIn
-          </div>
-          <div
-            variant="paragraph"
-            color="blue-gray"
-            className="text-lg font-normal"
-          >
+          <div className="font-bold mb-4 text-4xl">LogIn</div>
+          <div className="text-lg font-normal">
             Enter your email and password to LogIn
           </div>
         </div>
@@ -69,9 +67,6 @@ export function SignIn() {
               }}
               placeholder="name@mail.com"
               className=" p-2 mb-2 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
-              labelprops={{
-                className: "before:content-none after:content-none",
-              }}
             />
             <div className="text-red-500 ml-2 -mt-2 mb-2">
               {errors.email?.message}
@@ -86,26 +81,20 @@ export function SignIn() {
               type="password"
               placeholder="*******"
               className=" p-2 mb-2 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
-              labelprops={{
-                className: "before:content-none after:content-none",
-              }}
             />
             <div className="text-red-500 ml-2 -mt-2 mb-2">
               {errors.password?.message}
             </div>
           </div>
           {errorState && (
-            <div className="text-red-500 ml-2 mt-2 mb-2rounded-sm p-2 text-center font-bold">
+            <div className="text-red-500 ml-2 mt-2 mb-2 rounded-sm p-2 text-center font-bold">
               {errorState}
             </div>
           )}
           <button className="text-black font-bold p-3 bg-slate-200 w-full">
             LogIn
           </button>
-          <div
-            variant="paragraph"
-            className="text-center text-blue-500 font-medium mt-4"
-          >
+          <div className="text-center text-blue-500 font-medium mt-4">
             Not registered?
             <Link href="/register" className="text-gray-900 ml-1">
               Create account
@@ -117,7 +106,7 @@ export function SignIn() {
         <Image
           src="/pattern3.png"
           alt="signin image"
-          className=" rounded-3xl"
+          className="rounded-3xl"
           width={600}
           height={800}
           priority
@@ -125,8 +114,6 @@ export function SignIn() {
       </div>
     </section>
   );
-}
+};
 
 export default SignIn;
-
-// height: 924 px width: 646 px

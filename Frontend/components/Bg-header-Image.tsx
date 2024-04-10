@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function BgImage() {
+const BgImage: React.FC = () => {
   return (
     <main className=" bg-black flex ">
       <div className="w-full py-[135px]  pl-20 ">
@@ -22,4 +22,5 @@ export default function BgImage() {
       </div>
     </main>
   );
-}
+};
+export default BgImage;

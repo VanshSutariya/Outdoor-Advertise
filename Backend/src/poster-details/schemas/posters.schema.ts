@@ -8,14 +8,11 @@ export class Posters {
   @Prop({ required: true })
   title: string;
 
-  @Prop({ required: true, unique: true })
-  id: string;
-
   @Prop({ required: true })
   image: string;
 
-  @Prop({ required: true })
-  category: string;
+  @Prop({ required: false })
+  category?: string;
 
   @Prop({
     type: String,
@@ -45,16 +42,16 @@ export class Posters {
   @Prop({ required: true })
   facingFrom: string;
 
-  @Prop({ required: true })
-  size: string;
+  @Prop({ required: false })
+  size?: string;
 
-  @Prop({ required: true })
-  sft: number;
+  @Prop({ required: false })
+  sft?: number;
 
   @Prop({ required: true })
   minimumDays: number;
 
-  @Prop()
+  @Prop({ required: false })
   latLng?: number[];
 }
 

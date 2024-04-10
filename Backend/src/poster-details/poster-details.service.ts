@@ -35,15 +35,14 @@ export class PosterDetailsService {
     //   }
     // }
 
-    console.log(DBQuery);
-
-    const resData = await this.postersModel.find(DBQuery);
-    // return resData;
-
-    return {
-      result: resData.length,
-      data: resData,
-    };
+    const resPerPage = Number(query?.per_page) || 0;
+    const currentPage = Number(query.page) || 1;
+    const skip = resPerPage * (currentPage - 1);
+    const resData = await this.postersModel
+      .find(DBQuery)
+      .limit(resPerPage)
+      .skip(skip);
+    return resData;
   }
 
   // Get One
@@ -53,20 +52,19 @@ export class PosterDetailsService {
 
   // Create Poster
   async createPoster(createposterDto: CreatePosterDto) {
-    const count = await this.postersModel.countDocuments({});
-    const id = `pid${count + 1}`;
-    const newPoster = await this.postersModel.create({
-      ...createposterDto,
-      id,
-    });
+    // const count = await this.postersModel.countDocuments({});
+    // const id = `pid${count + 1}`;
+    const newPoster = await this.postersModel.create(createposterDto);
     if (!newPoster)
       throw new HttpException('New Poster/Hoardoing is not Created.', 404);
     return newPoster;
   }
 
   // update poster
-  async updatePoster(id: string, updatePosterDto: UpdatePosterDto, file) {
+  async updatePoster(id: string, updatePosterDto: UpdatePosterDto, file: any) {
     let { price, image } = updatePosterDto;
+    console.log(file);
+
     image = file.path;
     const updatePoster = await this.postersModel.findByIdAndUpdate(
       id,

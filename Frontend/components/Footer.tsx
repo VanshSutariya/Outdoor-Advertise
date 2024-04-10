@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function Footer() {
+const Footer: React.FC = () => {
   return (
     <footer className="text-gray-600 body-font bg-black  ">
       <div className="container px-5 py-20 mx-auto flex md:items-center lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
@@ -174,4 +174,6 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;

@@ -11,6 +11,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { PosterDetailsService } from './poster-details.service';
@@ -19,7 +20,7 @@ import { UpdatePosterDto } from './dto/updatePoster.dto';
 import mongoose from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Query as ExpressQuery } from 'express-serve-static-core';
-import { FilteredDto } from './dto/getFilteredData.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('poster')
 export class PosterDetailsController {
@@ -45,13 +46,14 @@ export class PosterDetailsController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
         destination: './public/poster',
         filename: (req, file, cb) => {
           const randomName = new Date().toISOString();
-          const imageName = randomName.replace(/:\s*/g, '-');
+          const imageName = randomName.replace(/:/g, '-');
           cb(null, `${imageName}${extname(file.originalname)}`);
         },
       }),
@@ -67,7 +69,7 @@ export class PosterDetailsController {
   async updatePoster(
     @Param('id') id: string,
     @Body() updatePosterDto: UpdatePosterDto,
-    @UploadedFile() file,
+    @UploadedFile() file: any,
   ) {
     const validId = mongoose.Types.ObjectId.isValid(id);
     if (!validId) throw new HttpException('Invalid user id ', 404);

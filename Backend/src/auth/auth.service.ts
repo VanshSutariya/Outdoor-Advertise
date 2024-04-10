@@ -19,6 +19,11 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async getUsersById(id: string) {
+    const user = await this.userModel.findById(id);
+    return user;
+  }
+
   async signUp(signUpDto: SignUpDto): Promise<{ token: string }> {
     const { name, email, password } = signUpDto;
     const newemail = await this.userModel.findOne({ email });

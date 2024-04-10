@@ -6,11 +6,11 @@ import * as Yup from "yup";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-export function Register() {
+const SignUp: React.FC = () => {
   const router = useRouter();
 
-  const [errorState, setErrorState] = useState("");
-  const [isError, setIsError] = useState(false);
+  const [errorState, setErrorState] = useState<string | null>("");
+  const [isError, setIsError] = useState<boolean>(false);
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required("First Name is required"),
@@ -29,7 +29,12 @@ export function Register() {
   const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  async function onSubmit(data) {
+  async function onSubmit(data: {
+    username: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) {
     setIsError(false);
     console.log(data);
 
@@ -51,7 +56,7 @@ export function Register() {
       if (!response.ok) throw new Error(data.message || "Enter valid inputs.");
 
       alert("Login Successfully");
-      router.push("/");
+      router.push("/login");
     } catch (error) {
       setIsError(true);
       setErrorState(error.message);
@@ -73,9 +78,7 @@ export function Register() {
       </div>
       <div className="w-full lg:w-3/5 mt-24">
         <div className="text-center">
-          <div variant="h2" className="font-bold mb-4 text-4xl">
-            Join Us Today
-          </div>
+          <div className="font-bold mb-4 text-4xl">Join Us Today</div>
           <div className="text-lg font-normal">
             Enter your email and password to Register.
           </div>
@@ -92,9 +95,6 @@ export function Register() {
               type="text"
               placeholder="doodle"
               className=" p-2 mb-2 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
-              labelprops={{
-                className: "before:content-none after:content-none",
-              }}
             />
             <div className="text-red-500 ml-2-mt-2 mb-2">
               {errors.username?.message}
@@ -106,9 +106,6 @@ export function Register() {
               name="email"
               placeholder="name@mail.com"
               className=" p-2 mb-2 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
-              labelprops={{
-                className: "before:content-none after:content-none",
-              }}
             />
             {isError && <p className="text-red-500 "> {errorState}</p>}
             <div className="text-red-500 ml-2 -mt-2 mb-2">
@@ -122,9 +119,6 @@ export function Register() {
               type="password"
               placeholder="********"
               className=" p-2 mb-3 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
-              labelprops={{
-                className: "before:content-none after:content-none",
-              }}
             />
             <div className="text-red-500 ml-2 -mt-2 mb-2">
               {errors.password?.message}
@@ -136,9 +130,6 @@ export function Register() {
               type="password"
               placeholder="********"
               className=" p-2 mb-3 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
-              labelprops={{
-                className: "before:content-none after:content-none",
-              }}
             />
             <div className="text-red-500 ml-2 -mt-2 mb-3">
               {errors.confirmPassword?.message}
@@ -159,6 +150,6 @@ export function Register() {
       </div>
     </section>
   );
-}
+};
 
-export default Register;
+export default SignUp;

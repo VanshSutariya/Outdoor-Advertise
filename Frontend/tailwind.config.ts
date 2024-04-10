@@ -1,5 +1,10 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+// /** @type {import('tailwindcss').Config} */
+// module.exports = {};
+// @ts-check
+const { withUt } = require("uploadthing/tw");
+
+module.exports = withUt({
+  // your config goes here
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -15,4 +20,4 @@ module.exports = {
     },
   },
   plugins: [],
-};
+});

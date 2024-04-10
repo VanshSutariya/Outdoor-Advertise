@@ -1,5 +1,5 @@
 import classes from "./SearchBar.module.css";
-function SearchBar(props) {
+const SearchBar: React.FC = (props) => {
   return (
     <form className={classes.form}>
       <div className={classes.controls}>
@@ -31,6 +31,6 @@ function SearchBar(props) {
       <button>Search OOH </button>
     </form>
   );
-}
+};
 
 export default SearchBar;

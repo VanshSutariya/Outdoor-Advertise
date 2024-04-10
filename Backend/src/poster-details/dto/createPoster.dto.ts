@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { MEDIA_PLAN } from '../constants/mediaPlan.constants';
@@ -20,6 +21,7 @@ export class CreatePosterDto {
 
   @IsNotEmpty()
   @IsString()
+  @IsOptional()
   category: string;
 
   @IsNotEmpty()
@@ -57,17 +59,20 @@ export class CreatePosterDto {
 
   @IsNotEmpty()
   @IsString()
-  size: string;
+  @IsOptional()
+  size?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  sft: number;
+  sft?: number;
 
   @IsNotEmpty()
   @IsNumber()
   minimumDays: number;
 
   @IsArray()
+  @IsOptional()
   @ArrayMinSize(2, {
     message: 'latLng must be an array of 2 elements of type number',
   })
