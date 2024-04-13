@@ -39,17 +39,23 @@ export class Posters {
   @Prop({ required: true })
   landmark: string;
 
+  @Prop({ required: false })
+  facingFrom?: string;
+
   @Prop({ required: true })
-  facingFrom: string;
+  size: string;
 
-  @Prop({ required: false })
-  size?: string;
-
-  @Prop({ required: false })
-  sft?: number;
+  @Prop({ required: true })
+  sft: number;
 
   @Prop({ required: true })
   minimumDays: number;
+
+  @Prop({ required: false })
+  minAutos?: number;
+
+  @Prop({ required: false })
+  maxAutos?: number;
 
   @Prop({ required: false })
   latLng?: number[];

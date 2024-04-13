@@ -7,6 +7,7 @@ interface Poster {
   title: string;
   image: string;
   price: number;
+  lightingType: string;
 
   // Define other properties of the poster object
 }
@@ -62,10 +63,10 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
 
   return (
     <>
-      <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mx-auto justify-items-center ">
+      <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mx-auto justify-items-center ">
         {posterData.map((poster: Poster) => (
           <div
-            className="my-4 hover:shadow-2xl hover:scale-105 hover:shadow-gray-600 "
+            className="my-4 rounded-lg hover:shadow-xl hover:scale-105 hover:shadow-neutral-300 "
             key={poster._id}
           >
             <PosterItem {...poster} />

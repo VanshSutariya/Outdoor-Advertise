@@ -1,18 +1,35 @@
-import { useEffect, useState } from "react";
-import { addDays } from "date-fns";
+import { useEffect, useRef, useState } from "react";
+import { addDays, max } from "date-fns";
 import { differenceInDays } from "date-fns";
 import { DateRange } from "react-date-range";
-import "react-date-range/dist/styles.css"; // main css file
-import "react-date-range/dist/theme/default.css"; // theme css file
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 import useFindWidth from "../../hooks/useWidth";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import Billing from "./billing";
 
 interface DatePickerProps {
   price: number;
   minDays: number;
+  rickshaws: boolean;
+  minauto: number;
+  maxauto: number;
 }
-const DatePicker: React.FC<DatePickerProps> = ({ price, minDays }) => {
+const DatePicker: React.FC<DatePickerProps> = ({
+  price,
+  minDays,
+  rickshaws,
+  minauto,
+  maxauto,
+}) => {
   const windowWidth = useFindWidth();
   const [diffInDays, setDiffInDays] = useState<number>(0);
+  const noOfAuto = useRef<HTMLInputElement>();
+  const [autoInputError, setAutoInputError] = useState<string | null>(null);
+
+  const { user, isLoggedIn }: { user: string | null; isLoggedIn: boolean } =
+    useSelector((state: RootState) => state.auth);
 
   const [state, setState] = useState([
     {
@@ -43,9 +60,24 @@ const DatePicker: React.FC<DatePickerProps> = ({ price, minDays }) => {
     //   addDays(new Date(), 4),
     // ];
 
-    console.log(state);
+    // console.log(state);
   }, [state, diffInDays]);
 
+  const handleAutoChange = () => {
+    const inputValue = parseInt(noOfAuto.current!.value, 10);
+    if (inputValue < minauto || inputValue > maxauto) {
+      setAutoInputError(
+        `Book min ${minauto} and max ${maxauto} Auto Quantity.`
+      );
+    } else {
+      setAutoInputError(null);
+    }
+  };
+
+  const totalPrice = rickshaws
+    ? noOfAuto.current &&
+      parseInt(noOfAuto.current.value, 10) * price * diffInDays
+    : price * diffInDays;
   return (
     <>
       <div className=" md:flex">
@@ -72,33 +104,20 @@ const DatePicker: React.FC<DatePickerProps> = ({ price, minDays }) => {
             </button>
           </div>
         </div>
-
-        <div className=" p-5 ">
-          <p className="p-2  text-xl font-mono"> ₹{price} / per day</p>
-
-          <div className=" flex gap-2">
-            <p className="text-lg font-mono border-2 border-black	 rounded-md p-3 text-red-950">
-              StartDate: {state[0].startDate.toLocaleDateString("en-IN")}
-            </p>
-            <p className="text-lg font-mono border-2 border-black rounded-md p-3 text-red-950">
-              EndDate: {state[0].endDate.toLocaleDateString("en-IN")}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="border-2 border-black mt-5 p-2 text-xl rounded-lg  font-mono ">
-              TotalPrice : ₹{price * diffInDays}
-            </p>
-            {diffInDays > 4 ? (
-              <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
-                Book Now
-              </button>
-            ) : (
-              <p className="p-2 mb-2 text-xl font-mono bg-orange-500 rounded-md mt-2">
-                Select Minimum {minDays} days
-              </p>
-            )}
-          </div>
-        </div>
+        <Billing
+          handleAutoChange={handleAutoChange}
+          totalPrice={totalPrice}
+          diffInDays={diffInDays}
+          isLoggedIn={isLoggedIn}
+          maxauto={maxauto}
+          minauto={minauto}
+          minDays={minDays}
+          autoInputError={autoInputError}
+          price={price}
+          rickshaws={rickshaws}
+          state={state}
+          noOfAuto={noOfAuto}
+        />
       </div>
     </>
   );

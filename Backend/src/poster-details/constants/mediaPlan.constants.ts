@@ -1,8 +1,8 @@
 export enum MEDIA_PLAN {
   AIRPORTS = 'Airports',
-  RAILWAYS = 'Railways',
+  RAILWAYPLATFORMS = 'RailwayPlatforms',
   BILLBOARD = 'Billboard',
-  BUSSTANDS = 'Busstands',
+  BUSSTANDS = 'BusStands',
   FOOTOVERBRIDGES = 'Footoverbridges',
   POLES = 'Poles',
   RICKSHAWS = 'Rickshaws',

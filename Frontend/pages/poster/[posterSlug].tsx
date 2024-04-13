@@ -7,7 +7,7 @@ const PosterSlugPage = () => {
   const router = useRouter();
   const id: string | string[] | undefined = router.query.posterSlug;
   return (
-    <main>
+    <main className="overflow-auto">
       <NavBar />
       <PosterDetails id={id as string} />
 

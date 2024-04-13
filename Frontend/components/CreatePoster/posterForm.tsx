@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { UploadButton } from "../../utils/uploadthing";
 import Input from "./elements/input";
+import { useRouter } from "next/router";
 
 const PosterForm: React.FC = () => {
+  const router = useRouter();
   const [formValues, setFormValues] = useState({
     companyName: "",
     title: "",
@@ -17,6 +19,8 @@ const PosterForm: React.FC = () => {
     perDayPrice: undefined,
     height: undefined,
     width: undefined,
+    minAutos: undefined,
+    maxAutos: undefined,
   });
   const [imgUrl, setImgUrl] = useState<string | null>("");
 
@@ -30,7 +34,9 @@ const PosterForm: React.FC = () => {
       name === "perDayPrice" ||
       name === "height" ||
       name === "width" ||
-      name === "mindays"
+      name === "mindays" ||
+      name === "minAutos" ||
+      name === "maxAutos"
         ? parseFloat(value)
         : value;
 
@@ -40,9 +46,12 @@ const PosterForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (formValues.facingFrom.trim() === "") {
+    if (formValues.facingFrom?.trim() === "") {
       delete formValues.facingFrom;
     }
+
+    if (!formValues.maxAutos) delete formValues.maxAutos;
+    if (!formValues.minAutos) delete formValues.minAutos;
 
     const data = { ...formValues, imgUrl };
     const {
@@ -59,6 +68,8 @@ const PosterForm: React.FC = () => {
       height,
       width,
       imgUrl: image,
+      minAutos,
+      maxAutos,
     } = data;
     const size = `${height} X ${width}`;
     const sft = height * width;
@@ -80,16 +91,56 @@ const PosterForm: React.FC = () => {
           image,
           size,
           sft,
+          minAutos,
+          maxAutos,
         }),
       });
       const response = await resData.json();
-      if (!response.ok) throw new Error(response.message);
-      alert("Data Successfully submit.");
+
+      if (!resData.ok) {
+        throw new Error(response.message || "enter valid data");
+      }
+      // Try to alert first to check if it's working
+      alert("Data Successfully submitted.");
+      // Then try navigating
+      router.push("/");
     } catch (error) {
       console.log(error.message);
     }
 
     console.log(data);
+  };
+
+  const renderAdditionalInputs = () => {
+    if (formValues.mediatype === "Rickshaws") {
+      return (
+        <>
+          <div className=" flex flex-wrap -mx-3 mb-6">
+            <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+              <Input
+                name="minAutos"
+                value={formValues.minAutos}
+                onChange={handleChange}
+                type="number"
+                placeholder="1"
+                label="Minimum Autos"
+              />
+            </div>
+            <div className="w-full md:w-1/2 px-3">
+              <Input
+                name="maxAutos"
+                value={formValues.maxAutos}
+                onChange={handleChange}
+                type="number"
+                placeholder="10"
+                label="Maximum Autos"
+              />
+            </div>
+          </div>
+        </>
+      );
+    }
+    return null;
   };
 
   return (
@@ -109,7 +160,7 @@ const PosterForm: React.FC = () => {
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
               <Input
                 name="companyName"
-                value="pixer"
+                value={formValues.companyName}
                 onChange={handleChange}
                 type="text"
                 placeholder="pixel"
@@ -145,12 +196,11 @@ const PosterForm: React.FC = () => {
                   onChange={handleChange}
                 >
                   <option value="Poles">Poles</option>
-                  <option value="Busses">Busses</option>
                   <option value="Airports">Airports</option>
-                  <option value="Railways">Railways</option>
+                  <option value="RailwayPlatforms">RailwayPlatforms</option>
                   <option value="Rickshaws">Rickshaws</option>
                   <option value="Billboard">Billboard</option>
-                  <option value="Busstands">Busstands</option>
+                  <option value="BusStands">BusStands</option>
                   <option value="Footoverbridges">Footoverbridges</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
@@ -196,6 +246,9 @@ const PosterForm: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Additional inputs for Rickshaws */}
+          {renderAdditionalInputs()}
 
           {/*landmark & facingfrom ------------------------- */}
           <div className=" flex flex-wrap -mx-3 mb-6">

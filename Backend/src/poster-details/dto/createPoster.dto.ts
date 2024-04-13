@@ -54,22 +54,31 @@ export class CreatePosterDto {
   landmark: string;
 
   @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  facingFrom: string;
+  facingFrom?: string;
 
   @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  size?: string;
+  size: string;
 
-  @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  sft?: number;
+  sft: number;
 
   @IsNotEmpty()
   @IsNumber()
   minimumDays: number;
+
+  @IsNotEmpty()
+  @IsOptional()
+  @IsNumber()
+  minAutos?: number;
+
+  @IsNotEmpty()
+  @IsOptional()
+  @IsNumber()
+  maxAutos?: number;
 
   @IsArray()
   @IsOptional()

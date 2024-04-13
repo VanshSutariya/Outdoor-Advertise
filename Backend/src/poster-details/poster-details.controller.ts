@@ -42,7 +42,7 @@ export class PosterDetailsController {
 
   @Post('add')
   async createPoster(@Body() createPosterDto: CreatePosterDto) {
-    return this.posterdetailsService.createPoster(createPosterDto);
+    return await this.posterdetailsService.createPoster(createPosterDto);
   }
 
   @Patch(':id')

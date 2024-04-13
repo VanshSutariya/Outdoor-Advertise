@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store";
+import { loginIn, logout } from "../store/auth-slice";
 import { decode } from "jsonwebtoken";
 import fetchUser from "../utils/http";
-
 const NavBar: React.FC = () => {
+  const dispatch = useDispatch();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [userName, setUserName] = useState<string | null>(null);
+
+  const { user, isLoggedIn }: { user: string | null; isLoggedIn: boolean } =
+    useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const jwtCookie = document.cookie
@@ -16,23 +20,19 @@ const NavBar: React.FC = () => {
     if (jwtCookie) {
       const token = jwtCookie.split("=")[1];
       const decodedToken = decode(token) as { id: string };
-      console.log(decodedToken);
       if (decodedToken) {
         const fetchUserFunc = async () => {
-          const user = await fetchUser(decodedToken.id);
-          console.log(user);
-          setUserName(user);
+          const userName = await fetchUser(decodedToken.id);
+          dispatch(loginIn(userName));
         };
         fetchUserFunc();
-        setLoggedIn(true);
       }
     }
-  }, []);
+  }, [dispatch]);
 
   const handleLogout = async () => {
     document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    setLoggedIn(false);
-    setUserName(null);
+    dispatch(logout());
   };
 
   const handleMobileMenuToggle = () => {
@@ -41,11 +41,18 @@ const NavBar: React.FC = () => {
 
   return (
     <>
-      <nav className="flex font-inter justify-between items-center px-4 bg-black tracking-wide">
-        <div className='flex mr-9 flex-col items-center justify-center w-full"'>
-          <Link href="/">
-            <span className="sm:w-[7rem] w-[5rem] text-white text-lg font-bold flex items-center">
-              <img src="/logo.png" alt="Logo" className="mr-2 h-[60px]" />
+      <nav className="flex justify-between items-center px-4 pb-2 tracking-wide border-b-[1px]">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center">
+            <span className="w-full text-black text-lg font-bold  items-center">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-full md:w-[120px] h-[70px]"
+              />
+            </span>
+            <span className=" w-full px-3 mr-5 font-bold md:text-xl text-blue-950">
+              OutdoorAdvertise
             </span>
           </Link>
         </div>
@@ -53,38 +60,51 @@ const NavBar: React.FC = () => {
           className="md:hidden flex cursor-pointer max-w-sm"
           onClick={handleMobileMenuToggle}
         >
+          {isLoggedIn && user && (
+            <div className="  sm:flex mr-4 md:hidden items-center font-semibold space-x-4">
+              <div className='flex flex-col items-center justify-center w-full"'>
+                <Link href="/">
+                  <img
+                    src="/shopping-cart.png"
+                    alt="Logo"
+                    className=" h-[50px]"
+                  />
+                </Link>
+              </div>
+            </div>
+          )}
           <div className="flex-1 ml-auto">
-            <span className="text-white text-4xl">&#9776;</span>
+            <span className="text-black text-4xl">&#9776;</span>
           </div>
         </div>
         <div className="container hidden mx-auto md:flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="hidden md:flex font-semibold space-x-4">
+            <div className="hidden md:flex pt-1 font-thin text-lg space-x-4">
               <Link href="/">
-                <span className="text-white">Home</span>
+                <span className="text-black">Home</span>
               </Link>
               <Link href="/about">
-                <span className="text-white">About</span>
+                <span className="text-black">About</span>
               </Link>
               <Link href="/services">
-                <span className="text-white">Services</span>
+                <span className="text-black">Services</span>
               </Link>
               <Link href="/contact">
-                <span className="text-white">Contact</span>
+                <span className="text-black">Contact</span>
               </Link>
             </div>
           </div>
-          {!loggedIn && (
+          {!isLoggedIn && (
             <div className="md:flex hidden items-center font-semibold space-x-4">
-              <button className="text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-900 px-4 py-1 rounded">
+              <button className="text-black  border-2 border-black hover:bg-gray-200 active:bg-gray-300 px-4 py-2 rounded-3xl">
                 <Link href="/login">Login</Link>
               </button>
-              <button className="text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-900 px-4 py-1 rounded">
+              <button className="text-black  border-2 border-black hover:bg-gray-200 active:bg-gray-300 px-4 py-2 rounded-3xl">
                 <Link href="/register">Register</Link>
               </button>
             </div>
           )}
-          {loggedIn && userName && (
+          {isLoggedIn && user && (
             <div className="md:flex hidden items-center font-semibold space-x-4">
               <div className='flex flex-col items-center justify-center w-full"'>
                 <Link href="/">
@@ -95,10 +115,10 @@ const NavBar: React.FC = () => {
                   />
                 </Link>
               </div>
-              <p className="text-xl text-white">{userName}</p>
+              <p className="text-xl text-black">{user}</p>
               <button
                 onClick={handleLogout}
-                className="text-white bg-gray-600 hover:bg-gray-700 active:bg-gray-900 px-4 py-1 rounded"
+                className="text-white bg-black hover:bg-gray-700 active:bg-gray-900 px-4 py-2 rounded-3xl"
               >
                 <Link href="/">LogOut</Link>
               </button>
@@ -127,7 +147,7 @@ const NavBar: React.FC = () => {
                     Services
                   </span>
                 </Link>
-                {!loggedIn && (
+                {!isLoggedIn && (
                   <>
                     <Link href="/register">
                       <span className="block my-2 text-black cursor-pointer">
@@ -141,7 +161,7 @@ const NavBar: React.FC = () => {
                     </Link>
                   </>
                 )}
-                {loggedIn && (
+                {isLoggedIn && (
                   <>
                     <Link href="/">
                       <button className="block my-2 text-black cursor-pointer">
@@ -158,19 +178,6 @@ const NavBar: React.FC = () => {
               </div>
             </div>
           </>
-        )}
-        {loggedIn && userName && (
-          <div className="  sm:flex md:hidden items-center font-semibold space-x-4">
-            <div className='flex flex-col items-center justify-center w-full"'>
-              <Link href="/">
-                <img
-                  src="/shopping-cart.png"
-                  alt="Logo"
-                  className=" h-[50px]"
-                />
-              </Link>
-            </div>
-          </div>
         )}
       </nav>
     </>

@@ -1,6 +1,8 @@
 import "../styles/globals.css";
 import Head from "next/head";
 import { AppProps } from "next/app";
+import { Provider, useDispatch } from "react-redux";
+import store from "../store/index";
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -12,7 +14,9 @@ function App({ Component, pageProps }: AppProps) {
           content="hoarding billboard outdoor advertise."
         />
       </Head>
-      <Component {...pageProps} />
+      <Provider store={store}>
+        <Component {...pageProps} />
+      </Provider>
     </>
   );
 }

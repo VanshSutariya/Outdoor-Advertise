@@ -5,9 +5,15 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { loginIn } from "../../store/auth-slice";
+import { decode } from "jsonwebtoken";
+import fetchUser from "../../utils/http";
+// import Cookies from "js-cookie";
 
 const SignIn: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<string | null>(null);
 
   const validationSchema = Yup.object().shape({
@@ -33,8 +39,18 @@ const SignIn: React.FC = () => {
       if (!response.ok)
         throw new Error(resData.message || "Invalid Credentials");
 
-      document.cookie = `jwt=${resData.token}; path=/`;
+      document.cookie = `jwt=${resData.token}; expires=${new Date(
+        new Date().getTime() + 5000
+      )} path=/`;
 
+      const decodedToken = decode(resData.token) as { id: string };
+      if (decodedToken) {
+        const fetchUserFunc = async () => {
+          const userName = await fetchUser(decodedToken.id);
+          dispatch(loginIn(userName));
+        };
+        fetchUserFunc();
+      }
       alert("Login Successfully");
 
       router.push("/");

@@ -25,21 +25,12 @@ export class AuthController {
   ): Promise<Response> {
     const token = await this.authService.login(loginDto);
     const expirationTime = new Date();
-    expirationTime.setDate(expirationTime.getDate() + 1); // 1 day
+    expirationTime.setTime(expirationTime.getTime() + 60 * 60 * 1000);
     response.cookie('Authentication', token, {
       secure: true,
       httpOnly: true,
       expires: expirationTime,
     });
-    console.log(
-      token,
-      response.cookie('Authentication', token, {
-        secure: true,
-        httpOnly: true,
-        expires: expirationTime,
-      }),
-    );
-
     return response.json({ ...token });
   }
 }

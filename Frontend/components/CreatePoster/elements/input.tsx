@@ -24,6 +24,7 @@ const Input: React.FC<InputProps> = (props) => {
         placeholder={props.placeholder}
         value={props.value}
         onChange={props.onChange}
+        onWheel={(e) => e.target.blur()}
       />
     </>
   );

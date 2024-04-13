@@ -39,7 +39,10 @@ export class AuthService {
 
     if (!user) throw new HttpException('enter valid Credentials.', 401);
 
-    const token = this.jwtService.sign({ id: user._id });
+    const token = this.jwtService.sign(
+      { id: user._id },
+      { expiresIn: process.env.JWT_EXPIRES, secret: process.env.JWT_SECRET },
+    );
 
     return { token };
   }
@@ -59,7 +62,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password.');
     }
 
-    const token = this.jwtService.sign({ id: user._id });
+    const token = this.jwtService.sign(
+      { id: user._id },
+      { expiresIn: process.env.JWT_EXPIRES, secret: process.env.JWT_SECRET },
+    );
 
     return { token };
   }
