@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  IsArray,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -43,4 +44,9 @@ export class UpdatePosterDto {
   @IsNumber()
   @Min(4, { message: 'Minimum Days must be greater than or equal to 4' })
   minimumDays?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  bookingDate: string[];
 }

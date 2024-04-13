@@ -1,6 +1,8 @@
 import { fetchOnePoster } from "../../utils/http";
 import { useEffect, useState } from "react";
 import DatePicker from "./date-range-picker";
+import { CiLocationOn } from "react-icons/ci";
+import { LiaTagSolid } from "react-icons/lia";
 
 interface PosterData {
   image: string;
@@ -15,6 +17,9 @@ interface PosterData {
   mediatype: string;
   minAutos: number;
   maxAutos: number;
+  state: string;
+  city: string;
+  bookingDate: string[];
 }
 
 interface PosterDetailsProps {
@@ -31,10 +36,13 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
     lightingType: "",
     address: "",
     facingFrom: "",
+    state: "",
+    city: "",
     minimumDays: 0,
     mediatype: "",
     maxAutos: 0,
     minAutos: 0,
+    bookingDate: [],
   });
 
   useEffect(() => {
@@ -69,45 +77,88 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
 
   return (
     <>
-      <div className="md:flex items-center">
-        <div className="pt-8 hover:scale-105 rounded-lg md:ml-[100px] md:mr-12 mb-9">
+      <div className="md:flex items-center justify-center">
+        <div className="md:w-1/3 pt-8  p-5 rounded-lg mb-9">
           <img
-            className="rounded-2xl sm:h-[200px] md:h-[300px] w-full"
+            className="rounded-2xl md:h-[300px] h-[300px] w-full"
             src={posterData.image}
             alt="poster1-image"
           />
         </div>
-        <div className="sm:w-full md:w-1/2 rounded-lg md:ml-[50px]">
-          <h1 className="mt-4 text-4xl text-gray-800 font-bold tracking-wider font-serif">
+        <div className="w-full border-[2px] border-gray-100 shadow-md sm:w-full md:w-1/2 rounded-lg ">
+          <h1 className="mt-4 flex  justify-center text-3xl text-gray-800 font-bold tracking-wider font-serif">
             {posterData.title}
           </h1>
-          <table className="border-spacing-3 black w-full table-fixed text-2xl mt-5 mb-5 tracking-wide font-mono">
-            <tbody className="rounded-lg">
-              {dataEntries.map(([key, value], index) => (
-                <tr
-                  key={index}
-                  className={
-                    index % 2 === 0
-                      ? "bg-violet-200 rounded-lg"
-                      : "bg-violet-300 rounded-lg"
-                  }
-                >
-                  <td>{key.toUpperCase()}</td>
-                  <td>{value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="p-5">
+            {/* location */}
+            <div className="border-b-[2px] border-t-[2px] border-gray-300 pb-[5px]">
+              <div className=" flex ">
+                <div className="pt-[5px] pr-[3px] ">
+                  <CiLocationOn size={18} />
+                </div>
+                <p className="text-lg">Location:</p>
+              </div>
+              <p className=" text-slate-600">
+                {posterData.address?.toLocaleLowerCase()},
+                {posterData.city?.toLocaleLowerCase()},
+                {posterData.state?.toLocaleLowerCase()}
+              </p>
+            </div>
+            {/* specification */}
+            <div className="border-b-[2px] border-gray-300 pb-[5px]">
+              <div className="text-lg flex  ">
+                <div className="pt-[8px] pr-[3px] ">
+                  <LiaTagSolid size={17} />
+                </div>
+                <p>Specifications:</p>
+              </div>
+              <div className="text-slate-600">
+                <p className="">
+                  Size:{posterData.size} | Area: {posterData.sft} squarefoot |
+                  MediaType: {posterData.mediatype}
+                </p>
+                <p>
+                  LightingType: {posterData.lightingType?.toLocaleLowerCase()}{" "}
+                </p>
+              </div>
+            </div>
+            {/* Booking Info */}
+            <div className="border-b-[2px] border-gray-300 pb-[5px]">
+              <div className="text-lg flex ">
+                <div className="pt-[8px] pr-[3px] ">
+                  <LiaTagSolid size={17} />
+                </div>
+                <p>Booking Info:</p>
+              </div>
+              <div className="text-slate-600">
+                <p>
+                  {" "}
+                  Minimum Booking Days : {posterData.minimumDays} days{" "}
+                  {posterData.mediatype === "Rickshaws"
+                    ? `| MinAutos :${posterData.minAutos} | MaxAutos:${posterData.maxAutos} `
+                    : ""}
+                </p>
+              </div>
+            </div>
+            <div className="flex  justify-center pt-4">
+              <p className="-pl-3">
+                <span className="text-lg">Price </span>{" "}
+                <span className="text-xl ml-5 text-green-500 font-bold">
+                  ₹{posterData.price}/ perDay
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="rounded-lg pb-10 w-full flex ">
+      {/* <div className="rounded-lg pb-10 w-full flex ">
         <iframe
           title="Google Maps"
           width="100%"
           height="300"
           src={url}
         ></iframe>
-      </div>
+      </div> */}
       <div className="justify-center flex pb-3">
         <DatePicker
           price={posterData.price}
@@ -115,6 +166,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           rickshaws={posterData.mediatype === "Rickshaws" ? true : false}
           minauto={posterData.minAutos}
           maxauto={posterData.maxAutos}
+          bookingDate={posterData.bookingDate}
         />
       </div>
     </>

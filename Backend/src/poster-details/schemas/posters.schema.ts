@@ -59,6 +59,9 @@ export class Posters {
 
   @Prop({ required: false })
   latLng?: number[];
+
+  @Prop({ type: [String] })
+  bookingDate: string[];
 }
 
 export const PostersSchema = SchemaFactory.createForClass(Posters);

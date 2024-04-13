@@ -15,6 +15,7 @@ interface DatePickerProps {
   rickshaws: boolean;
   minauto: number;
   maxauto: number;
+  bookingDate: string[];
 }
 const DatePicker: React.FC<DatePickerProps> = ({
   price,
@@ -22,8 +23,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
   rickshaws,
   minauto,
   maxauto,
+  bookingDate,
 }) => {
   const windowWidth = useFindWidth();
+  const [bookingDates, setBookingDates] = useState<string[]>([]);
   const [diffInDays, setDiffInDays] = useState<number>(0);
   const noOfAuto = useRef<HTMLInputElement>();
   const [autoInputError, setAutoInputError] = useState<string | null>(null);
@@ -52,16 +55,25 @@ const DatePicker: React.FC<DatePickerProps> = ({
   useEffect(() => {
     const diff = differenceInDays(state[0].endDate, state[0].startDate) + 1;
     setDiffInDays(diff);
-    // const bookedDates = [
-    //   addDays(new Date()),
-    //   addDays(new Date(), 1),
-    //   addDays(new Date(), 2),
-    //   addDays(new Date(), 3),
-    //   addDays(new Date(), 4),
-    // ];
 
-    // console.log(state);
+    const startDate = state[0].startDate;
+    const endDate = state[0].endDate;
+
+    const datesArray = [];
+    for (
+      let date = new Date(startDate);
+      date <= endDate;
+      date.setDate(date.getDate() + 1)
+    ) {
+      datesArray.push(new Date(date).toLocaleDateString());
+    }
+
+    setBookingDates([...bookingDate, ...datesArray]);
   }, [state, diffInDays]);
+
+  const handleBookedDates = () => {
+    console.log(bookingDates);
+  };
 
   const handleAutoChange = () => {
     const inputValue = parseInt(noOfAuto.current!.value, 10);
@@ -78,6 +90,12 @@ const DatePicker: React.FC<DatePickerProps> = ({
     ? noOfAuto.current &&
       parseInt(noOfAuto.current.value, 10) * price * diffInDays
     : price * diffInDays;
+
+  console.log(
+    state[0].startDate.toLocaleDateString(),
+    state[0].endDate.toLocaleDateString()
+  );
+
   return (
     <>
       <div className=" md:flex">
@@ -91,7 +109,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             direction={windowWidth < 780 ? "vertical" : "horizontal"}
             showSelectionPreview={true}
             moveRangeOnFirstSelection={false}
-            // disabledDates={["2024/03/30", "2024/04/3"]}
+            disabledDates={bookingDate}
             // disabledDates={bookedDates}
           />
           <div className=" pb-5 mt-3 ">
@@ -105,6 +123,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
           </div>
         </div>
         <Billing
+          handleBookedDates={handleBookedDates}
           handleAutoChange={handleAutoChange}
           totalPrice={totalPrice}
           diffInDays={diffInDays}

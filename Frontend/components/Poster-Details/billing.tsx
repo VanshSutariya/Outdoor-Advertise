@@ -14,10 +14,12 @@ interface BillingType {
   state: { startDate: Date; endDate: Date; key: string }[];
   noOfAuto: React.RefObject<HTMLInputElement>;
   isLoggedIn: boolean;
+  handleBookedDates: () => void;
 }
 
 const Billing: React.FC<BillingType> = ({
   handleAutoChange,
+  handleBookedDates,
   totalPrice,
   diffInDays,
   maxauto,
@@ -32,7 +34,7 @@ const Billing: React.FC<BillingType> = ({
 }) => {
   return (
     <>
-      <div className=" p-5 border-[1px]  border-gray-200 shadow-md shadow-gray-500 rounded-2xl">
+      <div className=" p-5 border-[2px]  border-gray-200 shadow-md shadow-gray-300 rounded-2xl">
         <p className="pb-3">
           {" "}
           <span className="text-xl font-bold">₹{price} /</span>
@@ -80,8 +82,11 @@ const Billing: React.FC<BillingType> = ({
                   </button>
                 </Link>
               ) : (
-                <Link href="/login">
-                  <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
+                <Link href="/">
+                  <button
+                    onClick={handleBookedDates}
+                    className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
+                  >
                     Reserve
                   </button>
                 </Link>

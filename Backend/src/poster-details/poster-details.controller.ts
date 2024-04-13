@@ -47,33 +47,13 @@ export class PosterDetailsController {
 
   @Patch(':id')
   @UseGuards(AuthGuard())
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './public/poster',
-        filename: (req, file, cb) => {
-          const randomName = new Date().toISOString();
-          const imageName = randomName.replace(/:/g, '-');
-          cb(null, `${imageName}${extname(file.originalname)}`);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
-          cb(null, true);
-        } else {
-          cb(new Error('Only PNG and JPEG files are allowed!'), false);
-        }
-      },
-    }),
-  )
   async updatePoster(
     @Param('id') id: string,
     @Body() updatePosterDto: UpdatePosterDto,
-    @UploadedFile() file: any,
   ) {
     const validId = mongoose.Types.ObjectId.isValid(id);
     if (!validId) throw new HttpException('Invalid user id ', 404);
-    return this.posterdetailsService.updatePoster(id, updatePosterDto, file);
+    return this.posterdetailsService.updatePoster(id, updatePosterDto);
   }
 
   @Delete(':id')

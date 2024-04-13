@@ -61,14 +61,11 @@ export class PosterDetailsService {
   }
 
   // update poster
-  async updatePoster(id: string, updatePosterDto: UpdatePosterDto, file: any) {
-    let { price, image } = updatePosterDto;
-    console.log(file);
-
-    image = file.path;
+  async updatePoster(id: string, updatePosterDto: UpdatePosterDto) {
+    let { bookingDate } = updatePosterDto;
     const updatePoster = await this.postersModel.findByIdAndUpdate(
       id,
-      { price, image },
+      { bookingDate },
       { new: true },
     );
     if (!updatePoster) throw new HttpException('Poster is not updated. ', 404);

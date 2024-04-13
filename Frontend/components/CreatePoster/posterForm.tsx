@@ -71,7 +71,7 @@ const PosterForm: React.FC = () => {
       minAutos,
       maxAutos,
     } = data;
-    const size = `${height} X ${width}`;
+    const size = `${height}H X ${width}W`;
     const sft = height * width;
     try {
       const resData = await fetch("http://localhost:4000/poster/add", {

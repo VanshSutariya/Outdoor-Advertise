@@ -41,7 +41,7 @@ const SearchBar: React.FC = (props) => {
             <option value=""> Airports/Railways</option>
           </select>
         </div>
-        <div className="flex md:w-1/4 items-center justify-center w-full text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600">
+        <div className="flex w-full md:w-[64px] md:h-16 h-[50px] items-center justify-center  text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600">
           <button>
             <FaSearch size={26} />
           </button>
