@@ -33,7 +33,7 @@ const SearchBar: React.FC = (props) => {
             id="month"
             className="bg-transparent focus:outline-none border-none pt-2"
           >
-            <option value="" defaultValue="selected">
+            <option value="" disabled selected>
               ---Select Media Type--
             </option>
             <option value=""> BillBoard Hoarding</option>
@@ -41,7 +41,7 @@ const SearchBar: React.FC = (props) => {
             <option value=""> Airports/Railways</option>
           </select>
         </div>
-        <div className="flex w-full md:w-[64px] md:h-16 h-[50px] items-center justify-center  text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600">
+        <div className="flex w-full md:w-[60px] mr-[4px] mt-[4px] md:h-14 h-[50px] items-center justify-center  text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600">
           <button>
             <FaSearch size={26} />
           </button>

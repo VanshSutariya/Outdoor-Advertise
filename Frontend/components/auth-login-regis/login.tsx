@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginIn } from "../../store/auth-slice";
 import { decode } from "jsonwebtoken";
+import ForgotPassword from "./forgetPasswordPopUp";
 import fetchUser from "../../utils/http";
 // import Cookies from "js-cookie";
 
@@ -15,6 +16,7 @@ const SignIn: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<string | null>(null);
+  const [showForgotpassword, setShowForgotPassword] = useState(false);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
@@ -52,13 +54,20 @@ const SignIn: React.FC = () => {
         fetchUserFunc();
       }
       alert("Login Successfully");
-
       router.push("/");
     } catch (error) {
       setErrorState(error.message);
       console.log(error.message);
     }
   }
+
+  const handleForgotPasswordClick = () => {
+    setShowForgotPassword(true);
+  };
+
+  const closeForgotPasswordPopup = () => {
+    setShowForgotPassword(false);
+  };
 
   return (
     <section className="m-8 flex gap-4">
@@ -101,6 +110,16 @@ const SignIn: React.FC = () => {
             <div className="text-red-500 ml-2 -mt-2 mb-2">
               {errors.password?.message}
             </div>
+            <p className="mt-2">
+              {/* Forgot Password-------------------- */}
+              <button
+                type="button"
+                className="text-blue-600 hover:underline focus:outline-none"
+                onClick={handleForgotPasswordClick}
+              >
+                Forgot your password?
+              </button>
+            </p>
           </div>
           {errorState && (
             <div className="text-red-500 ml-2 mt-2 mb-2 rounded-sm p-2 text-center font-bold">
@@ -127,6 +146,13 @@ const SignIn: React.FC = () => {
           height={800}
           priority
         />
+        {showForgotpassword && (
+          <ForgotPassword onClose={closeForgotPasswordPopup} />
+        )}
+        {/* Blur background overlay */}
+        {showForgotpassword && (
+          <div className="fixed inset-0 bg-black opacity-60"></div>
+        )}
       </div>
     </section>
   );

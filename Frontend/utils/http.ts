@@ -26,8 +26,8 @@ export async function fetchAllPoster({
   page,
   per_page,
 }: {
-  page: number,
-  per_page: number,
+  page: number;
+  per_page: number;
 }): Promise<any[]> {
   const resData = await fetch(
     `http://localhost:4000/poster?page=${page}&per_page=${per_page}`,
@@ -47,4 +47,14 @@ export async function fetchOnePoster(id: string): Promise<any> {
   });
   const poster = await resData.json();
   return poster;
+}
+
+export async function forgotPassword(email: string): Promise<String> {
+  const resData = await fetch("http://localhost:4000/auth/forget-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(email),
+  });
+  const resp = await resData.json();
+  return resp;
 }

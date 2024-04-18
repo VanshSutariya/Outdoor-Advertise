@@ -66,7 +66,7 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
       <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mx-auto justify-items-center ">
         {posterData.map((poster: Poster) => (
           <div
-            className="my-4 rounded-lg hover:shadow-xl hover:scale-105 hover:shadow-neutral-300 "
+            className="mt-6 rounded-lg hover:shadow-xl  hover:shadow-neutral-300 "
             key={poster._id}
           >
             <PosterItem {...poster} />

@@ -25,6 +25,7 @@ const NavBar: React.FC = () => {
           const userName = await fetchUser(decodedToken.id);
           dispatch(loginIn(userName));
         };
+
         fetchUserFunc();
       }
     }

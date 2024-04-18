@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef, useState } from "react";
 import { addDays, max } from "date-fns";
 import { differenceInDays } from "date-fns";
@@ -23,21 +24,33 @@ const DatePicker: React.FC<DatePickerProps> = ({
   rickshaws,
   minauto,
   maxauto,
-  bookingDate,
+  bookingDate = [],
 }) => {
   const windowWidth = useFindWidth();
   const [bookingDates, setBookingDates] = useState<string[]>([]);
   const [diffInDays, setDiffInDays] = useState<number>(0);
-  const noOfAuto = useRef<HTMLInputElement>();
+  const noOfAuto = useRef<HTMLInputElement>(null);
   const [autoInputError, setAutoInputError] = useState<string | null>(null);
 
   const { user, isLoggedIn }: { user: string | null; isLoggedIn: boolean } =
     useSelector((state: RootState) => state.auth);
 
+  const calculateMinDate = (): Date => {
+    let nextAvailableDate = new Date();
+    const arr = bookingDate;
+    console.log(arr);
+    while (arr.includes(nextAvailableDate.toLocaleDateString())) {
+      nextAvailableDate = addDays(nextAvailableDate, 1);
+    }
+    console.log("first", nextAvailableDate);
+
+    return nextAvailableDate;
+  };
+
   const [state, setState] = useState([
     {
-      startDate: new Date(),
-      endDate: addDays(new Date(), minDays),
+      startDate: calculateMinDate(), // Set the start date dynamically
+      endDate: addDays(calculateMinDate(), minDays ? minDays : 3), // Adjust the end date accordingly
       key: "selection",
     },
   ]);
@@ -45,8 +58,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const clearDates = () => {
     setState([
       {
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: calculateMinDate(),
+        endDate: addDays(calculateMinDate(), minDays),
         key: "selection",
       },
     ]);
@@ -55,7 +68,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
   useEffect(() => {
     const diff = differenceInDays(state[0].endDate, state[0].startDate) + 1;
     setDiffInDays(diff);
+  }, [state]);
 
+  const handleBookedDates = () => {
     const startDate = state[0].startDate;
     const endDate = state[0].endDate;
 
@@ -69,10 +84,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
     }
 
     setBookingDates([...bookingDate, ...datesArray]);
-  }, [state, diffInDays]);
-
-  const handleBookedDates = () => {
-    console.log(bookingDates);
   };
 
   const handleAutoChange = () => {
@@ -91,11 +102,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
       parseInt(noOfAuto.current.value, 10) * price * diffInDays
     : price * diffInDays;
 
-  console.log(
-    state[0].startDate.toLocaleDateString(),
-    state[0].endDate.toLocaleDateString()
-  );
-
   return (
     <>
       <div className=" md:flex">
@@ -103,14 +109,13 @@ const DatePicker: React.FC<DatePickerProps> = ({
           <DateRange
             onChange={(item) => setState([item.selection])}
             ranges={state}
-            minDate={new Date()}
+            minDate={calculateMinDate()}
             rangeColors={["#EC7A20"]}
             months={2}
             direction={windowWidth < 780 ? "vertical" : "horizontal"}
             showSelectionPreview={true}
             moveRangeOnFirstSelection={false}
             disabledDates={bookingDate}
-            // disabledDates={bookedDates}
           />
           <div className=" pb-5 mt-3 ">
             <button

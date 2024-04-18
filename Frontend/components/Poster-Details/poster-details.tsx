@@ -1,3 +1,4 @@
+"use client";
 import { fetchOnePoster } from "../../utils/http";
 import { useEffect, useState } from "react";
 import DatePicker from "./date-range-picker";
@@ -27,29 +28,18 @@ interface PosterDetailsProps {
 }
 
 const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
-  const [posterData, setPosterData] = useState<PosterData>({
-    image: "",
-    title: "",
-    price: 0,
-    size: "",
-    sft: 0,
-    lightingType: "",
-    address: "",
-    facingFrom: "",
-    state: "",
-    city: "",
-    minimumDays: 0,
-    mediatype: "",
-    maxAutos: 0,
-    minAutos: 0,
-    bookingDate: [],
-  });
+  const [loading, setLoading] = useState(true);
+  const [posterData, setPosterData] = useState<PosterData>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const resData: PosterData = await fetchOnePoster(id);
-        setPosterData(resData);
+        // Simulate loading for 1 second
+        setTimeout(() => {
+          setPosterData(resData);
+          setLoading(false);
+        }, 1000);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -58,6 +48,17 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
     fetchData();
   }, [id]);
 
+  if (loading) {
+    return (
+      <div className=" flex justify-center text-2xl font-bold mt-16 mb-16 ">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!posterData) {
+    return <div>Error: Failed to fetch poster data</div>;
+  }
   const lat: number = 23.02436884189762;
   const lng: number = 72.53198504447938;
   const url: string = `https://maps.google.com/maps?q=${lat},${lng}&output=embed`;
@@ -71,6 +72,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
     "createdAt",
     "updatedAt",
   ];
+
   const dataEntries = Object.entries(posterData).filter(
     ([key]) => !excludeFields.includes(key)
   );
