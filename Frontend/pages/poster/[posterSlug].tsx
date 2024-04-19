@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 const PosterSlugPage = () => {
   const router = useRouter();
   const id: string | string[] | undefined = router.query.posterSlug;
+
   return (
     <main className="overflow-auto">
       <NavBar />

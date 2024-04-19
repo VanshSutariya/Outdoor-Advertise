@@ -36,10 +36,10 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
       try {
         const resData: PosterData = await fetchOnePoster(id);
         // Simulate loading for 1 second
+        setPosterData(resData);
         setTimeout(() => {
-          setPosterData(resData);
           setLoading(false);
-        }, 1000);
+        }, 500);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

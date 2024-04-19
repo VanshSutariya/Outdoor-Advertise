@@ -19,5 +19,8 @@ module.exports = withUt({
       },
     },
   },
-  plugins: [],
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["light"],
+  },
 });

@@ -38,19 +38,48 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const calculateMinDate = (): Date => {
     let nextAvailableDate = new Date();
     const arr = bookingDate;
-    console.log(arr);
+
+    // Find the next available date that is not in the bookingDate array
     while (arr.includes(nextAvailableDate.toLocaleDateString())) {
       nextAvailableDate = addDays(nextAvailableDate, 1);
     }
-    console.log("first", nextAvailableDate);
 
-    return nextAvailableDate;
+    let startDate = nextAvailableDate;
+    console.log("startdate", startDate);
+
+    // Find the end date based on the minimum days
+    const md = Number(minDays) - 1;
+    console.log(md, "md========================");
+    console.log(addDays(startDate, md), "enddate=================");
+
+    let endDate = addDays(startDate, md);
+
+    // Check if there are any disabled dates or already booked dates between the start and end date
+    for (
+      let date = new Date(startDate);
+      date <= endDate;
+      date.setDate(date.getDate() + 1)
+    ) {
+      if (arr.includes(date.toLocaleDateString())) {
+        // If a disabled date is found, adjust the start date accordingly
+        startDate = addDays(date, 1);
+        // Reset the end date based on the adjusted start date
+        const mdd = Number(minDays) - 1;
+        console.log(mdd);
+        endDate = addDays(startDate, mdd);
+        console.log(endDate);
+        // Reset the loop to check again from the adjusted start date
+        // date = new Date(startDate);
+      }
+    }
+
+    return startDate;
   };
 
   const [state, setState] = useState([
     {
       startDate: calculateMinDate(), // Set the start date dynamically
-      endDate: addDays(calculateMinDate(), minDays ? minDays : 3), // Adjust the end date accordingly
+      endDate: addDays(calculateMinDate(), minDays ? minDays - 1 : 3), // Adjust the end date accordingly
       key: "selection",
     },
   ]);

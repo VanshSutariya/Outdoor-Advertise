@@ -71,6 +71,13 @@ export class AuthController {
 
   @Patch('/update-password')
   async updatePassword(@Body() updatePassDto: UpdatePassDto) {
-    return this.authService.updatepassword(updatePassDto);
+    try {
+      return await this.authService.updatepassword(updatePassDto);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Internal server error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

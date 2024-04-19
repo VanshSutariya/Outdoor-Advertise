@@ -17,7 +17,7 @@ export default function Home() {
     totaldata();
   }, []);
   return (
-    <main className="">
+    <main className="bg-white">
       <div className="bg-white sticky w-full z-50 top-0 shadow-sm">
         <Header />
         {/* <BgImage /> */}

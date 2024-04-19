@@ -134,14 +134,14 @@ export class AuthService {
       const { email, currentPassword, newPassword } = newPass;
       const user = await this.userModel.findOne({ email });
       if (!user) {
-        return 'No user found';
+        throw new Error('Invalid email.');
       }
       const isPassCorrect = await bcrypt.compare(
         currentPassword,
         user.password,
       );
       if (!isPassCorrect) {
-        return 'Your Current Password is wrong.';
+        throw new Error('Your Current Password is wrong.');
       }
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       user.password = hashedPassword;
@@ -151,8 +151,8 @@ export class AuthService {
         message: 'Successfully password has been updated',
       };
     } catch (error) {
-      console.error(error.message);
-      return `${error.message}`;
+      console.error('Password reset failed:', error.message);
+      throw error;
     }
   }
 }

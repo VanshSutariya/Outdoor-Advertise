@@ -107,7 +107,7 @@ const NavBar: React.FC = () => {
           )}
           {isLoggedIn && user && (
             <div className="md:flex hidden items-center font-semibold space-x-4">
-              <div className='flex flex-col items-center justify-center w-full"'>
+              <div className='flex items-center justify-center w-full"'>
                 <Link href="/">
                   <img
                     src="/shopping-cart.png"
@@ -116,13 +116,39 @@ const NavBar: React.FC = () => {
                   />
                 </Link>
               </div>
-              <p className="text-xl text-black">{user}</p>
-              <button
-                onClick={handleLogout}
-                className="text-white bg-black hover:bg-gray-700 active:bg-gray-900 px-4 py-2 rounded-3xl"
-              >
-                <Link href="/">LogOut</Link>
-              </button>
+              <div className=" dropdown dropdown-end">
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="flex btn btn-ghost btn-circle avatar"
+                >
+                  <div className="w-20 border-[3px]  border-gray-900  rounded-full">
+                    <img alt="Tailwind CSS Navbar component" src="/user.png" />
+                  </div>
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="mt-3 z-[1] p-2 w-55  shadow menu menu-sm dropdown-content bg-base-100 rounded-box "
+                >
+                  <li className="w-55 items-center">
+                    <p className="border-b-gray-900 bg-gray-">
+                      sutariyavansh@gmail.in
+                    </p>
+                  </li>
+                  <li className="w-full items-center">
+                    <a className="">Profile</a>
+                  </li>
+                  <li className="w-full items-center">
+                    <Link href="/">
+                      {" "}
+                      <button onClick={handleLogout}>Logout</button>
+                    </Link>
+                  </li>
+                  <li className="w-full items-center">
+                    <Link href="/updatePassword">Update Password</Link>
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
 

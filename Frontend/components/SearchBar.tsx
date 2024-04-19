@@ -33,7 +33,7 @@ const SearchBar: React.FC = (props) => {
             id="month"
             className="bg-transparent focus:outline-none border-none pt-2"
           >
-            <option value="" disabled selected>
+            <option value="" disabled>
               ---Select Media Type--
             </option>
             <option value=""> BillBoard Hoarding</option>

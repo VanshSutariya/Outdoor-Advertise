@@ -32,6 +32,7 @@ const Billing: React.FC<BillingType> = ({
   noOfAuto,
   isLoggedIn,
 }) => {
+  console.log(rickshaws);
   return (
     <>
       <div className=" p-5 border-[2px]  border-gray-200 shadow-md shadow-gray-300 rounded-2xl">
@@ -68,14 +69,14 @@ const Billing: React.FC<BillingType> = ({
         <div className="text-center">
           {diffInDays > minDays ? (
             <>
-              {rickshaws &&
+              {/* {rickshaws &&
                 Number(noOfAuto.current.value) >= minauto &&
                 Number(noOfAuto.current.value) <= maxauto && (
                   <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
                     Reserve
                   </button>
                 )}
-              {!rickshaws && isLoggedIn ? (
+              {rickshaws && isLoggedIn ? (
                 <Link href="/">
                   <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
                     Reserve
@@ -90,7 +91,29 @@ const Billing: React.FC<BillingType> = ({
                     Reserve
                   </button>
                 </Link>
+              )} */}
+
+              {rickshaws &&
+              Number(noOfAuto.current.value) >= minauto &&
+              Number(noOfAuto.current.value) <= maxauto ? (
+                <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
+                  Reserve
+                </button>
+              ) : (
+                <>
+                  {!rickshaws && isLoggedIn && (
+                    <Link href="/">
+                      <button
+                        onClick={handleBookedDates}
+                        className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
+                      >
+                        Reserve
+                      </button>
+                    </Link>
+                  )}
+                </>
               )}
+
               {rickshaws && noOfAuto && diffInDays && (
                 <div className=" bg-transparent  border-2 border-black mt-3 rounded-lg  ">
                   <p className="text-lg font-mono">
@@ -103,9 +126,15 @@ const Billing: React.FC<BillingType> = ({
               )}
             </>
           ) : (
-            <p className="p-2 mb-2 text-xl font-mono bg-orange-500 rounded-md mt-3">
-              Select Minimum {minDays} days
-            </p>
+            <>
+              {rickshaws &&
+                Number(noOfAuto.current?.value) >= minauto &&
+                Number(noOfAuto.current?.value) <= maxauto && (
+                  <p className="p-2 mb-2 text-xl font-mono bg-orange-500 rounded-md mt-3">
+                    Select Minimum {minDays} days
+                  </p>
+                )}
+            </>
           )}
         </div>
         <div className=" border-b-[2px] border-b-gray-300">
