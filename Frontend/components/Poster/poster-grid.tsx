@@ -21,7 +21,7 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
 
-  let per_page: number = 6;
+  let per_page: number = 8;
   const totalPages: number = Math.ceil(totalLength / per_page);
   let isPageOutOfRange: boolean;
 

@@ -56,7 +56,7 @@ export class PosterDetailsService {
     // const id = `pid${count + 1}`;
     const newPoster = await this.postersModel.create(createposterDto);
     if (!newPoster)
-      throw new HttpException('New Poster/Hoardoing is not Created.', 404);
+      throw new HttpException('New Poster/Hoarding is not Created.', 404);
     return newPoster;
   }
 

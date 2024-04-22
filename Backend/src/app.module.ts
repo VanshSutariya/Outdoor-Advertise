@@ -5,6 +5,10 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PosterDetailsModule } from './poster-details/poster-details.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CartController } from './cart/cart.controller';
+import { CartModule } from './cart/cart.module';
+import { StripeController } from './stripe/stripe.controller';
+import { StripeModule } from './stripe/stripe.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,6 +29,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
         },
       },
     }),
+    CartModule,
+    StripeModule,
   ],
   controllers: [],
   providers: [],

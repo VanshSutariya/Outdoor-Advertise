@@ -11,6 +11,10 @@ import { RootState } from "../../store";
 import Billing from "./billing";
 
 interface DatePickerProps {
+  id: string;
+  image: string;
+  title: string;
+  address: string;
   price: number;
   minDays: number;
   rickshaws: boolean;
@@ -19,6 +23,10 @@ interface DatePickerProps {
   bookingDate: string[];
 }
 const DatePicker: React.FC<DatePickerProps> = ({
+  id,
+  image,
+  title,
+  address,
   price,
   minDays,
   rickshaws,
@@ -27,13 +35,13 @@ const DatePicker: React.FC<DatePickerProps> = ({
   bookingDate = [],
 }) => {
   const windowWidth = useFindWidth();
-  const [bookingDates, setBookingDates] = useState<string[]>([]);
   const [diffInDays, setDiffInDays] = useState<number>(0);
   const noOfAuto = useRef<HTMLInputElement>(null);
   const [autoInputError, setAutoInputError] = useState<string | null>(null);
 
-  const { user, isLoggedIn }: { user: string | null; isLoggedIn: boolean } =
-    useSelector((state: RootState) => state.auth);
+  const { isLoggedIn }: { isLoggedIn: boolean } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const calculateMinDate = (): Date => {
     let nextAvailableDate = new Date();
@@ -45,13 +53,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
     }
 
     let startDate = nextAvailableDate;
-    console.log("startdate", startDate);
-
     // Find the end date based on the minimum days
     const md = Number(minDays) - 1;
-    console.log(md, "md========================");
-    console.log(addDays(startDate, md), "enddate=================");
-
     let endDate = addDays(startDate, md);
 
     // Check if there are any disabled dates or already booked dates between the start and end date
@@ -65,9 +68,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
         startDate = addDays(date, 1);
         // Reset the end date based on the adjusted start date
         const mdd = Number(minDays) - 1;
-        console.log(mdd);
         endDate = addDays(startDate, mdd);
-        console.log(endDate);
         // Reset the loop to check again from the adjusted start date
         // date = new Date(startDate);
       }
@@ -83,12 +84,24 @@ const DatePicker: React.FC<DatePickerProps> = ({
       key: "selection",
     },
   ]);
+  console.log("initial state ================", state);
 
+  const NextAvailableDate = (): Date => {
+    let nextAvailableDate = new Date();
+    const arr = bookingDate;
+
+    // Find the next available date that is not in the bookingDate array
+    while (arr.includes(nextAvailableDate.toLocaleDateString())) {
+      nextAvailableDate = addDays(nextAvailableDate, 1);
+    }
+
+    return nextAvailableDate;
+  };
   const clearDates = () => {
     setState([
       {
-        startDate: calculateMinDate(),
-        endDate: addDays(calculateMinDate(), minDays),
+        startDate: NextAvailableDate(),
+        endDate: NextAvailableDate(),
         key: "selection",
       },
     ]);
@@ -98,22 +111,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
     const diff = differenceInDays(state[0].endDate, state[0].startDate) + 1;
     setDiffInDays(diff);
   }, [state]);
-
-  const handleBookedDates = () => {
-    const startDate = state[0].startDate;
-    const endDate = state[0].endDate;
-
-    const datesArray = [];
-    for (
-      let date = new Date(startDate);
-      date <= endDate;
-      date.setDate(date.getDate() + 1)
-    ) {
-      datesArray.push(new Date(date).toLocaleDateString());
-    }
-
-    setBookingDates([...bookingDate, ...datesArray]);
-  };
 
   const handleAutoChange = () => {
     const inputValue = parseInt(noOfAuto.current!.value, 10);
@@ -157,19 +154,23 @@ const DatePicker: React.FC<DatePickerProps> = ({
           </div>
         </div>
         <Billing
-          handleBookedDates={handleBookedDates}
-          handleAutoChange={handleAutoChange}
-          totalPrice={totalPrice}
-          diffInDays={diffInDays}
-          isLoggedIn={isLoggedIn}
+          id={id}
+          title={title}
+          image={image}
+          address={address}
+          price={price}
+          state={state}
           maxauto={maxauto}
           minauto={minauto}
           minDays={minDays}
-          autoInputError={autoInputError}
-          price={price}
-          rickshaws={rickshaws}
-          state={state}
           noOfAuto={noOfAuto}
+          rickshaws={rickshaws}
+          totalPrice={totalPrice}
+          diffInDays={diffInDays}
+          isLoggedIn={isLoggedIn}
+          bookingDate={bookingDate}
+          autoInputError={autoInputError}
+          handleAutoChange={handleAutoChange}
         />
       </div>
     </>

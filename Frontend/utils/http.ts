@@ -10,7 +10,7 @@ export default async function fetchUser(id: string): Promise<string> {
 
   const user = await resData.json();
   console.log(user);
-  return user.name;
+  return user;
 }
 
 export async function fetchAllPosters(): Promise<any[]> {
@@ -54,6 +54,15 @@ export async function forgotPassword(email: string): Promise<String> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(email),
+  });
+  const resp = await resData.json();
+  return resp;
+}
+
+export async function deleteAllCartData(userId: string): Promise<String> {
+  const resData = await fetch(`http://localhost:4000/cart/${userId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
   });
   const resp = await resData.json();
   return resp;

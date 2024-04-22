@@ -10,15 +10,12 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { PosterDetailsService } from './poster-details.service';
 import { CreatePosterDto } from './dto/createPoster.dto';
 import { UpdatePosterDto } from './dto/updatePoster.dto';
 import mongoose from 'mongoose';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { AuthGuard } from '@nestjs/passport';
 

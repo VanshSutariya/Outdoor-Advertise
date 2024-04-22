@@ -5,14 +5,27 @@ import { RootState } from "../store";
 import { loginIn, logout } from "../store/auth-slice";
 import { decode } from "jsonwebtoken";
 import fetchUser from "../utils/http";
+import { FaUserLarge } from "react-icons/fa6";
+import Cart from "./Cart/cart";
+
 const NavBar: React.FC = () => {
   const dispatch = useDispatch();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
-  const { user, isLoggedIn }: { user: string | null; isLoggedIn: boolean } =
+  const {
+    userId,
+    userName,
+    isLoggedIn,
+  }: { userId: string | null; userName: string | null; isLoggedIn: boolean } =
     useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
+    document.cookie =
+      "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/poster;";
+    document.cookie =
+      "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/resetPassword;";
+    dispatch(logout());
+
     const jwtCookie = document.cookie
       .split("; ")
       .find((row) => row.startsWith("jwt="));
@@ -61,14 +74,14 @@ const NavBar: React.FC = () => {
           className="md:hidden flex cursor-pointer max-w-sm"
           onClick={handleMobileMenuToggle}
         >
-          {isLoggedIn && user && (
+          {isLoggedIn && userId && (
             <div className="  sm:flex mr-4 md:hidden items-center font-semibold space-x-4">
               <div className='flex flex-col items-center justify-center w-full"'>
                 <Link href="/">
                   <img
                     src="/shopping-cart.png"
                     alt="Logo"
-                    className=" h-[50px]"
+                    className=" h-[35px]"
                   />
                 </Link>
               </div>
@@ -105,47 +118,39 @@ const NavBar: React.FC = () => {
               </button>
             </div>
           )}
-          {isLoggedIn && user && (
+          {isLoggedIn && userId && (
             <div className="md:flex hidden items-center font-semibold space-x-4">
               <div className='flex items-center justify-center w-full"'>
-                <Link href="/">
-                  <img
-                    src="/shopping-cart.png"
-                    alt="Logo"
-                    className=" h-[50px]"
-                  />
-                </Link>
+                {/* Cart------------------ */}
+                <Cart />
               </div>
+              {/* profile dropdown */}
               <div className=" dropdown dropdown-end">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="flex btn btn-ghost btn-circle avatar"
-                >
-                  <div className="w-20 border-[3px]  border-gray-900  rounded-full">
-                    <img alt="Tailwind CSS Navbar component" src="/user.png" />
+                <div tabIndex={0} role="button" className="flex ">
+                  <div className="flex items-center border-[2px] p-2 hover:bg-gray-200 rounded-3xl">
+                    <div className=" items-center">
+                      <p className="text-lg p-1">{userName}</p>
+                    </div>
+                    <div className="p-1">
+                      <FaUserLarge size={32} />
+                    </div>
                   </div>
                 </div>
                 <ul
                   tabIndex={0}
-                  className="mt-3 z-[1] p-2 w-55  shadow menu menu-sm dropdown-content bg-base-100 rounded-box "
+                  className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box "
                 >
-                  <li className="w-55 items-center">
-                    <p className="border-b-gray-900 bg-gray-">
-                      sutariyavansh@gmail.in
-                    </p>
+                  <li className=" items-center">
+                    <a>Profile</a>
                   </li>
-                  <li className="w-full items-center">
-                    <a className="">Profile</a>
-                  </li>
-                  <li className="w-full items-center">
+                  <li className=" items-center">
                     <Link href="/">
                       {" "}
                       <button onClick={handleLogout}>Logout</button>
                     </Link>
                   </li>
-                  <li className="w-full items-center">
-                    <Link href="/updatePassword">Update Password</Link>
+                  <li className=" items-center">
+                    <Link href="/updatePassword">UpdatePassword</Link>
                   </li>
                 </ul>
               </div>

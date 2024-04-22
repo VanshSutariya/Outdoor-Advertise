@@ -1,25 +1,32 @@
-import { log } from "console";
 import Link from "next/link";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { cartActions } from "../../store/cart-slice";
+import { RootState } from "../../store";
 
 interface BillingType {
   handleAutoChange: () => void;
-  totalPrice: number;
-  diffInDays: number;
+  id: string;
+  price: number;
+  image: string;
+  title: string;
+  address: string;
   maxauto: number;
   minauto: number;
   minDays: number;
+  totalPrice: number;
+  diffInDays: number;
   autoInputError: string;
-  price: number;
   rickshaws: boolean;
-  state: { startDate: Date; endDate: Date; key: string }[];
-  noOfAuto: React.RefObject<HTMLInputElement>;
   isLoggedIn: boolean;
-  handleBookedDates: () => void;
+  bookingDate: string[];
+  noOfAuto: React.RefObject<HTMLInputElement>;
+  state: { startDate: Date; endDate: Date; key: string }[];
 }
 
 const Billing: React.FC<BillingType> = ({
   handleAutoChange,
-  handleBookedDates,
+  id,
   totalPrice,
   diffInDays,
   maxauto,
@@ -29,10 +36,52 @@ const Billing: React.FC<BillingType> = ({
   price,
   rickshaws,
   state,
+  image,
+  title,
+  address,
   noOfAuto,
-  isLoggedIn,
+  bookingDate,
 }) => {
-  console.log(rickshaws);
+  const dispatch = useDispatch();
+
+  const {
+    userId,
+    userName,
+    isLoggedIn,
+  }: { userId: string | null; userName: string | null; isLoggedIn: boolean } =
+    useSelector((state: RootState) => state.auth);
+
+  const [bookingDates, setBookingDates] = useState<string[]>([]);
+
+  const addToCartHandler = () => {
+    const startDate = state[0].startDate;
+    const endDate = state[0].endDate;
+
+    const datesArray = [];
+    for (
+      let date = new Date(startDate);
+      date <= endDate;
+      date.setDate(date.getDate() + 1)
+    ) {
+      datesArray.push(new Date(date).toLocaleDateString());
+    }
+
+    const updatedBookingDates = [...bookingDate, ...datesArray];
+    setBookingDates(updatedBookingDates);
+
+    const posterId = id;
+    dispatch(
+      cartActions.addItemToCart({
+        posterId,
+        image,
+        userId,
+        title,
+        address,
+        totalPrice,
+        bookingDates: updatedBookingDates,
+      })
+    );
+  };
   return (
     <>
       <div className=" p-5 border-[2px]  border-gray-200 shadow-md shadow-gray-300 rounded-2xl">
@@ -67,51 +116,53 @@ const Billing: React.FC<BillingType> = ({
           <p className="text-red-500 text-lg">{autoInputError}</p>
         )}
         <div className="text-center">
-          {diffInDays > minDays ? (
+          {diffInDays >= minDays ? (
             <>
-              {/* {rickshaws &&
+              {rickshaws ? (
                 Number(noOfAuto.current.value) >= minauto &&
-                Number(noOfAuto.current.value) <= maxauto && (
-                  <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
-                    Reserve
-                  </button>
-                )}
-              {rickshaws && isLoggedIn ? (
-                <Link href="/">
-                  <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
-                    Reserve
-                  </button>
-                </Link>
-              ) : (
-                <Link href="/">
-                  <button
-                    onClick={handleBookedDates}
-                    className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
-                  >
-                    Reserve
-                  </button>
-                </Link>
-              )} */}
-
-              {rickshaws &&
-              Number(noOfAuto.current.value) >= minauto &&
-              Number(noOfAuto.current.value) <= maxauto ? (
-                <button className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950">
-                  Reserve
-                </button>
-              ) : (
-                <>
-                  {!rickshaws && isLoggedIn && (
-                    <Link href="/">
+                Number(noOfAuto.current.value) <= maxauto ? (
+                  isLoggedIn ? (
+                    <Link href="#">
                       <button
-                        onClick={handleBookedDates}
+                        // onClick={}
                         className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
                       >
                         Reserve
                       </button>
                     </Link>
-                  )}
-                </>
+                  ) : (
+                    <Link href="/login">
+                      <button
+                        // onClick={}
+                        className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
+                      >
+                        Reserve
+                      </button>
+                    </Link>
+                  )
+                ) : (
+                  <p className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg ">
+                    Add Proper Booking Quantity
+                  </p>
+                )
+              ) : isLoggedIn ? (
+                <Link href="#">
+                  <button
+                    onClick={addToCartHandler}
+                    className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
+                  >
+                    Add to Cart
+                  </button>
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <button
+                    // onClick={}
+                    className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-pink-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
+                  >
+                    Reserve
+                  </button>
+                </Link>
               )}
 
               {rickshaws && noOfAuto && diffInDays && (
@@ -127,13 +178,9 @@ const Billing: React.FC<BillingType> = ({
             </>
           ) : (
             <>
-              {rickshaws &&
-                Number(noOfAuto.current?.value) >= minauto &&
-                Number(noOfAuto.current?.value) <= maxauto && (
-                  <p className="p-2 mb-2 text-xl font-mono bg-orange-500 rounded-md mt-3">
-                    Select Minimum {minDays} days
-                  </p>
-                )}
+              <p className="p-2 mb-2 text-xl font-mono bg-orange-500 rounded-md mt-3">
+                Select Minimum {minDays} days
+              </p>
             </>
           )}
         </div>

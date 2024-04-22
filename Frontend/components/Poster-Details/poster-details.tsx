@@ -6,6 +6,7 @@ import { CiLocationOn } from "react-icons/ci";
 import { LiaTagSolid } from "react-icons/lia";
 
 interface PosterData {
+  id: number;
   image: string;
   title: string;
   price: number;
@@ -50,7 +51,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
 
   if (loading) {
     return (
-      <div className=" flex justify-center text-2xl font-bold mt-16 mb-16 ">
+      <div className=" flex justify-center text-2xl font-bold mt-16 mb-16 h-screen ">
         Loading...
       </div>
     );
@@ -146,7 +147,9 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
               <p className="-pl-3">
                 <span className="text-lg">Price </span>{" "}
                 <span className="text-xl ml-5 text-green-500 font-bold">
-                  ₹{posterData.price}/ perDay
+                  {posterData.mediatype === "Rickshaws"
+                    ? `₹${posterData.price}/ perAuto`
+                    : `₹${posterData.price}/ perDay`}
                 </span>
               </p>
             </div>
@@ -163,12 +166,16 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
       </div> */}
       <div className="justify-center flex pb-3">
         <DatePicker
+          title={posterData.title}
           price={posterData.price}
           minDays={posterData.minimumDays}
           rickshaws={posterData.mediatype === "Rickshaws" ? true : false}
           minauto={posterData.minAutos}
           maxauto={posterData.maxAutos}
           bookingDate={posterData.bookingDate}
+          id={id}
+          image={posterData.image}
+          address={posterData.address}
         />
       </div>
     </>
