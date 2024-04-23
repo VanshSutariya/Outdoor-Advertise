@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { deleteAllCartData } from "../utils/http";
 
 interface Item {
+  _id: any;
   userId: string;
   posterId: string;
   image: string;
@@ -12,10 +13,12 @@ interface Item {
 interface cartState {
   items: Item[];
   finalTotal: number;
+  cartId: string[];
 }
 const initialState: cartState = {
   items: [],
   finalTotal: 0,
+  cartId: [],
 };
 
 const cartSlice = createSlice({
@@ -45,6 +48,7 @@ const cartSlice = createSlice({
           title: details.title,
           totalPrice: details.totalPrice,
           address: details.address,
+          _id: "",
         });
         state.finalTotal += details.totalPrice;
         try {

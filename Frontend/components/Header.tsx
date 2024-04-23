@@ -6,7 +6,6 @@ import { loginIn, logout } from "../store/auth-slice";
 import { decode } from "jsonwebtoken";
 import fetchUser from "../utils/http";
 import { FaUserLarge } from "react-icons/fa6";
-import Cart from "./Cart/cart";
 
 const NavBar: React.FC = () => {
   const dispatch = useDispatch();
@@ -120,10 +119,15 @@ const NavBar: React.FC = () => {
           )}
           {isLoggedIn && userId && (
             <div className="md:flex hidden items-center font-semibold space-x-4">
-              <div className='flex items-center justify-center w-full"'>
-                {/* Cart------------------ */}
-                <Cart />
-              </div>
+              <Link href="/cart">
+                <button className="btn bg-transparent">
+                  <img
+                    src="/shopping-cart.png"
+                    alt="Logo"
+                    className=" h-[35px]"
+                  />
+                </button>
+              </Link>
               {/* profile dropdown */}
               <div className=" dropdown dropdown-end">
                 <div tabIndex={0} role="button" className="flex ">

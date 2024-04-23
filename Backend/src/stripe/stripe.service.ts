@@ -27,13 +27,21 @@ export class StripeService {
       quantity: 1,
     }));
 
+    const ids = items.map((item) => item._id);
+
+    const metadata = {
+      purchased_items: JSON.stringify(ids),
+    };
+
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
+      metadata: metadata,
       success_url: 'http://localhost:3000/success',
       cancel_url: 'http://localhost:3000/cart',
     });
+    // console.log('session', session);
 
     return session.url;
   }

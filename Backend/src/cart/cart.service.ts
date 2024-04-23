@@ -15,7 +15,6 @@ export class CartService {
     if (query?.userId) {
       DBQuery['userId'] = query?.userId;
     }
-    console.log(DBQuery);
 
     const resData = await this.cartModal.find(DBQuery);
     if (!resData) throw new HttpException('No Data in db.', 404);
@@ -26,6 +25,10 @@ export class CartService {
     const newCart = await this.cartModal.create(createCartDto);
     if (!newCart) throw new HttpException('Cart details is not added.', 404);
     return newCart;
+  }
+
+  async deleteCartById(id: string) {
+    return this.cartModal.findByIdAndDelete(id);
   }
 
   async deleteFromCart(userId: string, posterId: string): Promise<Cart> {

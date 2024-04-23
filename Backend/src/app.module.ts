@@ -9,6 +9,7 @@ import { CartController } from './cart/cart.controller';
 import { CartModule } from './cart/cart.module';
 import { StripeController } from './stripe/stripe.controller';
 import { StripeModule } from './stripe/stripe.module';
+import { StripeWebhookModule } from './stripe-webhook/stripe-webhook.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +32,7 @@ import { StripeModule } from './stripe/stripe.module';
     }),
     CartModule,
     StripeModule,
+    StripeWebhookModule,
   ],
   controllers: [],
   providers: [],

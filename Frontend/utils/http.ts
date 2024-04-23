@@ -9,7 +9,6 @@ export default async function fetchUser(id: string): Promise<string> {
   });
 
   const user = await resData.json();
-  console.log(user);
   return user;
 }
 

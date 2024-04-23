@@ -12,7 +12,6 @@ import Link from "next/link";
 export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [checkout, setCheckout] = useState(false);
   const { userId }: { userId: string | null } = useSelector(
     (state: RootState) => state.auth
   );
@@ -26,8 +25,6 @@ export default function CartPage() {
           throw new Error("Failed to fetch cart data.");
         }
         const data = await res.json();
-        console.log(data);
-
         // Dispatch an action to update Redux state with fetched cart data
         dispatch(cartActions.setCartItems(data));
       } catch (error) {
@@ -47,7 +44,6 @@ export default function CartPage() {
   }
 
   async function handleCheckout() {
-    setCheckout(true);
     try {
       const response = await fetch("http://localhost:4000/stripe/checkout", {
         method: "POST",

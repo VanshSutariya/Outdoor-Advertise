@@ -6,6 +6,7 @@ interface Items {
   totalPrice: number;
   image: string;
   title: string;
+  _id: string;
 }
 @Controller('stripe')
 export class StripeController {
