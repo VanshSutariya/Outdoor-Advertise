@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
-
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PosterDetailsModule } from './poster-details/poster-details.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { CartController } from './cart/cart.controller';
 import { CartModule } from './cart/cart.module';
-import { StripeController } from './stripe/stripe.controller';
 import { StripeModule } from './stripe/stripe.module';
 import { StripeWebhookModule } from './stripe-webhook/stripe-webhook.module';
+import { BookingModule } from './booking/booking.module';
+import { UserRoleChangeController } from './user-role-change/user-role-change.controller';
+import { UserRoleChangeService } from './user-role-change/user-role-change.service';
+import { UserRoleChangeModule } from './user-role-change/user-role-change.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +34,8 @@ import { StripeWebhookModule } from './stripe-webhook/stripe-webhook.module';
     CartModule,
     StripeModule,
     StripeWebhookModule,
+    BookingModule,
+    UserRoleChangeModule,
   ],
   controllers: [],
   providers: [],

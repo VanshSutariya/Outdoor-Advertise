@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import PosterItem from "./poster-item";
-import { fetchAllPoster } from "../../utils/http";
+import React, { useEffect, useState } from 'react';
+import PosterItem from './poster-item';
+import { fetchAllPoster } from '../../utils/http';
 
 interface Poster {
   _id: string;
@@ -21,7 +21,7 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
 
-  let per_page: number = 8;
+  let per_page: number = 6;
   const totalPages: number = Math.ceil(totalLength / per_page);
   let isPageOutOfRange: boolean;
 
@@ -39,10 +39,9 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
             pageNumbers.push(i);
           }
         }
-        console.log(pageNumbers);
         setPageNumbers(pageNumbers);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -63,10 +62,10 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
 
   return (
     <>
-      <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mx-auto justify-items-center ">
+      <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-2 mx-auto justify-items-center ">
         {posterData.map((poster: Poster) => (
           <div
-            className="mt-6 rounded-lg hover:shadow-xl  hover:shadow-neutral-300 "
+            className="mt-8 rounded-lg transform inline-block overflow-hidden transition-transform duration-300  hover:scale-130"
             key={poster._id}
           >
             <PosterItem {...poster} />
@@ -78,7 +77,7 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
           <div>No more pages...</div>
         ) : (
           <div className="flex justify-center items-center mt-16">
-            <div className="flex border-[2px] gap-4 rounded-[10px] border-black p-4">
+            <div className="flex border-[2px] gap-4 rounded-[10px] border-black p-2">
               {page === 1 ? (
                 <div className="opacity-60" aria-disabled="true">
                   Previous
@@ -98,8 +97,8 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
                   key={index}
                   className={
                     page === pageNumber
-                      ? "bg-green-500 fw-bold px-2 rounded-md text-black "
-                      : "hover:bg-green-500 px-1 rounded-md "
+                      ? 'bg-gray-800 fw-bold px-2 rounded-md text-white '
+                      : 'hover:bg-gray-800 hover:text-white px-1 rounded-md '
                   }
                   onClick={() => handlePagebutton(pageNumber)}
                 >

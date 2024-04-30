@@ -1,7 +1,7 @@
-import { FaSearch } from "react-icons/fa";
+import { FaSearch } from 'react-icons/fa';
 const SearchBar: React.FC = (props) => {
   return (
-    <form className=" px-12 md:flex justify-center items-center font-sans pt-5 ">
+    <form className="px-12 md:flex justify-center items-center font-inter pt-5 ">
       <div className="bar w-700 md:border-[1px] bg-white shadow-md  md:rounded-full  md:flex justify-center md:text-sm ">
         <div className="md:w-1/3 items-center justify-center w-full  rounded-full px-6 py-2 transition-all duration-250 ease-in-out  hover:bg-gray-200">
           <p>Location</p>

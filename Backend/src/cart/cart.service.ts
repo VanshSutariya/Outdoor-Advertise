@@ -21,6 +21,12 @@ export class CartService {
     return resData;
   }
 
+  async getCartById(id: string) {
+    const cartData = this.cartModal.findById(id);
+    if (!cartData) throw new HttpException('No Data in db.', 404);
+    return cartData;
+  }
+
   async createCart(createCartDto: CreateCartDto) {
     const newCart = await this.cartModal.create(createCartDto);
     if (!newCart) throw new HttpException('Cart details is not added.', 404);

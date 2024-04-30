@@ -1,10 +1,10 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 const BgImage: React.FC = () => {
   return (
     <main className=" bg-black flex ">
       <div className="w-full py-[135px]  pl-20 ">
-        <div className="text-white text-3xl font-serif tracking-widest ">
+        <div className="text-white text-3xl font-inter tracking-widest ">
           <p> Outdoor Advertisement </p>
         </div>
         <p className="text-white text-xl tracking-wide">

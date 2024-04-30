@@ -1,19 +1,19 @@
-import NavBar from "../../components/Header";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { cartActions } from "../../store/cart-slice";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { MdDeleteOutline } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
-import { IoIosArrowRoundBack } from "react-icons/io";
-import Link from "next/link";
+import NavBar from '../../components/Header';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { cartActions } from '../../store/cart-slice';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { MdDeleteOutline } from 'react-icons/md';
+import { FaRegEdit } from 'react-icons/fa';
+import { IoIosArrowRoundBack } from 'react-icons/io';
+import Link from 'next/link';
 
 export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { userId }: { userId: string | null } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
   const { items, finalTotal } = useSelector((state: RootState) => state.cart);
 
@@ -22,13 +22,13 @@ export default function CartPage() {
       try {
         const res = await fetch(`http://localhost:4000/cart?userId=${userId}`);
         if (!res.ok) {
-          throw new Error("Failed to fetch cart data.");
+          throw new Error('Failed to fetch cart data.');
         }
         const data = await res.json();
         // Dispatch an action to update Redux state with fetched cart data
         dispatch(cartActions.setCartItems(data));
       } catch (error) {
-        console.error("Error fetching cart data:", error.message);
+        console.error('Error fetching cart data:', error.message);
       }
     };
     func();
@@ -45,10 +45,10 @@ export default function CartPage() {
 
   async function handleCheckout() {
     try {
-      const response = await fetch("http://localhost:4000/stripe/checkout", {
-        method: "POST",
+      const response = await fetch('http://localhost:4000/stripe/checkout', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(items),
       });
@@ -57,10 +57,10 @@ export default function CartPage() {
         const data = await response.text();
         router.push(data);
       } else {
-        throw new Error("Error creating checkout session.");
+        throw new Error('Error creating checkout session.');
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   }
 
@@ -106,16 +106,23 @@ export default function CartPage() {
                               </span>
                             </div>
                           </td>
-                          <td className="">
+                          <td className=" ">
                             <button
                               onClick={() => handleDelete(item?.posterId)}
+                              className=""
                             >
-                              <MdDeleteOutline size={28} />
+                              <MdDeleteOutline
+                                size={28}
+                                className="hover:text-red-700"
+                              />
                             </button>
                           </td>
                           <td className="items-center">
                             <button onClick={() => handleEdit(item?.posterId)}>
-                              <FaRegEdit size={23} />
+                              <FaRegEdit
+                                size={23}
+                                className="hover:text-green-500"
+                              />
                             </button>
                           </td>
                           <td className="text-[21px] font-semibold">

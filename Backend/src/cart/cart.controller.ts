@@ -20,6 +20,12 @@ export class CartController {
   async getAll(@Query() query: ExpressQuery) {
     return await this.cartService.getAll(query);
   }
+
+  @Get(':id')
+  async getCartById(@Param('id') id: string) {
+    return await this.cartService.getCartById(id);
+  }
+
   @Post('add')
   async createCart(@Body() createCartdto: CreateCartDto) {
     return await this.cartService.createCart(createCartdto);

@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-@Injectable()
-export class UpdateCartDto {
+export class CreateBookingDto {
   @IsString()
   @IsNotEmpty()
   userId: string;
@@ -23,9 +27,9 @@ export class UpdateCartDto {
   @IsNotEmpty()
   address: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  finalTotal: number;
+  totalPrice: number;
 
   @IsOptional()
   @IsArray()

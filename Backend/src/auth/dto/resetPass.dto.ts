@@ -11,7 +11,7 @@ export class resetDto {
 }
 
 export class UpdatePassDto {
-  @IsString()
+  // @IsString()
   @IsEmail()
   @IsNotEmpty()
   email: string;

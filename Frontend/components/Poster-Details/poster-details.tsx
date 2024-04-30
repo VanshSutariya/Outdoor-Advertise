@@ -1,9 +1,12 @@
-"use client";
-import { fetchOnePoster } from "../../utils/http";
-import { useEffect, useState } from "react";
-import DatePicker from "./date-range-picker";
-import { CiLocationOn } from "react-icons/ci";
-import { LiaTagSolid } from "react-icons/lia";
+'use client';
+import { fetchOnePoster } from '../../utils/http';
+import { useEffect, useState } from 'react';
+import DatePicker from './date-range-picker';
+import { CiLocationOn } from 'react-icons/ci';
+import { LiaTagSolid } from 'react-icons/lia';
+
+import { IoIosArrowRoundBack } from 'react-icons/io';
+import Link from 'next/link';
 
 interface PosterData {
   id: number;
@@ -17,8 +20,8 @@ interface PosterData {
   facingFrom: string;
   minimumDays: number;
   mediatype: string;
-  minAutos: number;
-  maxAutos: number;
+  minQty: number;
+  maxQty: number;
   state: string;
   city: string;
   bookingDate: string[];
@@ -42,7 +45,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           setLoading(false);
         }, 500);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -65,23 +68,35 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   const url: string = `https://maps.google.com/maps?q=${lat},${lng}&output=embed`;
 
   const excludeFields = [
-    "_id",
-    "image",
-    "__v",
-    "latLng",
-    "title",
-    "createdAt",
-    "updatedAt",
+    '_id',
+    'image',
+    '__v',
+    'latLng',
+    'title',
+    'createdAt',
+    'updatedAt',
   ];
 
   const dataEntries = Object.entries(posterData).filter(
-    ([key]) => !excludeFields.includes(key)
+    ([key]) => !excludeFields.includes(key),
   );
 
+  const capitalizedTitle = posterData.title
+    .split(' ')
+    .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+    .join(' ');
   return (
     <>
+      <div>
+        <Link
+          href="/"
+          className=" text-lg md:px-[60px] pt-3 flex text-blue-600 hover:text-blue-700 active:text-blue-500"
+        >
+          <IoIosArrowRoundBack size={30} /> Back
+        </Link>
+      </div>
       <div className="md:flex items-center justify-center">
-        <div className="md:w-1/3 pt-8  p-5 rounded-lg mb-9">
+        <div className="md:w-1/3 pt-2  p-5 rounded-lg mb-9">
           <img
             className="rounded-2xl md:h-[300px] h-[300px] w-full"
             src={posterData.image}
@@ -89,8 +104,8 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           />
         </div>
         <div className="w-full border-[2px] border-gray-100 shadow-md sm:w-full md:w-1/2 rounded-lg ">
-          <h1 className="mt-4 flex  justify-center text-3xl text-gray-800 font-bold tracking-wider font-serif">
-            {posterData.title}
+          <h1 className="mt-5 flex  justify-center text-3xl text-gray-800 font-bold tracking-wider font-inter">
+            {capitalizedTitle}
           </h1>
           <div className="p-5">
             {/* location */}
@@ -121,7 +136,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                   MediaType: {posterData.mediatype}
                 </p>
                 <p>
-                  LightingType: {posterData.lightingType?.toLocaleLowerCase()}{" "}
+                  LightingType: {posterData.lightingType?.toLocaleLowerCase()}{' '}
                 </p>
               </div>
             </div>
@@ -135,21 +150,24 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
               </div>
               <div className="text-slate-600">
                 <p>
-                  {" "}
-                  Minimum Booking Days : {posterData.minimumDays} days{" "}
-                  {posterData.mediatype === "Rickshaws"
-                    ? `| MinAutos :${posterData.minAutos} | MaxAutos:${posterData.maxAutos} `
-                    : ""}
+                  {' '}
+                  Minimum Booking Days : {posterData.minimumDays} days{' '}
+                  {posterData.mediatype === 'Rickshaws'
+                    ? `| MinAutos :${posterData.minQty} | MaxAutos:${posterData.maxQty} `
+                    : ''}
+                  {posterData.mediatype === 'Poles'
+                    ? `| MinPoles :${posterData.minQty} | MaxPoles:${posterData.maxQty} `
+                    : ''}
                 </p>
               </div>
             </div>
             <div className="flex  justify-center pt-4">
               <p className="-pl-3">
-                <span className="text-lg">Price </span>{" "}
-                <span className="text-xl ml-5 text-green-500 font-bold">
-                  {posterData.mediatype === "Rickshaws"
-                    ? `₹${posterData.price}/ perAuto`
-                    : `₹${posterData.price}/ perDay`}
+                <span className="text-lg">Price </span>{' '}
+                <span className="text-xl ml-5 text-green-500 font-bold font-poppins">
+                  {posterData.mediatype === 'Rickshaws'
+                    ? `₹${posterData.price}/ auto`
+                    : `₹${posterData.price}/ day`}
                 </span>
               </p>
             </div>
@@ -169,9 +187,14 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           title={posterData.title}
           price={posterData.price}
           minDays={posterData.minimumDays}
-          rickshaws={posterData.mediatype === "Rickshaws" ? true : false}
-          minauto={posterData.minAutos}
-          maxauto={posterData.maxAutos}
+          mediatype={
+            posterData.mediatype === 'Rickshaws' ||
+            posterData.mediatype === 'Poles'
+              ? posterData.mediatype
+              : false
+          }
+          minQty={posterData.minQty}
+          maxQty={posterData.maxQty}
           bookingDate={posterData.bookingDate}
           id={id}
           image={posterData.image}

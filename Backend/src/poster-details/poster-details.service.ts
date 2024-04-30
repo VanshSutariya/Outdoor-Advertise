@@ -14,6 +14,15 @@ export class PosterDetailsService {
 
   // get all posters
   async getAllPosters(query: Query) {
+    // if (query?.price) {
+    //   if (query?.priceCondition) {
+    //     DBQuery['price'] = {
+    //       [`$${query?.priceCondition}`]: query?.price,
+    //     };
+    //   } else {
+    //     DBQuery['price'] = query?.price;
+    //   }
+    // }
     let DBQuery = {};
 
     if (query?.state) {
@@ -25,15 +34,6 @@ export class PosterDetailsService {
     if (query?.city) {
       DBQuery['city'] = { $regex: '^' + query?.city, $options: 'i' };
     }
-    // if (query?.price) {
-    //   if (query?.priceCondition) {
-    //     DBQuery['price'] = {
-    //       [`$${query?.priceCondition}`]: query?.price,
-    //     };
-    //   } else {
-    //     DBQuery['price'] = query?.price;
-    //   }
-    // }
 
     const resPerPage = Number(query?.per_page) || 0;
     const currentPage = Number(query.page) || 1;
@@ -62,14 +62,50 @@ export class PosterDetailsService {
 
   // update poster
   async updatePoster(id: string, updatePosterDto: UpdatePosterDto) {
-    let { bookingDate } = updatePosterDto;
-    const updatePoster = await this.postersModel.findByIdAndUpdate(
+    const poster = await this.postersModel.findById(id);
+
+    if (!poster) {
+      throw new HttpException('Poster not found', 404);
+    }
+
+    const existingBookingDate = poster.bookingDate;
+
+    const existingBookingDateObjects = existingBookingDate.map(
+      (dateString) => new Date(dateString),
+    );
+
+    const newBookingDateObjects = updatePosterDto.bookingDate.map(
+      (dateString) => new Date(dateString),
+    );
+
+    const updatedBookingDateObjects = [
+      ...existingBookingDateObjects,
+      ...newBookingDateObjects,
+    ];
+
+    updatedBookingDateObjects.sort((a, b) => a.getTime() - b.getTime());
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric',
+    };
+    const updatedBookingDate = updatedBookingDateObjects.map((dateObject) =>
+      dateObject.toLocaleDateString('en-US', options),
+    );
+    console.log(updatedBookingDate);
+
+    const updatedPoster = await this.postersModel.findByIdAndUpdate(
       id,
-      { bookingDate },
+      { bookingDate: updatedBookingDate },
       { new: true },
     );
-    if (!updatePoster) throw new HttpException('Poster is not updated. ', 404);
-    return updatePoster;
+
+    if (!updatedPoster) {
+      throw new HttpException('Failed to update poster', 500);
+    }
+
+    // Return the updated poster document
+    return updatedPoster;
   }
 
   // delete poster

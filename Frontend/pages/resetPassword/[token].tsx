@@ -1,26 +1,26 @@
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { logout } from "../../store/auth-slice";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../store/auth-slice';
 
 const ResetPasswordPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const [errorState, setErrorState] = useState<string | null>("");
+  const [errorState, setErrorState] = useState<string | null>('');
   const [isError, setIsError] = useState<boolean>(false);
 
   const validationSchema = Yup.object().shape({
-    password: Yup.string().required("Password is required").min(6),
+    password: Yup.string().required('Password is required').min(6),
     confirmPassword: Yup.string()
-      .required("Password is required")
+      .required('Password is required')
       .min(6)
       .oneOf(
-        [Yup.ref("password"), null],
-        "ConfirmPassword and Passwords must be same."
+        [Yup.ref('password'), null],
+        'ConfirmPassword and Passwords must be same.',
       ),
   });
 
@@ -38,23 +38,20 @@ const ResetPasswordPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:4000/auth/reset-password",
+        'http://localhost:4000/auth/reset-password',
         {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password, reset_token }),
-        }
+        },
       );
       const data = await response.json();
 
-      if (!response.ok) throw new Error(data.message || "Enter valid inputs.");
+      if (!response.ok) throw new Error(data.message || 'Enter valid inputs.');
 
-      alert("Password reset successfully");
-      document.cookie =
-        "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/resetPassword;";
-      dispatch(logout());
+      alert('Password reset successfully');
 
-      router.push("/login");
+      router.push('/login');
     } catch (error) {
       setIsError(true);
       setErrorState(error.message);
@@ -78,7 +75,7 @@ const ResetPasswordPage = () => {
           <div className="flex flex-col ">
             <p className="mb-2 font-medium">Password</p>
             <input
-              {...register("password")}
+              {...register('password')}
               name="password"
               type="password"
               placeholder="********"
@@ -90,7 +87,7 @@ const ResetPasswordPage = () => {
 
             <p className="mb-2 font-medium">Confirm Password</p>
             <input
-              {...register("confirmPassword")}
+              {...register('confirmPassword')}
               type="password"
               placeholder="********"
               className=" p-2 mb-3 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"

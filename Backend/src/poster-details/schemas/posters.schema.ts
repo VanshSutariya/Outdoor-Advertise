@@ -52,10 +52,10 @@ export class Posters {
   minimumDays: number;
 
   @Prop({ required: false })
-  minAutos?: number;
+  minQty?: number;
 
   @Prop({ required: false })
-  maxAutos?: number;
+  maxQty?: number;
 
   @Prop({ required: false })
   latLng?: number[];

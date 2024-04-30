@@ -1,15 +1,19 @@
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { loginIn } from "../../store/auth-slice";
-import { decode } from "jsonwebtoken";
-import ForgotPassword from "./forgetPasswordPopUp";
-import fetchUser from "../../utils/http";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginIn, logout } from '../../store/auth-slice';
+import { decode } from 'jsonwebtoken';
+import ForgotPassword from './forgetPasswordPopUp';
+import fetchUser from '../../utils/http';
+import React from 'react';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { RootState } from '../../store';
 // import Cookies from "js-cookie";
 
 const SignIn: React.FC = () => {
@@ -17,10 +21,21 @@ const SignIn: React.FC = () => {
   const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<string | null>(null);
   const [showForgotpassword, setShowForgotPassword] = useState(false);
+  const {
+    userId,
+    userName,
+    isLoggedIn,
+    userRole,
+  }: {
+    userId: string | null;
+    userName: string | null;
+    isLoggedIn: boolean;
+    userRole: string | null;
+  } = useSelector((state: RootState) => state.auth);
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().required("Email is required").email("Email is invalid"),
-    password: Yup.string().required("Password is required").min(6),
+    email: Yup.string().required('Email is required').email('Email is invalid'),
+    password: Yup.string().required('Password is required').min(6),
   });
 
   const formOptions = { resolver: yupResolver(validationSchema) };
@@ -28,22 +43,23 @@ const SignIn: React.FC = () => {
   const { errors } = formState;
 
   async function onSubmit(data: { email: string; password: string }) {
+    // dispatch(logout());
+
     const { email, password } = data;
-    console.log(data);
     try {
-      const response = await fetch("http://localhost:4000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('http://localhost:4000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       const resData = await response.json();
 
       if (!response.ok)
-        throw new Error(resData.message || "Invalid Credentials");
+        throw new Error(resData.message || 'Invalid Credentials');
 
       document.cookie = `jwt=${resData.token}; expires=${new Date(
-        new Date().getTime() + 5000
-      )} path=/`;
+        new Date().getTime() + 5000,
+      )}; path=/; secure;`;
 
       const decodedToken = decode(resData.token) as { id: string };
       if (decodedToken) {
@@ -51,10 +67,16 @@ const SignIn: React.FC = () => {
           const userName = await fetchUser(decodedToken.id);
           dispatch(loginIn(userName));
         };
+
         fetchUserFunc();
+        notify();
+
+        if (userRole === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/');
+        }
       }
-      alert("Login Successfully");
-      router.push("/");
     } catch (error) {
       setErrorState(error.message);
       console.log(error.message);
@@ -69,9 +91,38 @@ const SignIn: React.FC = () => {
     setShowForgotPassword(false);
   };
 
+  const notify = () =>
+    toast.success('Login Success.', {
+      position: 'top-right',
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'colored',
+      transition: Bounce,
+    });
+
+  useEffect(() => {
+    if (errorState) {
+      toast.error(errorState, {
+        position: 'top-right',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+        transition: Bounce,
+      });
+    }
+  }, [errorState]);
+
   return (
     <section className="m-8 flex gap-4">
-      <div className="w-full lg:w-3/5 mt-24">
+      <div className="w-full lg:w-3/5 mt-16">
         <div className="text-center">
           <div className="font-bold mb-4 text-4xl">LogIn</div>
           <div className="text-lg font-normal">
@@ -85,7 +136,7 @@ const SignIn: React.FC = () => {
           <div className="flex flex-col ">
             <label className="font-medium mb-2">Your email</label>
             <input
-              {...register("email")}
+              {...register('email')}
               name="email"
               onChange={() => {
                 setErrorState(null);
@@ -98,7 +149,7 @@ const SignIn: React.FC = () => {
             </div>
             <label className="mb-2 font-medium">Password</label>
             <input
-              {...register("password")}
+              {...register('password')}
               onChange={() => {
                 setErrorState(null);
               }}
@@ -121,12 +172,7 @@ const SignIn: React.FC = () => {
               </button>
             </p>
           </div>
-          {errorState && (
-            <div className="text-red-500 ml-2 mt-2 mb-2 rounded-sm p-2 text-center font-bold">
-              {errorState}
-            </div>
-          )}
-          <button className="text-black font-bold p-3 bg-slate-200 w-full">
+          <button className="rounded-lg font-bold font-poppins p-3 bg-slate-200 w-full hover:bg-slate-300 active:bg-slate-200">
             LogIn
           </button>
           <div className="text-center text-blue-500 font-medium mt-4">

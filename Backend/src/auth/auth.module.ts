@@ -24,7 +24,6 @@ import { EmailService } from './email.service';
         };
       },
     }),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, EmailService],

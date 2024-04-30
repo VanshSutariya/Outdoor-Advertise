@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { FC, useCallback } from "react";
-import { IconType } from "react-icons";
-import qs from "query-string";
+import { useSearchParams, useRouter } from 'next/navigation';
+import { FC, useCallback } from 'react';
+import { IconType } from 'react-icons';
+import qs from 'query-string';
 
 interface CategoryBoxProps {
   icon: IconType;
@@ -28,16 +28,16 @@ const CategoryBox: FC<CategoryBoxProps> = ({ icon: Icon, label, selected }) => {
     };
 
     // If click same category, that category will remove
-    if (params?.get("category") === label) {
+    if (params?.get('category') === label) {
       delete udpatedQuery.category;
     }
 
     const url = qs.stringifyUrl(
       {
-        url: "/",
+        url: '/',
         query: udpatedQuery,
       },
-      { skipNull: true }
+      { skipNull: true },
     );
 
     router.push(url);
@@ -51,16 +51,15 @@ const CategoryBox: FC<CategoryBoxProps> = ({ icon: Icon, label, selected }) => {
           flex-col 
           items-center 
           justify-center 
-          gap-2
-          p-3
-          border-b-2
+          py-2
+          border-b-4
           hover:text-neutral-800
           transition
           cursor-pointer
           ${
             selected
-              ? "border-b-neutral-800 text-neutral-800"
-              : "border-transparent text-neutral-500"
+              ? 'border-b-neutral-800 text-neutral-800'
+              : 'border-transparent text-neutral-500'
           }
         `}
     >

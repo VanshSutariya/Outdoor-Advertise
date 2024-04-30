@@ -1,14 +1,14 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
-import { addDays, max } from "date-fns";
-import { differenceInDays } from "date-fns";
-import { DateRange } from "react-date-range";
-import "react-date-range/dist/styles.css";
-import "react-date-range/dist/theme/default.css";
-import useFindWidth from "../../hooks/useWidth";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import Billing from "./billing";
+'use client';
+import { useEffect, useRef, useState } from 'react';
+import { addDays, max } from 'date-fns';
+import { differenceInDays } from 'date-fns';
+import { DateRange } from 'react-date-range';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import useFindWidth from '../../hooks/useWidth';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import Billing from './billing';
 
 interface DatePickerProps {
   id: string;
@@ -17,9 +17,9 @@ interface DatePickerProps {
   address: string;
   price: number;
   minDays: number;
-  rickshaws: boolean;
-  minauto: number;
-  maxauto: number;
+  mediatype: string | boolean;
+  minQty: number;
+  maxQty: number;
   bookingDate: string[];
 }
 const DatePicker: React.FC<DatePickerProps> = ({
@@ -29,18 +29,18 @@ const DatePicker: React.FC<DatePickerProps> = ({
   address,
   price,
   minDays,
-  rickshaws,
-  minauto,
-  maxauto,
-  bookingDate = [],
+  mediatype,
+  minQty,
+  maxQty,
+  bookingDate,
 }) => {
   const windowWidth = useFindWidth();
   const [diffInDays, setDiffInDays] = useState<number>(0);
-  const noOfAuto = useRef<HTMLInputElement>(null);
+  const noOfAuto = useRef<HTMLInputElement>();
   const [autoInputError, setAutoInputError] = useState<string | null>(null);
 
   const { isLoggedIn }: { isLoggedIn: boolean } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
 
   const calculateMinDate = (): Date => {
@@ -81,10 +81,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
     {
       startDate: calculateMinDate(), // Set the start date dynamically
       endDate: addDays(calculateMinDate(), minDays ? minDays - 1 : 3), // Adjust the end date accordingly
-      key: "selection",
+      key: 'selection',
     },
   ]);
-  console.log("initial state ================", state);
+  console.log('initial state ================', state);
 
   const NextAvailableDate = (): Date => {
     let nextAvailableDate = new Date();
@@ -102,7 +102,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
       {
         startDate: NextAvailableDate(),
         endDate: NextAvailableDate(),
-        key: "selection",
+        key: 'selection',
       },
     ]);
   };
@@ -114,18 +114,19 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
   const handleAutoChange = () => {
     const inputValue = parseInt(noOfAuto.current!.value, 10);
-    if (inputValue < minauto || inputValue > maxauto) {
+    if (inputValue < minQty || inputValue > maxQty) {
       setAutoInputError(
-        `Book min ${minauto} and max ${maxauto} Auto Quantity.`
+        `Book minimum ${minQty} and maximum ${maxQty} Quantity.`,
       );
     } else {
       setAutoInputError(null);
     }
   };
 
-  const totalPrice = rickshaws
-    ? noOfAuto.current &&
-      parseInt(noOfAuto.current.value, 10) * price * diffInDays
+  const totalPrice = mediatype
+    ? parseInt(noOfAuto.current?.value, 10) > 0
+      ? parseInt(noOfAuto.current.value, 10) * price * diffInDays
+      : 1 * price * diffInDays
     : price * diffInDays;
 
   return (
@@ -136,9 +137,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
             onChange={(item) => setState([item.selection])}
             ranges={state}
             minDate={calculateMinDate()}
-            rangeColors={["#EC7A20"]}
+            rangeColors={['#EC7A20']}
             months={2}
-            direction={windowWidth < 780 ? "vertical" : "horizontal"}
+            direction={windowWidth < 780 ? 'vertical' : 'horizontal'}
             showSelectionPreview={true}
             moveRangeOnFirstSelection={false}
             disabledDates={bookingDate}
@@ -160,11 +161,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
           address={address}
           price={price}
           state={state}
-          maxauto={maxauto}
-          minauto={minauto}
+          maxQty={maxQty}
+          minQty={minQty}
           minDays={minDays}
           noOfAuto={noOfAuto}
-          rickshaws={rickshaws}
+          mediatype={mediatype}
           totalPrice={totalPrice}
           diffInDays={diffInDays}
           isLoggedIn={isLoggedIn}

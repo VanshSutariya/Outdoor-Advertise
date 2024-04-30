@@ -1,29 +1,29 @@
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { logout } from "../store/auth-slice";
-import NavBar from "../components/Header";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/auth-slice';
+import NavBar from '../components/Header';
 
 const UpdatePasswordPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const [errorState, setErrorState] = useState<string | null>("");
+  const [errorState, setErrorState] = useState<string | null>('');
   const [isError, setIsError] = useState<boolean>(false);
 
   const validationSchema = Yup.object().shape({
-    newPassword: Yup.string().required("Password is required").min(6),
-    currentPassword: Yup.string().required("Password is required").min(6),
-    email: Yup.string().required("Email is required").email("Email is invalid"),
+    newPassword: Yup.string().required('Password is required').min(6),
+    currentPassword: Yup.string().required('Password is required').min(6),
+    email: Yup.string().required('Email is required').email('Email is invalid'),
     confirmPassword: Yup.string()
-      .required("Password is required")
+      .required('Password is required')
       .min(6)
       .oneOf(
-        [Yup.ref("newPassword"), null],
-        "ConfirmPassword and Passwords must be same."
+        [Yup.ref('newPassword'), null],
+        'ConfirmPassword and Passwords must be same.',
       ),
   });
 
@@ -38,27 +38,27 @@ const UpdatePasswordPage = () => {
     confirmPassword: string;
   }) {
     setIsError(false);
-    console.log(data);
     const { email, currentPassword, newPassword } = data;
+    console.log(data, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
     try {
       const response = await fetch(
-        "http://localhost:4000/auth/update-password",
+        'http://localhost:4000/auth/updatePassword',
         {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, currentPassword, newPassword }),
-        }
+        },
       );
       const data = await response.json();
 
-      if (!response.ok) throw new Error(data.message || "Enter valid inputs.");
+      if (!response.ok) throw new Error(data.message || 'Enter valid inputs.');
 
       document.cookie =
-        "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/poster";
+        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/poster';
       dispatch(logout());
-      alert("Password reset successfully");
+      alert('Password reset successfully');
 
-      router.push("/");
+      router.push('/');
     } catch (error) {
       setIsError(true);
       setErrorState(error.message);
@@ -84,7 +84,7 @@ const UpdatePasswordPage = () => {
             <div className="flex flex-col ">
               <p className="mb-2 font-medium">Your Login email</p>
               <input
-                {...register("email")}
+                {...register('email')}
                 type="text"
                 name="email"
                 placeholder="name@mail.com"
@@ -96,7 +96,7 @@ const UpdatePasswordPage = () => {
               </div>
               <p className="mb-2 font-medium">Current Password</p>
               <input
-                {...register("currentPassword")}
+                {...register('currentPassword')}
                 name="currentPassword"
                 type="password"
                 placeholder="********"
@@ -107,7 +107,7 @@ const UpdatePasswordPage = () => {
               </div>
               <p className="mb-2 font-medium">New Password</p>
               <input
-                {...register("newPassword")}
+                {...register('newPassword')}
                 name="newPassword"
                 type="password"
                 placeholder="********"
@@ -119,7 +119,7 @@ const UpdatePasswordPage = () => {
 
               <p className="mb-2 font-medium">Confirm Password</p>
               <input
-                {...register("confirmPassword")}
+                {...register('confirmPassword')}
                 type="password"
                 placeholder="********"
                 className=" p-2 mb-3 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"

@@ -7,15 +7,18 @@ import {
   Param,
   Patch,
   Post,
+  Put,
+  Query,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto, UpdateDto } from './dto/login.dto';
 import { SignUpDto } from './dto/signup.dto';
 import { Response, response } from 'express';
 import { emailDto } from './dto/email.dto';
 import { EmailService } from './email.service';
 import { UpdatePassDto, resetDto } from './dto/resetPass.dto';
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +26,11 @@ export class AuthController {
     private authService: AuthService,
     private emailService: EmailService,
   ) {}
+
+  @Get()
+  async getAllUser(@Query() query: ExpressQuery) {
+    return await this.authService.getAllUsers(query);
+  }
 
   @Get(':id')
   async getUserById(@Param('id') id: string) {
@@ -64,15 +72,22 @@ export class AuthController {
     }
   }
 
-  @Patch('/reset-password')
+  @Patch(':id')
+  async updateUser(@Param('id') id: string, @Body() updatedto: UpdateDto) {
+    const up = this.authService.updateUserDetails(id, updatedto);
+    return up;
+  }
+
+  @Put('/reset-password')
   async resetPass(@Body() resetInfo: resetDto) {
     return this.authService.resetpass(resetInfo);
   }
 
-  @Patch('/update-password')
-  async updatePassword(@Body() updatePassDto: UpdatePassDto) {
+  @Put('/updatePassword')
+  async updatepassword(@Body() updatePassDto: UpdatePassDto) {
     try {
-      return await this.authService.updatepassword(updatePassDto);
+      const result = await this.authService.updatepassword(updatePassDto);
+      return result;
     } catch (error) {
       throw new HttpException(
         error.message || 'Internal server error',
