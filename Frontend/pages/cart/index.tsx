@@ -79,6 +79,9 @@ export default function CartPage() {
                       <th className="text-left font-semibold pl-8  ">
                         Product
                       </th>
+                      <th className="text-left font-semibold ">
+                        Booking Dates
+                      </th>
                       <th className="text-left font-semibold ">Delete</th>
                       <th className="text-left font-semibold ">Edit</th>
                       <th className="text-left font-semibold ">Total</th>
@@ -105,6 +108,11 @@ export default function CartPage() {
                                 </p>
                               </span>
                             </div>
+                          </td>
+                          <td>
+                            {item.bookingDate[0] +
+                              '  -  ' +
+                              item.bookingDate[item.bookingDate.length - 1]}
                           </td>
                           <td className=" ">
                             <button

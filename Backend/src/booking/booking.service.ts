@@ -19,9 +19,15 @@ export class BookingService {
     if (query?.userId) {
       DBQuery['userId'] = query?.userId;
     }
+    const resPerPage = Number(query?.per_page) || 0;
+    const currPage = Number(query.page) || 1;
+    const skip = resPerPage * (currPage - 1);
+    const resData = await this.bookingModel
+      .find(DBQuery)
+      .limit(resPerPage)
+      .skip(skip);
 
-    const resData = await this.bookingModel.find(DBQuery);
-    if (!resData) throw new HttpException('You have zero order placed.', 404);
+    if (!resData) throw new HttpException('You have no order placed yet.', 404);
     return resData;
   }
 

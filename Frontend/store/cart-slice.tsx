@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { deleteAllCartData } from "../utils/http";
+import { createSlice } from '@reduxjs/toolkit';
+import { deleteAllCartData } from '../utils/http';
 
 interface Item {
   _id: any;
@@ -9,6 +9,7 @@ interface Item {
   title: string;
   totalPrice: number;
   address: string;
+  bookingDate: string[];
 }
 interface cartState {
   items: Item[];
@@ -22,7 +23,7 @@ const initialState: cartState = {
 };
 
 const cartSlice = createSlice({
-  name: "cart",
+  name: 'cart',
   initialState,
   reducers: {
     setCartItems(state, action) {
@@ -31,14 +32,14 @@ const cartSlice = createSlice({
       // Recalculate final total
       state.finalTotal = state.items.reduce(
         (total, item) => total + item.totalPrice,
-        0
+        0,
       );
     },
     addItemToCart(state, action) {
       const details = action.payload;
       const existingItem = state.items.find(
         (item) =>
-          item.posterId === details.posterId && item.userId === details.userId
+          item.posterId === details.posterId && item.userId === details.userId,
       );
       if (!existingItem) {
         state.items.push({
@@ -48,7 +49,8 @@ const cartSlice = createSlice({
           title: details.title,
           totalPrice: details.totalPrice,
           address: details.address,
-          _id: "",
+          bookingDate: details.bookingDates,
+          _id: '',
         });
         state.finalTotal += details.totalPrice;
         try {
@@ -61,17 +63,18 @@ const cartSlice = createSlice({
               totalPrice: details.totalPrice,
               address: details.address,
               bookingDate: details.bookingDates,
+              createdBy: details.cretedBy,
             };
 
-            const resData = await fetch("http://localhost:4000/cart/add", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
+            const resData = await fetch('http://localhost:4000/cart/add', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(data),
             });
             const response = await resData.json();
-            console.log(response);
+
             if (!resData.ok) {
-              throw new Error(response.message || "enter valid data");
+              throw new Error(response.message || 'enter valid data');
             }
           };
           data();
@@ -83,12 +86,12 @@ const cartSlice = createSlice({
     removeItem(state, action) {
       const { posterId, userId } = action.payload;
       const existingItem = state.items.find(
-        (item) => item.posterId === posterId && item.userId === userId
+        (item) => item.posterId === posterId && item.userId === userId,
       );
       console.log(existingItem);
 
       state.items = state.items.filter(
-        (item) => item.posterId !== posterId && item.userId === userId
+        (item) => item.posterId !== posterId && item.userId === userId,
       );
       state.finalTotal = state.finalTotal - existingItem.totalPrice;
 
@@ -97,14 +100,14 @@ const cartSlice = createSlice({
           const resData = await fetch(
             `http://localhost:4000/cart/${userId}/${posterId}`,
             {
-              method: "DELETE",
-              headers: { "Content-Type": "application/json" },
-            }
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+            },
           );
           const response = await resData.json();
           console.log(response);
           if (!resData.ok) {
-            throw new Error(response.message || "Something went wrong.");
+            throw new Error(response.message || 'Something went wrong.');
           }
         };
         data();

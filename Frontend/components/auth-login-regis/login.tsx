@@ -11,15 +11,16 @@ import { decode } from 'jsonwebtoken';
 import ForgotPassword from './forgetPasswordPopUp';
 import fetchUser from '../../utils/http';
 import React from 'react';
-import { Bounce, ToastContainer, toast } from 'react-toastify';
+import { Bounce, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RootState } from '../../store';
+import ToastComponent from '../reactToast/toast';
+import toastFunction from '../reactToast/toast';
 // import Cookies from "js-cookie";
 
 const SignIn: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [errorState, setErrorState] = useState<string | null>(null);
   const [showForgotpassword, setShowForgotPassword] = useState(false);
   const {
     userId,
@@ -42,9 +43,15 @@ const SignIn: React.FC = () => {
   const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  async function onSubmit(data: { email: string; password: string }) {
-    // dispatch(logout());
+  const handleLoginSuccess = () => {
+    toastFunction('success', 'Login Successful!');
+  };
 
+  const handleLoginError = (errorMessage: string) => {
+    toastFunction('error', errorMessage);
+  };
+
+  async function onSubmit(data: { email: string; password: string }) {
     const { email, password } = data;
     try {
       const response = await fetch('http://localhost:4000/auth/login', {
@@ -58,28 +65,27 @@ const SignIn: React.FC = () => {
         throw new Error(resData.message || 'Invalid Credentials');
 
       document.cookie = `jwt=${resData.token}; expires=${new Date(
-        new Date().getTime() + 5000,
+        new Date().getTime() + 20 * 60 * 1000,
       )}; path=/; secure;`;
 
       const decodedToken = decode(resData.token) as { id: string };
       if (decodedToken) {
         const fetchUserFunc = async () => {
-          const userName = await fetchUser(decodedToken.id);
-          dispatch(loginIn(userName));
+          const userDetail = await fetchUser(decodedToken.id);
+          dispatch(loginIn(userDetail));
+
+          handleLoginSuccess();
+          if (userDetail?.role === 'admin') {
+            router.push('/admin');
+          } else {
+            router.push('/');
+          }
         };
 
         fetchUserFunc();
-        notify();
-
-        if (userRole === 'admin') {
-          router.push('/admin');
-        } else {
-          router.push('/');
-        }
       }
     } catch (error) {
-      setErrorState(error.message);
-      console.log(error.message);
+      handleLoginError(error.message);
     }
   }
 
@@ -90,35 +96,6 @@ const SignIn: React.FC = () => {
   const closeForgotPasswordPopup = () => {
     setShowForgotPassword(false);
   };
-
-  const notify = () =>
-    toast.success('Login Success.', {
-      position: 'top-right',
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'colored',
-      transition: Bounce,
-    });
-
-  useEffect(() => {
-    if (errorState) {
-      toast.error(errorState, {
-        position: 'top-right',
-        autoClose: 1500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'colored',
-        transition: Bounce,
-      });
-    }
-  }, [errorState]);
 
   return (
     <section className="m-8 flex gap-4">
@@ -138,9 +115,6 @@ const SignIn: React.FC = () => {
             <input
               {...register('email')}
               name="email"
-              onChange={() => {
-                setErrorState(null);
-              }}
               placeholder="name@mail.com"
               className=" p-2 mb-2 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
             />
@@ -150,9 +124,6 @@ const SignIn: React.FC = () => {
             <label className="mb-2 font-medium">Password</label>
             <input
               {...register('password')}
-              onChange={() => {
-                setErrorState(null);
-              }}
               name="password"
               type="password"
               placeholder="*******"
@@ -172,9 +143,13 @@ const SignIn: React.FC = () => {
               </button>
             </p>
           </div>
-          <button className="rounded-lg font-bold font-poppins p-3 bg-slate-200 w-full hover:bg-slate-300 active:bg-slate-200">
+          <button
+            // onClick={handleErrorToast}
+            className="rounded-lg font-bold font-poppins p-3 bg-slate-200 w-full hover:bg-slate-300 active:bg-slate-200"
+          >
             LogIn
           </button>
+
           <div className="text-center text-blue-500 font-medium mt-4">
             Not registered?
             <Link href="/register" className="text-gray-900 ml-1">

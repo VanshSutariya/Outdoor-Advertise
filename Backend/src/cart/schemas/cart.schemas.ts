@@ -17,6 +17,9 @@ export class Cart {
   @Prop({ required: true })
   address: string;
 
+  @Prop({ required: false })
+  createdBy: string;
+
   @Prop({ required: true })
   totalPrice: number;
 

@@ -25,7 +25,7 @@ const Sidebar = ({ children }: any) => {
           </div>
           <ul className="mt-6 md:px-4 ">
             {/* Navigation links */}
-            <li className="px-4 flex   items-center justify-center py-2 text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white  ">
+            <li className="px-4 flex   items-center justify-center py-2 text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100  ">
               <Link
                 href="/admin"
                 className="flex active:bg-black active:text-white aria-pressed:bg-black w-full md:ml-3"
@@ -34,7 +34,7 @@ const Sidebar = ({ children }: any) => {
                 <p>Dashboard</p>
               </Link>
             </li>
-            <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white ">
+            <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100">
               <Link
                 href="/admin/users"
                 className=" flex items-center active:bg-black active:text-white w-full md:ml-3"
@@ -43,13 +43,16 @@ const Sidebar = ({ children }: any) => {
                 <p> Users</p>
               </Link>
             </li>
-            <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white ">
-              <Link href="#" className=" flex items-center w-full md:ml-3">
+            <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100 ">
+              <Link
+                href="/admin/orders"
+                className=" flex items-center w-full md:ml-3 "
+              >
                 <LuShoppingCart size={22} className="mr-2 " />
                 <p> Orders</p>
               </Link>
             </li>
-            <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white ">
+            <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100 ">
               <Link
                 href="/admin/roleManage"
                 className=" flex items-center w-full md:ml-3"

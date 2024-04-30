@@ -62,6 +62,9 @@ export class Posters {
 
   @Prop({ type: [String] })
   bookingDate: string[];
+
+  @Prop({ type: String, required: false })
+  createdBy: string;
 }
 
 export const PostersSchema = SchemaFactory.createForClass(Posters);

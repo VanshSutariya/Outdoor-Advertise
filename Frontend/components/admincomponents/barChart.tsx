@@ -108,7 +108,7 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
   };
 
   return (
-    <div className="h-[400px] md:w-[1700px] border-[2px] border-gray-200 p-3 rounded-xl">
+    <div className=" md:w-[1700px] border-[2px] border-gray-200 p-3 rounded-xl">
       <Bar data={data} options={options} />
     </div>
   );

@@ -18,6 +18,7 @@ const ProfileDropDown: React.FC = () => {
   const handleLogout = async () => {
     document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     dispatch(logout());
+    router.push('/login');
   };
 
   function handleAccountPage() {
@@ -25,13 +26,11 @@ const ProfileDropDown: React.FC = () => {
   }
   return (
     <>
-      <div className=" dropdown dropdown-end">
+      <div className=" dropdown dropdown-end ">
         <div tabIndex={0} role="button" className="flex ">
-          <div className="flex items-center mt-2 border-2 p-2 hover:bg-gray-200 rounded-xl">
+          <div className="flex items-center mb-1  border-2 p-2 hover:bg-gray-200 rounded-xl">
             <div className=" items-center">
-              <p className="text-lg p-1">
-                {userName.substring(0, 1).toUpperCase() + userName.substring(1)}
-              </p>
+              <p className="text-lg p-1">{userName ? userName : '...'}</p>
             </div>
             <div className="p-1">
               <FaUserLarge size={25} />
@@ -45,7 +44,7 @@ const ProfileDropDown: React.FC = () => {
           <li className=" items-center">
             <button onClick={handleAccountPage}>Account</button>
           </li>
-          <li className=" items-center">
+          <li className="items-center">
             <Link href="/">
               <button onClick={handleLogout}>Logout</button>
             </Link>

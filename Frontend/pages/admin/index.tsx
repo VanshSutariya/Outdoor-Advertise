@@ -72,7 +72,7 @@ export default function AdminHomePage() {
     }
   }, []);
 
-  function formatRevenue(revenue) {
+  function formatRevenue(revenue: any) {
     const crore = 10000000; // 1 crore = 10,000,000
     const lakh = 100000; // 1 lakh = 100,000
 
@@ -84,7 +84,6 @@ export default function AdminHomePage() {
       return '₹' + numeral(revenue).format('0,0.00');
     }
   }
-  console.log(userName, userRole);
 
   return (
     <>
@@ -92,10 +91,12 @@ export default function AdminHomePage() {
         <div className="container mx-auto font-poppins ">
           <div className="text-3xl xs:flex items-center font-semibold -mt-5 mb-3 font-poppins">
             <p>Dashboard</p>
-            <div className="relative m-6  items-end w-fit xs:ml-[900px] ">
-              <NotificationPopUp />
+            <div className="flex justify-end w-full items-center">
+              <div className="relative m-6 w-fit items-end ">
+                <NotificationPopUp />
+              </div>
+              <ProfileDropDown />
             </div>
-            <ProfileDropDown />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -173,9 +174,11 @@ export default function AdminHomePage() {
                           alt="Avatar"
                           className="w-8 h-8 rounded-full mr-4"
                         />
-                        <p className="">{item.userName}</p>
+                        <div>
+                          <p className="">{item.userName}</p>
+                          <p className="">{item.userEmail}</p>
+                        </div>
                       </div>
-                      <p className="">{item.userEmail}</p>
                       <p className="text-green-500">
                         ₹{numeral(item.totalPrice).format('0,0.00')}
                       </p>

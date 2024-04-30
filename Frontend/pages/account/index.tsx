@@ -194,10 +194,12 @@ export default function AccountPage() {
                 </div>
               </div>
             </button>
-
+          </div>
+          <div className="md:flex gap-8 md:mt-5">
+            {userRole === 'user' && <PopUpModal />}
             {userRole && userRole !== 'user' && (
               <Link href="/createPoster" className="w-[285px]">
-                <div className="flex border-[2px] border-slate-200 mt-3 shadow-md rounded-md p-3 w-full  hover:bg-slate-200 active:bg-white">
+                <div className="flex border-[2px] border-slate-200 mt-3 shadow-md rounded-md p-3   hover:bg-slate-200 active:bg-white">
                   <img
                     src="/billboard.png"
                     alt="order"
@@ -210,12 +212,22 @@ export default function AccountPage() {
                 </div>
               </Link>
             )}
+            {userRole === 'admin' && (
+              <Link href="/admin" className="w-[285px]">
+                <div className="flex border-[2px] border-slate-200 mt-3 shadow-md rounded-md p-3 hover:bg-slate-200 active:bg-white">
+                  <img
+                    src="/dashboard.png"
+                    alt="order"
+                    className="h-14 w-12 mt-1 mb-1"
+                  />
+                  <div>
+                    <p className="ml-3 mt-3 text-lg"> Dashboard</p>
+                    <p className="ml-3 text-sm"> analysis, users controls</p>
+                  </div>
+                </div>
+              </Link>
+            )}
           </div>
-          {userRole === 'user' && (
-            <div className="md:flex gap-8 md:mt-5">
-              <PopUpModal />
-            </div>
-          )}
         </div>
       </div>
       <Footer />

@@ -80,6 +80,10 @@ export class CreatePosterDto {
   @IsNumber()
   maxAutos?: number;
 
+  @IsNotEmpty()
+  @IsString()
+  createdBy: string;
+
   @IsArray()
   @IsOptional()
   @ArrayMinSize(2, {

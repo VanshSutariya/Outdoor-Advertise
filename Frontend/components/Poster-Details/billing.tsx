@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { cartActions } from '../../store/cart-slice';
 import { RootState } from '../../store';
+import toastFunction from '../reactToast/toast';
+import { useRouter } from 'next/router';
 
 interface BillingType {
   handleAutoChange: () => void;
@@ -14,6 +16,7 @@ interface BillingType {
   maxQty: number;
   minQty: number;
   minDays: number;
+  createdBy: string;
   totalPrice: number;
   diffInDays: number;
   autoInputError: string;
@@ -41,7 +44,9 @@ const Billing: React.FC<BillingType> = ({
   address,
   noOfAuto,
   bookingDate,
+  createdBy,
 }) => {
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const {
@@ -52,6 +57,12 @@ const Billing: React.FC<BillingType> = ({
     useSelector((state: RootState) => state.auth);
 
   const [bookingDates, setBookingDates] = useState<string[]>([]);
+  const handleAddToCartSuccess = () => {
+    toastFunction('success', 'Added to Cart !');
+  };
+  const handleBookingQuantityError = (errorMessage: string) => {
+    toastFunction('warning', errorMessage);
+  };
 
   const addToCartHandler = () => {
     const startDate = state[0].startDate;
@@ -79,17 +90,41 @@ const Billing: React.FC<BillingType> = ({
         address,
         totalPrice,
         bookingDates: datesArray,
+        createdBy,
       }),
     );
+
+    router.push('/cart');
   };
+
+  function handleCart() {
+    if (mediatype === 'Rickshaws' || mediatype === 'Poles') {
+      const qty = Number(noOfAuto.current.value);
+      if (qty < minQty || qty > maxQty) {
+        handleBookingQuantityError(
+          qty < minQty
+            ? `Booking Quantity should be greater or equal to ${minQty}`
+            : `Booking Quantity should be less than ${maxQty}`,
+        );
+        return;
+      }
+    }
+
+    handleAddToCartSuccess();
+    setTimeout(addToCartHandler, 900);
+  }
+
   return (
     <>
-      <div className=" p-5 border-[2px]  border-gray-200 shadow-md shadow-gray-300 rounded-2xl">
+      <div className=" p-5 border-[2px]   border-gray-200 shadow-md shadow-gray-300 rounded-2xl">
         <p className="pb-3 font-poppins">
-          {' '}
           <span className="text-xl font-bold">₹{price}/</span>
           <span className="px-1 text-xl">
-            {mediatype === 'Rickshaws' ? 'auto' : 'day'}
+            {mediatype === 'Rickshaws'
+              ? 'auto'
+              : mediatype === 'Poles'
+              ? 'pole'
+              : 'day'}
           </span>
         </p>
 
@@ -122,67 +157,27 @@ const Billing: React.FC<BillingType> = ({
         <div className="text-center">
           {diffInDays >= minDays ? (
             <>
-              {mediatype ? (
-                Number(noOfAuto.current.value) >= minQty &&
-                Number(noOfAuto.current.value) <= maxQty ? (
-                  isLoggedIn ? (
-                    <Link href="/cart">
-                      <button
-                        onClick={addToCartHandler}
-                        className="tracking-widest mt-2 text-white w-full md:w-[394px] text-2xl p-2 bg-green-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
-                      >
-                        Reserve
-                      </button>
-                    </Link>
-                  ) : (
-                    <Link href="/login">
-                      <button
-                        // onClick={}
-                        className="tracking-widest mt-2 text-white w-full md:w-[394px] text-2xl p-2 bg-green-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
-                      >
-                        Reserve
-                      </button>
-                    </Link>
-                  )
-                ) : (
-                  <p className="tracking-widest mt-2 text-white w-full md:w-[394px] text-2xl p-2 bg-red-500 rounded-lg ">
-                    Add Proper Booking Quantity
-                  </p>
-                )
-              ) : isLoggedIn ? (
-                <Link href="/cart">
-                  <button
-                    onClick={addToCartHandler}
-                    className="font-inter tracking-tighter mt-2 text-white w-full text-2xl p-2 bg-blue-500 rounded-lg hover:bg-green-600 active:bg-green-600 focus:bg-indigo-950"
-                  >
-                    Add To Cart
-                  </button>
-                </Link>
+              {isLoggedIn ? (
+                <button
+                  onClick={handleCart}
+                  className="tracking-widest mt-2 text-white w-full md:w-[394px] text-2xl p-2 bg-blue-500  hover:bg-green-400 hover:scale-105 transition-all delay-70 active:bg-green-600 active:scale-100  rounded-lg"
+                >
+                  Add To Cart
+                </button>
               ) : (
                 <Link href="/login">
                   <button
                     // onClick={}
-                    className="tracking-widest mt-2 text-white w-full text-2xl p-2 bg-green-500 rounded-lg hover:bg-purple-700 active:bg-purple-900 focus:bg-indigo-950"
+                    className="tracking-widest mt-2 text-white w-full md:w-[394px] text-2xl p-2 bg-blue-500  hover:bg-green-400 hover:scale-105 transition-all delay-70 active:bg-green-600 active:scale-100  rounded-lg"
                   >
-                    Reserve
+                    Add To Cart
                   </button>
                 </Link>
-              )}
-
-              {mediatype && noOfAuto && diffInDays && (
-                <div className=" bg-transparent  border-2 border-black mt-3 rounded-lg  ">
-                  <p className="text-lg font-inter">
-                    Total No. of {mediatype} : {noOfAuto.current.value}{' '}
-                  </p>
-                  <p className="text-lg font-inter ">
-                    Total Booking Days : {diffInDays}
-                  </p>
-                </div>
               )}
             </>
           ) : (
             <>
-              <p className="p-2 mb-2 text-xl text-white font-inter bg-orange-500 rounded-md mt-3">
+              <p className="p-2 mb-2 md:w-[394px] text-xl text-white font-inter bg-orange-500  mt-3">
                 Select Minimum {minDays} days
               </p>
             </>
@@ -190,9 +185,19 @@ const Billing: React.FC<BillingType> = ({
         </div>
         <div className=" border-b-[2px] border-b-gray-300">
           <div className=" flex mt-5 p-2 text-lg rounded-lg  font-inter ">
-            <div className="w-1/2">
+            <div className="w-full">
               <p>
-                ₹{price} X {diffInDays}days
+                {noOfAuto.current === undefined
+                  ? `₹${price} X ${diffInDays}days`
+                  : ` ₹${price} x ${
+                      noOfAuto?.current?.value ? noOfAuto?.current?.value : 1
+                    } ${
+                      mediatype === 'Rickshaws'
+                        ? 'auto'
+                        : mediatype === 'Poles'
+                        ? 'pole'
+                        : 'day'
+                    } x ${diffInDays}days `}
               </p>
             </div>
             <div className="font-inter w-1/2 flex justify-end">

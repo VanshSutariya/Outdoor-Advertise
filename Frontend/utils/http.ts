@@ -1,6 +1,4 @@
-export default async function fetchUser(id: string): Promise<string> {
-  // console.log(`http://localhost:4000/poster/${id}`);
-
+export default async function fetchUser(id: string): Promise<any> {
   const resData = await fetch(`http://localhost:4000/auth/${id}`, {
     method: 'GET',
     headers: {
@@ -80,6 +78,7 @@ export async function fetchAllBookingsData(): Promise<{
   const bookings = await resData.json();
   return bookings;
 }
+
 export async function fetchMonthlyData() {
   const resData = await fetch('http://localhost:4000/booking/currMonthData', {
     method: 'GET',
@@ -185,4 +184,23 @@ export async function UserRoleChangeStatus(userId) {
   );
   const newData = await data.json();
   return newData;
+}
+
+export async function fetchAllBookingsOrders({
+  page,
+  per_page,
+}: {
+  page: number;
+  per_page: number;
+}): Promise<any[]> {
+  const resData = await fetch(
+    `http://localhost:4000/booking?page=${page}&per_page=${per_page}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    },
+  );
+  const orders = await resData.json();
+  if (!resData.ok) throw new Error('Please place some orders.');
+  return orders;
 }

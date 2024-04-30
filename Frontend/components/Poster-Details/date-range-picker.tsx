@@ -21,6 +21,7 @@ interface DatePickerProps {
   minQty: number;
   maxQty: number;
   bookingDate: string[];
+  createdBy: string;
 }
 const DatePicker: React.FC<DatePickerProps> = ({
   id,
@@ -33,6 +34,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   minQty,
   maxQty,
   bookingDate,
+  createdBy,
 }) => {
   const windowWidth = useFindWidth();
   const [diffInDays, setDiffInDays] = useState<number>(0);
@@ -131,10 +133,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
   return (
     <>
-      <div className=" md:flex">
-        <div className="mx-10">
+      <div className=" md:flex ">
+        <div className="mx-10 md:pt-5 border-[2px]   border-gray-200 shadow-md shadow-gray-300 rounded-2xl p-3 ">
           <DateRange
-            onChange={(item) => setState([item.selection])}
+            onChange={(item: any) => setState([item.selection])}
             ranges={state}
             minDate={calculateMinDate()}
             rangeColors={['#EC7A20']}
@@ -144,10 +146,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
             moveRangeOnFirstSelection={false}
             disabledDates={bookingDate}
           />
-          <div className=" pb-5 mt-3 ">
+          <div className="">
             <button
-              className="text-lg hover:bg-blue-800 active:bg-blue-600 p-2 rounded-lg  text-white
-               bg-blue-950 "
+              className="text-md border-2 md:ml-4 px-2 py-1 border-black rounded-lg font-poppins bg-black text-white hover:scale-105 active:scale-95 "
               onClick={clearDates}
             >
               Clear Date
@@ -158,11 +159,12 @@ const DatePicker: React.FC<DatePickerProps> = ({
           id={id}
           title={title}
           image={image}
-          address={address}
           price={price}
           state={state}
           maxQty={maxQty}
           minQty={minQty}
+          createdBy={createdBy}
+          address={address}
           minDays={minDays}
           noOfAuto={noOfAuto}
           mediatype={mediatype}

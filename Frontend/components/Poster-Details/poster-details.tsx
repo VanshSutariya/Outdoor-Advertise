@@ -25,6 +25,7 @@ interface PosterData {
   state: string;
   city: string;
   bookingDate: string[];
+  createdBy: string;
 }
 
 interface PosterDetailsProps {
@@ -90,20 +91,20 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
       <div>
         <Link
           href="/"
-          className=" text-lg md:px-[60px] pt-3 flex text-blue-600 hover:text-blue-700 active:text-blue-500"
+          className="text-2xl md:px-[60px] pt-3 font-inter font-semibold flex text-blue-400 hover:text-purple-800 active:text-blue-500"
         >
-          <IoIosArrowRoundBack size={30} /> Back
+          <IoIosArrowRoundBack size={36} className="pb-1" /> Back
         </Link>
       </div>
       <div className="md:flex items-center justify-center">
-        <div className="md:w-1/3 pt-2  p-5 rounded-lg mb-9">
+        <div className="md:w-1/3  p-5 rounded-lg mb-9">
           <img
-            className="rounded-2xl md:h-[300px] h-[300px] w-full"
+            className="rounded-2xl  md:h-[300px] h-[300px] w-full"
             src={posterData.image}
             alt="poster1-image"
           />
         </div>
-        <div className="w-full border-[2px] border-gray-100 shadow-md sm:w-full md:w-1/2 rounded-lg ">
+        <div className="w-full md:-mt-8 border-[2px] border-gray-100 shadow-md sm:w-full md:w-1/2 rounded-lg ">
           <h1 className="mt-5 flex  justify-center text-3xl text-gray-800 font-bold tracking-wider font-inter">
             {capitalizedTitle}
           </h1>
@@ -116,7 +117,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                 </div>
                 <p className="text-lg">Location:</p>
               </div>
-              <p className=" text-slate-600">
+              <p className=" text-slate-600 md:ml-5">
                 {posterData.address?.toLocaleLowerCase()},
                 {posterData.city?.toLocaleLowerCase()},
                 {posterData.state?.toLocaleLowerCase()}
@@ -130,7 +131,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                 </div>
                 <p>Specifications:</p>
               </div>
-              <div className="text-slate-600">
+              <div className="text-slate-600 md:ml-5">
                 <p className="">
                   Size:{posterData.size} | Area: {posterData.sft} squarefoot |
                   MediaType: {posterData.mediatype}
@@ -148,7 +149,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                 </div>
                 <p>Booking Info:</p>
               </div>
-              <div className="text-slate-600">
+              <div className="text-slate-600 md:ml-5">
                 <p>
                   {' '}
                   Minimum Booking Days : {posterData.minimumDays} days{' '}
@@ -167,6 +168,8 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                 <span className="text-xl ml-5 text-green-500 font-bold font-poppins">
                   {posterData.mediatype === 'Rickshaws'
                     ? `₹${posterData.price}/ auto`
+                    : posterData.mediatype === 'Poles'
+                    ? `₹${posterData.price}/ pole`
                     : `₹${posterData.price}/ day`}
                 </span>
               </p>
@@ -199,6 +202,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           id={id}
           image={posterData.image}
           address={posterData.address}
+          createdBy={posterData.createdBy}
         />
       </div>
     </>

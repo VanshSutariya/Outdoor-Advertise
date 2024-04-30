@@ -27,6 +27,10 @@ export class CreateCartDto {
   @IsNotEmpty()
   address: string;
 
+  @IsString()
+  @IsNotEmpty()
+  createdBy: string;
+
   @IsNumber()
   @IsNotEmpty()
   totalPrice: number;

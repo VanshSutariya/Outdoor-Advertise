@@ -44,11 +44,8 @@ const NavBar: React.FC = () => {
       if (decodedToken) {
         const fetchUserFunc = async () => {
           const userName = await fetchUser(decodedToken.id);
-          console.log(userName);
-
           dispatch(loginIn(userName));
         };
-
         fetchUserFunc();
       }
     }
