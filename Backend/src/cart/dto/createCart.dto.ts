@@ -28,7 +28,8 @@ export class CreateCartDto {
   address: string;
 
   @IsString()
-  @IsNotEmpty()
+  // @IsNotEmpty()
+  @IsOptional()
   createdBy: string;
 
   @IsNumber()

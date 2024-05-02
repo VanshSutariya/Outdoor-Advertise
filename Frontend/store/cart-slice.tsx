@@ -9,6 +9,7 @@ interface Item {
   title: string;
   totalPrice: number;
   address: string;
+  createdBy: string;
   bookingDate: string[];
 }
 interface cartState {
@@ -49,6 +50,7 @@ const cartSlice = createSlice({
           title: details.title,
           totalPrice: details.totalPrice,
           address: details.address,
+          createdBy: details.createdBy,
           bookingDate: details.bookingDates,
           _id: '',
         });
@@ -63,7 +65,7 @@ const cartSlice = createSlice({
               totalPrice: details.totalPrice,
               address: details.address,
               bookingDate: details.bookingDates,
-              createdBy: details.cretedBy,
+              createdBy: details.createdBy,
             };
 
             const resData = await fetch('http://localhost:4000/cart/add', {

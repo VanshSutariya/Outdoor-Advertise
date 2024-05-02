@@ -31,6 +31,11 @@ export class CreateBookingDto {
   @IsNotEmpty()
   totalPrice: number;
 
+  @IsString()
+  // @IsNotEmpty()
+  @IsOptional()
+  createdBy: string;
+
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

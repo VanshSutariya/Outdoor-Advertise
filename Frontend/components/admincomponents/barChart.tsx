@@ -2,7 +2,7 @@ import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
 import { defaults } from 'chart.js/auto';
-import { start } from 'repl';
+import numeral from 'numeral';
 
 Chart.register(...registerables);
 
@@ -71,7 +71,7 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
             weight: 'bold' as 'bold',
           },
           callback: function (value: number) {
-            return '₹' + value;
+            return formatRevenue(value);
           },
         },
         drawBorder: false,
@@ -108,10 +108,23 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
   };
 
   return (
-    <div className=" md:w-[1700px] border-[2px] border-gray-200 p-3 rounded-xl">
+    <div className=" md:w-[1700px] md:h-[475px] border-[2px] border-gray-200 p-3 rounded-xl">
       <Bar data={data} options={options} />
     </div>
   );
 };
 
 export default BarGraph;
+
+function formatRevenue(revenue: any) {
+  const crore = 10000000; // 1 crore = 10,000,000
+  const lakh = 100000; // 1 lakh = 100,000
+
+  if (revenue >= crore) {
+    return `₹${(revenue / crore).toFixed(2)} CR`;
+  } else if (revenue >= lakh) {
+    return `₹${(revenue / lakh).toFixed(2)} L`;
+  } else {
+    return '₹' + numeral(revenue).format('0,0.00');
+  }
+}

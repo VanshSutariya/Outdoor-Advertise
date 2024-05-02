@@ -10,7 +10,7 @@ import { logout } from '../../store/auth-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { UploadButton } from '../../utils/uploadthing';
 import React from 'react';
-import { Bounce, ToastContainer, toast } from 'react-toastify';
+import { Bounce, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PopUpModal from '../../components/account/popupModal';
 
@@ -214,6 +214,21 @@ export default function AccountPage() {
             )}
             {userRole === 'admin' && (
               <Link href="/admin" className="w-[285px]">
+                <div className="flex border-[2px] border-slate-200 mt-3 shadow-md rounded-md p-3 hover:bg-slate-200 active:bg-white">
+                  <img
+                    src="/dashboard.png"
+                    alt="order"
+                    className="h-14 w-12 mt-1 mb-1"
+                  />
+                  <div>
+                    <p className="ml-3 mt-3 text-lg"> Dashboard</p>
+                    <p className="ml-3 text-sm"> analysis, users controls</p>
+                  </div>
+                </div>
+              </Link>
+            )}
+            {userRole === 'member' && (
+              <Link href="dashboard" className="w-[285px]">
                 <div className="flex border-[2px] border-slate-200 mt-3 shadow-md rounded-md p-3 hover:bg-slate-200 active:bg-white">
                   <img
                     src="/dashboard.png"

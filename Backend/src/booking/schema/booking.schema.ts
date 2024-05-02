@@ -8,6 +8,9 @@ export class Booking {
   @Prop({ required: true })
   posterId: string;
 
+  @Prop({ required: false })
+  createdBy: string;
+
   @Prop({ required: true })
   title: string;
 

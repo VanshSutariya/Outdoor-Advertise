@@ -3,7 +3,7 @@ interface InputProps {
   type: string;
   placeholder: string;
   label: string;
-  value: string;
+  value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -17,7 +17,7 @@ const Input: React.FC<InputProps> = (props) => {
         {props.label}
       </label>
       <input
-        className="appearance-none font-poppins block w-full bg-slate-100  border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+        className="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
         id={props.name}
         name={props.name}
         type={props.type}

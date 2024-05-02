@@ -14,22 +14,32 @@ interface Poster {
 
 interface PosterGridProps {
   totalLength: number;
+  id?: string;
 }
 
-const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
+const PosterGrid: React.FC<PosterGridProps> = (props) => {
   const [posterData, setPosterData] = useState<Poster[]>([]);
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
 
   let per_page: number = 6;
-  const totalPages: number = Math.ceil(totalLength / per_page);
+  const totalPages: number = Math.ceil(props.totalLength / per_page);
   let isPageOutOfRange: boolean;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resData: Poster[] = await fetchAllPoster({ page, per_page });
-        setPosterData(resData);
+        if (props.id) {
+          const resData: Poster[] = await fetchAllPoster(
+            page,
+            per_page,
+            props.id,
+          );
+          setPosterData(resData);
+        } else {
+          const resData: Poster[] = await fetchAllPoster(page, per_page);
+          setPosterData(resData);
+        }
 
         let pageNumbers: number[] = [];
         const offsetNumber: number = 2;
@@ -46,7 +56,7 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
     };
 
     fetchData();
-  }, [page, totalLength, totalPages]);
+  }, [page, props.totalLength, totalPages]);
 
   const handlePrevClick = () => {
     setPage(page - 1);
@@ -68,7 +78,11 @@ const PosterGrid: React.FC<PosterGridProps> = ({ totalLength }) => {
             className="mt-8 rounded-lg transform inline-block overflow-hidden transition-transform duration-300  hover:scale-130"
             key={poster._id}
           >
-            <PosterItem {...poster} />
+            {props.id ? (
+              <PosterItem {...poster} id={props.id} />
+            ) : (
+              <PosterItem {...poster} />
+            )}
           </div>
         ))}
       </div>

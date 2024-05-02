@@ -19,13 +19,19 @@ export class BookingService {
     if (query?.userId) {
       DBQuery['userId'] = query?.userId;
     }
+
+    if (query?.createdBy) {
+      DBQuery['createdBy'] = query?.createdBy;
+    }
+
     const resPerPage = Number(query?.per_page) || 0;
     const currPage = Number(query.page) || 1;
     const skip = resPerPage * (currPage - 1);
     const resData = await this.bookingModel
       .find(DBQuery)
       .limit(resPerPage)
-      .skip(skip);
+      .skip(skip)
+      .sort({ createdAt: -1 });
 
     if (!resData) throw new HttpException('You have no order placed yet.', 404);
     return resData;
@@ -44,7 +50,7 @@ export class BookingService {
   }
 
   // current month sales ------------------------------------------------
-  async getCurrentMonthSales() {
+  async getCurrentMonthSales(id?: string) {
     try {
       const currentDate = new Date();
       const startOfMonth = new Date(
@@ -58,14 +64,23 @@ export class BookingService {
         0,
       );
 
+      let matchQuery: any = {
+        createdAt: {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        },
+      };
+
+      if (id) {
+        matchQuery = {
+          ...matchQuery,
+          createdBy: id,
+        };
+      }
+
       const totalSalesResult = await this.bookingModel.aggregate([
         {
-          $match: {
-            createdAt: {
-              $gte: startOfMonth,
-              $lte: endOfMonth,
-            },
-          },
+          $match: matchQuery,
         },
         {
           $group: {
@@ -78,12 +93,7 @@ export class BookingService {
       const totalSales =
         totalSalesResult.length > 0 ? totalSalesResult[0].totalSales : 0;
 
-      const bookings = await this.bookingModel.find({
-        createdAt: {
-          $gte: startOfMonth,
-          $lte: endOfMonth,
-        },
-      });
+      const bookings = await this.bookingModel.find(matchQuery);
 
       const topPayments = await Promise.all(
         bookings
@@ -204,6 +214,7 @@ export class BookingService {
 
     return yearlyRevenue;
   }
+
   async getTotalRevenue(): Promise<number> {
     const revenue = await this.bookingModel.aggregate([
       {
@@ -216,5 +227,131 @@ export class BookingService {
     const totalRevenue = revenue.length > 0 ? revenue[0].totalRevenue : 0;
 
     return totalRevenue;
+  }
+
+  // memberstats----------------------------------------------------------------------------------
+  async getMemberRevenueStats(id: string): Promise<{
+    currentYearTotalRevenue: number;
+    yearlyRevenue: number[];
+    todayEarning: number;
+    currentMonthEarning: number;
+    totalPosters: number;
+  }> {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // Adjust month to be 1-indexed for MongoDB
+    currentDate.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(currentDate);
+    endOfDay.setUTCDate(currentDate.getUTCDate() + 1);
+    const currYear = new Date().getUTCFullYear();
+    const startOfYear = new Date(Date.UTC(currYear, 0, 1));
+    const endOfYear = new Date(Date.UTC(currYear + 1, 0, 1));
+
+    const [totalRevenue, monthResult, dayResult, currentYearData, yourPosters] =
+      await Promise.all([
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+              createdAt: {
+                $gte: new Date(currentYear, 0, 1),
+                $lte: new Date(currentYear, 11, 31),
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalRevenue: { $sum: '$totalPrice' },
+            },
+          },
+        ]),
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+              $expr: { $eq: [{ $year: '$createdAt' }, currentYear] },
+            },
+          },
+          {
+            $group: {
+              _id: { $month: '$createdAt' },
+              totalEarning: { $sum: '$totalPrice' },
+            },
+          },
+          {
+            $match: { _id: currentMonth }, // Filter to current month
+          },
+        ]),
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+              createdAt: {
+                $gte: currentDate,
+                $lt: endOfDay,
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              todayEarning: { $sum: '$totalPrice' },
+            },
+          },
+        ]),
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+              createdAt: {
+                $gte: startOfYear,
+                $lt: endOfYear,
+              },
+            },
+          },
+          {
+            $group: {
+              _id: { $month: '$createdAt' },
+              totalRevenue: { $sum: '$totalPrice' },
+            },
+          },
+          {
+            $sort: { _id: 1 },
+          },
+        ]),
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalPosters: { $sum: 1 },
+            },
+          },
+          {
+            $sort: { _id: 1 },
+          },
+        ]),
+      ]);
+
+    const yearlyRevenue: number[] = new Array(12).fill(0);
+    currentYearData.forEach((item: any) => {
+      const monthIndex = item._id - 1;
+      yearlyRevenue[monthIndex] = item.totalRevenue;
+    });
+
+    return {
+      currentYearTotalRevenue:
+        totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0,
+      currentMonthEarning:
+        monthResult.length > 0 ? monthResult[0].totalEarning : 0,
+      todayEarning: dayResult.length > 0 ? dayResult[0].totalEarning : 0,
+      totalPosters: yourPosters.length > 0 ? yourPosters[0].totalPosters : 0,
+      yearlyRevenue,
+    };
   }
 }

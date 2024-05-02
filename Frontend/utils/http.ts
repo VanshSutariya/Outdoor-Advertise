@@ -10,9 +10,22 @@ export default async function fetchUser(id: string): Promise<any> {
   if (!resData.ok) throw new Error('user id is not vaid.');
   return user;
 }
+export async function deletePosterById(id: string): Promise<any> {
+  const resData = await fetch(`http://localhost:4000/auth/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return resData;
+}
 
-export async function fetchAllPosters(): Promise<any[]> {
-  const resData = await fetch('http://localhost:4000/poster', {
+export async function fetchAllPosters(id?: string): Promise<any[]> {
+  let url = 'http://localhost:4000/poster';
+  if (id) {
+    url = `http://localhost:4000/poster?createdBy=${id}`;
+  }
+  const resData = await fetch(url, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -20,20 +33,21 @@ export async function fetchAllPosters(): Promise<any[]> {
   return posters;
 }
 
-export async function fetchAllPoster({
-  page,
-  per_page,
-}: {
-  page: number;
-  per_page: number;
-}): Promise<any[]> {
-  const resData = await fetch(
-    `http://localhost:4000/poster?page=${page}&per_page=${per_page}&state=&city=&price=`,
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    },
-  );
+export async function fetchAllPoster(
+  page: number,
+  per_page: number,
+  id?: string,
+): Promise<any[]> {
+  let url: string;
+  if (id) {
+    url = `http://localhost:4000/poster?page=${page}&per_page=${per_page}&createdBy=${id}&state=&city=&price=`;
+  } else {
+    url = `http://localhost:4000/poster?page=${page}&per_page=${per_page}&state=&city=&price=`;
+  }
+  const resData = await fetch(url, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
   const posters = await resData.json();
   return posters;
 }
@@ -79,8 +93,12 @@ export async function fetchAllBookingsData(): Promise<{
   return bookings;
 }
 
-export async function fetchMonthlyData() {
-  const resData = await fetch('http://localhost:4000/booking/currMonthData', {
+export async function fetchMonthlyData(id?: string) {
+  let url = 'http://localhost:4000/booking/currMonthData/';
+  if (id) {
+    url += id;
+  }
+  const resData = await fetch(url, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -203,4 +221,22 @@ export async function fetchAllBookingsOrders({
   const orders = await resData.json();
   if (!resData.ok) throw new Error('Please place some orders.');
   return orders;
+}
+
+export async function fetchMemberPosterStats(id: string): Promise<{
+  currentYearTotalRevenue: number;
+  yearlyRevenue: number[];
+  todayEarning: number;
+  currentMonthEarning: number;
+  totalPosters: number;
+}> {
+  const resData = await fetch(
+    `http://localhost:4000/booking/memberStats/${id}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    },
+  );
+  const bookings = await resData.json();
+  return bookings;
 }

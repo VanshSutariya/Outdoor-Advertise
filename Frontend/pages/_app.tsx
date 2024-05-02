@@ -2,9 +2,10 @@ import '../styles/globals.css';
 import Head from 'next/head';
 import { AppProps } from 'next/app';
 import { Provider, useDispatch } from 'react-redux';
-import store from '../store/index';
+import store, { persistor } from '../store/index';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { PersistGate } from 'redux-persist/integration/react';
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -17,8 +18,10 @@ function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <Provider store={store}>
-        <Component {...pageProps} />
-        <ToastContainer />
+        <PersistGate loading={null} persistor={persistor}>
+          <Component {...pageProps} />
+          <ToastContainer />
+        </PersistGate>
       </Provider>
     </>
   );

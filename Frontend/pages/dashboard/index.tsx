@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import BarGraph from '../../components/admincomponents/barChart';
 import Sidebar from '../../components/admincomponents/sidebar';
 
 import {
-  fetchAllBookingsData,
   fetchAllUsers,
+  fetchMemberPosterStats,
   fetchMonthlyData,
 } from '../../utils/http';
 import { BsCurrencyRupee } from 'react-icons/bs';
-import { LuCreditCard, LuUsers } from 'react-icons/lu';
+import { LuCreditCard } from 'react-icons/lu';
+import { GiReceiveMoney } from 'react-icons/gi';
 import { TbActivityHeartbeat } from 'react-icons/tb';
 import numeral from 'numeral';
-import NotificationPopUp from '../../components/admincomponents/notificationPopUp';
 import ProfileDropDown from '../../components/admincomponents/profileDropDown';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import Link from 'next/link';
 
 interface MonthlyPayment {
   userId: string;
@@ -29,12 +31,15 @@ interface TopPayment {
   topMonthlyPayment: MonthlyPayment[];
 }
 
-export default function AdminHomePage() {
+export default function DashboardPage() {
   const [topPayment, setTopPayments] = useState<TopPayment | null>(null);
-  const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
-  const [todayEarning, setTodayEarning] = useState<number | null>(null);
+  const [memberStats, setMemberStats] = useState({
+    totalRevenue: 0,
+    currentMonthRevenue: 0,
+    todayEarning: 0,
+    totalPosters: 0,
+  });
   const [monthlyData, setMonthlyData] = useState<number[] | null>([]);
-  const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [totalMembers, setTotalMembers] = useState<number | null>(null);
 
   const {
@@ -50,22 +55,23 @@ export default function AdminHomePage() {
   useEffect(() => {
     try {
       const data = async () => {
-        // Countusers
-        const role = 'user';
-        const userCount = await fetchAllUsers(role);
-        setTotalUsers(userCount);
         // count member
         const memberrole = 'member';
         const memberCount = await fetchAllUsers(memberrole);
         setTotalMembers(memberCount);
-        const data = await fetchAllBookingsData();
-        setTodayEarning(data.todayRevenue);
-        setTotalRevenue(data.totalRevenue);
+        const id = userId;
+        const data = await fetchMemberPosterStats(id);
+        setMemberStats((prev) => {
+          const newState = { ...prev };
+          newState.totalRevenue = data.currentYearTotalRevenue;
+          newState.currentMonthRevenue = data.currentMonthEarning;
+          newState.todayEarning = data.todayEarning;
+          newState.totalPosters = data.totalPosters;
+          return newState;
+        });
         setMonthlyData(data.yearlyRevenue);
 
-        const monthlydata = await fetchMonthlyData();
-        console.log(monthlyData);
-
+        const monthlydata = await fetchMonthlyData(userId);
         setTopPayments(monthlydata);
       };
       data();
@@ -91,26 +97,46 @@ export default function AdminHomePage() {
     <>
       <Sidebar>
         <div className="container mx-auto font-poppins ">
-          <div className="text-3xl xs:flex items-center font-semibold -mt-5 mb-3 font-poppins">
+          <div className="text-3xl xs:flex items-center font-semibold -mt-7  font-inter">
             <p>Dashboard</p>
-            <div className="flex justify-end w-full items-center">
-              <div className="relative m-6 w-fit items-end ">
-                <NotificationPopUp />
-              </div>
+            <Link
+              href="/"
+              className="md:ml-20 md: mt-1 text-xl font-normal font-poppins"
+            >
+              Home
+            </Link>
+            <div className="flex mt-3 justify-end w-full items-center">
               <ProfileDropDown />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-3 -mb-2">
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="text-md  mb-4 flex">
                 Total Revenue
                 <BsCurrencyRupee className="md:ml-24 text-gray-400 mt-1" />
               </div>
-              <p className="text-2xl font-medium ">
-                {totalRevenue && totalRevenue !== null
-                  ? formatRevenue(totalRevenue)
+              <p className="text-2xl ml-1 font-medium ">
+                {memberStats.totalRevenue && memberStats.totalRevenue !== null
+                  ? formatRevenue(memberStats.totalRevenue)
                   : 'Loading...'}
               </p>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="text-md  mb-4 flex">
+                Monthly Revenue
+                <GiReceiveMoney
+                  className="md:ml-[65px]  text-gray-400"
+                  size={20}
+                />
+              </div>
+              <p className="text-2xl font-medium ml-1">
+                {memberStats.currentMonthRevenue &&
+                memberStats.currentMonthRevenue !== null
+                  ? formatRevenue(memberStats.currentMonthRevenue)
+                  : '₹0'}
+              </p>
+              {/* <p className="text-green-500">+180.1% from last month</p> */}
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -118,34 +144,25 @@ export default function AdminHomePage() {
                 Today Earnings
                 <LuCreditCard className="md:ml-20 text-gray-400 mt-1" />
               </div>
-              <p className="text-2xl tracking-wider font-medium ">
-                {todayEarning && todayEarning !== null
-                  ? formatRevenue(todayEarning)
+              <p className="text-2xl ml-2 tracking-wider font-medium ">
+                {memberStats.todayEarning && memberStats.todayEarning !== null
+                  ? formatRevenue(memberStats.todayEarning)
                   : '₹0'}
               </p>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="text-md  mb-4 flex">
-                <p className="md:ml-3">Users</p>
-                <LuUsers className="md:ml-[145px] mt-1 text-gray-400" />
-              </div>
-              <p className="text-2xl font-medium ml-3">
-                {totalUsers !== null ? `+${totalUsers}` : 'Loading...'}
-              </p>
-              {/* <p className="text-green-500">+180.1% from last month</p> */}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-md  mb-4 flex">
-                <p className="ml-2">Members</p>
+                Your Posters
                 <TbActivityHeartbeat
                   size={22}
-                  className="font-light md:ml-[115px] mt-1 text-gray-400"
+                  className="font-light md:ml-[95px] mt-1 text-gray-400"
                 />
               </div>
               <p className="text-2xl font-medium ml-2">
-                {totalMembers !== null ? `+${totalMembers}` : 'Loading...'}
+                {memberStats.totalPosters && memberStats.totalPosters !== null
+                  ? `+${memberStats.totalPosters}`
+                  : 'Loading...'}
               </p>
 
               {/* <p className="text-green-500">+19% from last month</p> */}

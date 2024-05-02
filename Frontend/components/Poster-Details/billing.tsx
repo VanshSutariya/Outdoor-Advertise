@@ -81,6 +81,8 @@ const Billing: React.FC<BillingType> = ({
     setBookingDates(updatedBookingDates);
 
     const posterId = id;
+    console.log(createdBy);
+
     dispatch(
       cartActions.addItemToCart({
         posterId,

@@ -57,6 +57,7 @@ export class StripeWebhookService {
                   image: cartItem.image,
                   address: cartItem.address,
                   totalPrice: cartItem.totalPrice,
+                  createdBy: cartItem.createdBy,
                   bookingDate: cartItem.bookingDate,
                 };
 
@@ -66,7 +67,6 @@ export class StripeWebhookService {
                   console.log('booking failed----------', booking);
                   return;
                 }
-                console.log('Booking created:', booking);
 
                 // updating the booking dates in the posters-----------------------
                 const updatePosterDto: UpdatePosterDto = {

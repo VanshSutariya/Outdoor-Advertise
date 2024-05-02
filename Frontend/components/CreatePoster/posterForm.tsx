@@ -1,19 +1,30 @@
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Input from './elements/input';
 import { useRouter } from 'next/router';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { UploadButton } from '../../utils/uploadthing';
-import React from 'react';
-import { FaRegEdit } from 'react-icons/fa';
+import * as Yup from 'yup';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import toastFunction from '../reactToast/toast';
+import SelectInput from './elements/selectInput';
+import TextArea from './elements/textArea';
+import { fetchOnePoster } from '../../utils/http';
 
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+interface PosterFormProps {
+  id?: string; // Make id optional
+}
 
-const PosterForm: React.FC = () => {
+const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
   const router = useRouter();
+  const [imgUrl, setImgUrl] = useState<string | null>('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { userId }: { userId: string | null } = useSelector(
+    (state: RootState) => state.auth,
+  );
+
   const [formValues, setFormValues] = useState({
-    companyName: '',
     title: '',
     mediatype: 'Poles',
     lightingType: 'FRONT-LIGHTING',
@@ -22,14 +33,94 @@ const PosterForm: React.FC = () => {
     address: '',
     state: 'Gujarat',
     city: '',
-    mindays: undefined,
-    perDayPrice: undefined,
-    height: undefined,
-    width: undefined,
-    minQty: undefined,
-    maxQty: undefined,
+    mindays: 2,
+    perDayPrice: 1,
+    height: 1,
+    width: 1,
+    minQty: 1,
+    maxQty: 1,
   });
-  const [imgUrl, setImgUrl] = useState<string | null>('');
+  useEffect(() => {
+    const fetchPosterDetails = async () => {
+      try {
+        const response = await fetchOnePoster(id);
+        if (response) {
+          setFormValues((prev) => {
+            setImgUrl(response?.image);
+            const newdata = { ...prev };
+            newdata.title = response.title;
+            newdata.mediatype = response.mediatype;
+            newdata.lightingType = response.lightingType;
+            newdata.landmark = response?.landmark;
+            newdata.address = response.address;
+            newdata.facingFrom = response?.facinfFrom;
+            newdata.state = response.state;
+            newdata.city = response.city;
+            newdata.mindays = response.minimumDays;
+            newdata.perDayPrice = response.price;
+            newdata.minQty = response.minQty;
+            newdata.maxQty = response.maxQty;
+            const [heightStr, widthStr] = response?.size
+              .split('X')
+              .map((str: any) => str.trim());
+
+            // Extract numbers from the strings
+            const height = parseInt(heightStr);
+            const width = parseInt(widthStr);
+            newdata.height = height;
+            newdata.width = width;
+            return newdata;
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching poster details:', error);
+      }
+    };
+
+    if (id) {
+      fetchPosterDetails();
+    }
+  }, [id]);
+
+  const validateSchema = Yup.object().shape({
+    title: Yup.string()
+      .matches(/^[A-Za-z]/, 'Title must start with a letter')
+      .required('Title must be required')
+      .max(100, 'Title must be at most 30 characters'),
+    landmark: Yup.string()
+      .required('Landmark is required')
+      .max(100, 'Landmark must be at most 50 characters'),
+    facingFrom: Yup.string().max(
+      20,
+      'FacingFrom must be at most 20 characters',
+    ),
+    address: Yup.string().required('Address should not empty.'),
+    city: Yup.string()
+      .matches(/^[A-Za-z]+$/, 'City must contain only letters')
+      .required('City is required')
+      .max(20, 'City must be at most 20 characters'),
+    mindays: Yup.number()
+      .min(2, 'Minimum days must be at least 2')
+      .max(365, 'Minimum days must be at most 365'),
+    perDayPrice: Yup.number()
+      .required('Price must be required')
+      .min(1, 'Price must be at least 1')
+      .max(10000000, 'Price must be at most 10,000,000'),
+    height: Yup.number()
+      .required('Height must be required')
+      .min(1, 'Height must be at least 1')
+      .max(100000, 'Height must be at most 100,000'),
+    width: Yup.number()
+      .required('Width must be required')
+      .min(1, 'Width must be at least 1')
+      .max(100000, 'Width must be at most 100,000'),
+    minQty: Yup.number()
+      .min(1, 'Minimum Quantity must be at least 1')
+      .max(1000000, 'value must be at most 1,000,000'),
+    maxQty: Yup.number()
+      .min(1, 'Maximum Quantity must be at least 1')
+      .max(1000000, 'Maximum Quantity must be at most 1,000,000'),
+  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -37,85 +128,91 @@ const PosterForm: React.FC = () => {
     >,
   ) => {
     const { name, value } = e.target;
-    const numericValue =
-      name === 'perDayPrice' ||
-      name === 'height' ||
-      name === 'width' ||
-      name === 'mindays' ||
-      name === 'minQty' ||
-      name === 'maxQty'
-        ? parseFloat(value)
-        : value;
-
+    const numericValue = [
+      'perDayPrice',
+      'height',
+      'width',
+      'mindays',
+      'minQty',
+      'maxQty',
+    ].includes(name)
+      ? parseFloat(value)
+      : value;
     setFormValues({ ...formValues, [name]: numericValue });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    if (formValues.facingFrom?.trim() === '') {
-      delete formValues.facingFrom;
-    }
-
-    if (!formValues.minQty) delete formValues.maxQty;
-    if (!formValues.maxQty) delete formValues.minQty;
-
-    const data = { ...formValues, imgUrl };
-    const {
-      title,
-      mediatype,
-      lightingType,
-      landmark,
-      facingFrom,
-      address,
-      state,
-      city,
-      mindays: minimumDays,
-      perDayPrice: price,
-      height,
-      width,
-      imgUrl: image,
-      minQty,
-      maxQty,
-    } = data;
-    const size = `${height}H X ${width}W`;
-    const sft = height * width;
     try {
-      const resData = await fetch('http://localhost:4000/poster/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          mediatype,
-          lightingType,
-          landmark,
-          facingFrom,
-          address,
-          state,
-          city,
-          minimumDays,
-          price,
-          image,
-          size,
-          sft,
-          minQty,
-          maxQty,
-        }),
-      });
-      const response = await resData.json();
+      await validateSchema.validate(formValues, { abortEarly: false });
 
-      if (!resData.ok) {
-        throw new Error(response.message || 'enter valid data');
+      if (formValues.facingFrom?.trim() === '') {
+        delete formValues.facingFrom;
       }
-      // Try to alert first to check if it's working
-      alert('Data Successfully submitted.');
-      // Then try navigating
-      router.push('/account');
-    } catch (error) {
-      console.log(error.message);
-    }
 
-    console.log(data);
+      if (!formValues.minQty) delete formValues.maxQty;
+      if (!formValues.maxQty) delete formValues.minQty;
+      const { height, width, mindays, perDayPrice, ...formData } = formValues;
+      const size = `${height}H X ${width}W`;
+      const sft = height * width;
+      const postdata = {
+        ...formData,
+        sft,
+        size,
+        minimumDays: mindays,
+        price: perDayPrice,
+        image: imgUrl,
+        createdBy: userId,
+      };
+
+      if (id) {
+        const resData = await fetch(`http://localhost:4000/poster/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postdata),
+        });
+        const response = await resData.json();
+        if (!resData.ok) {
+          throw new Error(response.message || 'enter valid data');
+        }
+        toastFunction('success', 'Poster Created Successfully!');
+        router.push('/dashboard/posters');
+      } else {
+        const resData = await fetch('http://localhost:4000/poster/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postdata),
+        });
+        const response = await resData.json();
+
+        if (!resData.ok) {
+          throw new Error(response.message || 'enter valid data');
+        }
+
+        toastFunction('success', 'Poster Created Successfully!');
+
+        router.push('/account');
+      }
+    } catch (error) {
+      if (error.inner) {
+        const newErrors = {};
+
+        error.inner.forEach((err: { path: string | number; message: any }) => {
+          newErrors[err.path] = err.message;
+        });
+
+        setErrors(newErrors);
+      } else {
+        setErrors({});
+        const errorParts = error.message.split(',');
+        let formattedMessage = '';
+        for (const part of errorParts) {
+          formattedMessage += part.trim() + '\n';
+        }
+        console.log(error.message);
+        toastFunction('warning', formattedMessage);
+      }
+    }
   };
 
   const renderAdditionalInputs = () => {
@@ -135,6 +232,11 @@ const PosterForm: React.FC = () => {
                 placeholder="1"
                 label={`Minimum ${formValues.mediatype}`}
               />
+              {errors.minQty && (
+                <span className="text-red-500 ml-2 text-sm">
+                  {errors.minQty}
+                </span>
+              )}
             </div>
             <div className="w-full md:w-1/2 px-3">
               <Input
@@ -145,6 +247,11 @@ const PosterForm: React.FC = () => {
                 placeholder="10"
                 label={`Maximum ${formValues.mediatype}`}
               />
+              {errors.maxQty && (
+                <span className="text-red-500 ml-2 text-sm">
+                  {errors.maxQty}
+                </span>
+              )}
             </div>
           </div>
         </>
@@ -157,10 +264,12 @@ const PosterForm: React.FC = () => {
     <>
       <div>
         <Link
-          href="/"
-          className=" text-lg md:px-[60px] pt-3 flex text-blue-600 hover:text-blue-700 active:text-blue-500"
+          href={id ? `/dashboard/posters/${id}` : '/'}
+          className=" text-lg md:px-[60px] pt-3 flex text-blue-600 hover:text-blue-700 active:text-blue-500 "
         >
-          <IoIosArrowRoundBack size={30} /> Back
+          <p className="hover:scale-110 active:scale-95 duration-150 flex">
+            <IoIosArrowRoundBack size={30} /> Back
+          </p>
         </Link>
       </div>
       <main className=" pb-5">
@@ -169,100 +278,64 @@ const PosterForm: React.FC = () => {
             className="w-[800px] border-[2px] border-gray-100 shadow-xl rounded-xl md:p-4 "
             onSubmit={handleSubmit}
           >
-            <div className="flex justify-center items-center mr-[40px] p-5 ">
-              <h1 className="text-4xl  tracking-wide  font-inter">
-                Create Your Poster
+            <div className="flex justify-center items-center pb-[5px] md:-mt-3 ">
+              <h1 className="text-4xl mt-3 tracking-wide md:pl-5 font-inter text-center md:w-full ">
+                {id ? 'Edit Poster' : 'Create Your Poster'}
               </h1>
-            </div>
-            {/*title & company_name ------------------------- */}
-            <div className=" flex flex-wrap -mx-3 mb-6">
-              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <Input
-                  name="companyName"
-                  value={formValues.companyName}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder="pixel"
-                  label="Company Name"
-                />
+              <div className=" flex  justify-end md:pr-12">
+                <img src="/billboard.png" alt="" className="h-20 w-20   " />
               </div>
-              <div className="w-full md:w-1/2 px-3">
+            </div>
+            {/*title-------------------------------------------- */}
+            <div className=" flex flex-wrap -mx-3 mb-6">
+              <div className="w-full md:w-2/5 px-3">
                 <Input
                   name="title"
                   value={formValues.title}
                   onChange={handleChange}
                   type="text"
-                  placeholder="title"
+                  placeholder="shivranjini, ahmedabad"
                   label="Title"
                 />
+                {errors.title && (
+                  <span className="text-red-500 ml-2 text-sm">
+                    {errors.title}
+                  </span>
+                )}
               </div>
-            </div>
-            {/*mediatype & lightingtype ------------------------- */}
-            <div className=" flex flex-wrap -mx-3 mb-6">
-              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label
-                  className="block  tracking-wide font-poppins text-sm font-bold mb-2"
-                  htmlFor="mediatype"
-                >
-                  MediaType
-                </label>
-                <div className="relative">
-                  <select
-                    className="appearance-none block w-full font-poppins bg-slate-100  border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
-                    id="mediatype"
-                    name="mediatype"
-                    value={formValues.mediatype}
-                    onChange={handleChange}
-                  >
-                    <option value="Poles">Poles</option>
-                    <option value="Airports">Airports</option>
-                    <option value="RailwayPlatforms">RailwayPlatforms</option>
-                    <option value="Rickshaws">Rickshaws</option>
-                    <option value="Billboard">Billboard</option>
-                    <option value="BusStands">BusStands</option>
-                    <option value="Footoverbridges">Footoverbridges</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
-                    <svg
-                      className="fill-current h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
-                  </div>
-                </div>
+              {/* mediatype-------------------------------------------------- */}
+              <div className="w-full md:w-[240px] px-3 mb-6 md:mb-0">
+                <SelectInput
+                  name="mediatype"
+                  value={formValues.mediatype}
+                  onChange={handleChange}
+                  options={[
+                    'Poles',
+                    'Airports',
+                    'RailwayPlatforms',
+                    'Rickshaws',
+                    'Billboard',
+                    'BusStands',
+                    'Footoverbridges',
+                  ]}
+                  label="MediaType"
+                />
               </div>
-              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label
-                  className="block  tracking-wid font-poppins  text-sm font-bold mb-2"
-                  htmlFor="lightingType"
-                >
-                  LightingType
-                </label>
-                <div className="relative">
-                  <select
-                    className="appearance-none font-poppins block w-full bg-slate-100  border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
-                    id="lightingType"
-                    name="lightingType"
-                    value={formValues.lightingType}
-                    onChange={handleChange}
-                  >
-                    <option value="FRONT-LIGHTING">FRONT-LIGHTING</option>
-                    <option value="BACK-LIGHTING">BACK-LIGHTING</option>
-                    <option value="LED-SCREEN">LED-SCREEN</option>
-                    <option value="NO-LIGHTING">NO-LIGHTING</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
-                    <svg
-                      className="fill-current h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
-                  </div>
-                </div>
+              {/* lightingtype ------------------------- */}
+
+              <div className="w-full md:w-[230px] px-3 mb-6 md:mb-0">
+                <SelectInput
+                  name="lightingType"
+                  value={formValues.lightingType}
+                  onChange={handleChange}
+                  options={[
+                    'FRONT-LIGHTING',
+                    'BACK-LIGHTING',
+                    'LED-SCREEN',
+                    'NO-LIGHTING',
+                  ]}
+                  label="LightingType"
+                />
               </div>
             </div>
 
@@ -280,6 +353,11 @@ const PosterForm: React.FC = () => {
                   placeholder="vesu cross road"
                   label="Landmark"
                 />
+                {errors.landmark && (
+                  <span className="text-red-500 ml-2 text-sm">
+                    {errors.landmark}
+                  </span>
+                )}
               </div>
               <div className="w-full md:w-1/3 px-3">
                 <Input
@@ -290,77 +368,57 @@ const PosterForm: React.FC = () => {
                   placeholder="phonewala"
                   label="Facing Form"
                 />
+                {errors.facingFrom && (
+                  <span className="text-red-500 ml-2 text-sm">
+                    {errors.facingFrom}
+                  </span>
+                )}
               </div>
             </div>
 
             {/* address-------------------------------------- */}
-
             <div className="flex flex-wrap -mx-3 mb-3">
               <div className="w-full px-3">
-                <label
-                  className="block  tracking-wide font-poppins text-sm font-bold mb-2"
-                  htmlFor="address"
-                >
-                  Address
-                </label>
-                <textarea
-                  className="appearance-none font-poppins block w-full bg-slate-100  border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-100 focus:border-gray-100"
-                  id="address"
+                <TextArea
                   name="address"
                   value={formValues.address}
                   onChange={handleChange}
                   placeholder="xy-201, near business, city"
+                  label="Address"
                 />
+                {errors.address && (
+                  <span className="text-red-500 ml-2 text-sm">
+                    {errors.address}
+                  </span>
+                )}
               </div>
             </div>
+
             {/* state & city & mindays--------------------------------------  */}
             <div className="flex flex-wrap -mx-3 mb-6">
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label
-                  className="block font-poppins  tracking-wide  text-sm font-bold mb-2"
-                  htmlFor="state"
-                >
-                  State
-                </label>
-                <div className="relative">
-                  <select
-                    className="appearance-none font-poppins block w-full bg-slate-100  border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-100 focus:border-gray-100"
-                    id="state"
-                    name="state"
-                    value={formValues.state}
-                    onChange={handleChange}
-                  >
-                    <option value="Gujarat">Gujarat</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Delhi">Delhi</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
-                    <svg
-                      className="fill-current h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
-                  </div>
-                </div>
+                <SelectInput
+                  name="state"
+                  value={formValues.state}
+                  onChange={handleChange}
+                  options={['Gujarat', 'Maharashtra', 'Delhi']}
+                  label="State"
+                />
               </div>
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label
-                  className="block font-poppins tracking-wide  text-sm font-bold mb-2"
-                  htmlFor="city"
-                >
-                  City
-                </label>
-                <input
-                  className="appearance-none font-poppins block w-full bg-slate-100  border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-100 focus:border-gray-100"
-                  id="city"
+                <Input
                   name="city"
-                  type="text"
                   value={formValues.city}
                   onChange={handleChange}
-                  placeholder="Albuquerque"
+                  type="text"
+                  placeholder="Ahmedabad"
+                  label="City"
                 />
+                {errors.city && (
+                  <span className="text-red-500 ml-2 text-sm ">
+                    {errors.city}
+                  </span>
+                )}
               </div>
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                 <Input
@@ -371,6 +429,11 @@ const PosterForm: React.FC = () => {
                   placeholder="5"
                   label="Min Days"
                 />
+                {errors.mindays && (
+                  <span className="text-red-500 ml-2 text-sm ">
+                    {errors.mindays}
+                  </span>
+                )}
               </div>
             </div>
             {/* price & size & sft --------------------------------------------------- */}
@@ -384,6 +447,11 @@ const PosterForm: React.FC = () => {
                   placeholder="5000"
                   label="Per Day Price"
                 />
+                {errors.perDayPrice && (
+                  <span className="text-red-500 ml-2 text-sm ">
+                    {errors.perDayPrice}
+                  </span>
+                )}
               </div>
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                 <Input
@@ -394,6 +462,11 @@ const PosterForm: React.FC = () => {
                   placeholder="30"
                   label="Height In Foot"
                 />
+                {errors.height && (
+                  <span className="text-red-500 ml-2 text-sm ">
+                    {errors.height}
+                  </span>
+                )}
               </div>
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                 <Input
@@ -404,6 +477,11 @@ const PosterForm: React.FC = () => {
                   placeholder="30"
                   label="Width In Foot"
                 />
+                {errors.width && (
+                  <span className="text-red-500 ml-2 text-sm ">
+                    {errors.width}
+                  </span>
+                )}
               </div>
             </div>
             {/* upload button  */}
@@ -414,12 +492,11 @@ const PosterForm: React.FC = () => {
                   endpoint="imageUploader"
                   onClientUploadComplete={(res: { url: string }[]) => {
                     setImgUrl(res[0].url);
-                    console.log('Files: ', res);
-                    alert('Upload Completed');
+                    // console.log('Files: ', res);
+                    toastFunction('success', 'Image Uploaded Successfully!');
                   }}
                   onUploadError={(error: Error) => {
-                    // Do something with the error.
-                    alert(`ERROR! ${error.message}`);
+                    toastFunction('error', error.message);
                   }}
                 />
                 {imgUrl && (

@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { loginIn, logout } from '../store/auth-slice';
-import { decode } from 'jsonwebtoken';
-import fetchUser from '../utils/http';
+import { logout } from '../store/auth-slice';
 import { FaUserLarge } from 'react-icons/fa6';
 import { useRouter } from 'next/router';
 
@@ -24,33 +22,6 @@ const NavBar: React.FC = () => {
     isLoggedIn: boolean;
     userRole: string | null;
   } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    // document.cookie =
-    //   'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/poster;';
-    // document.cookie =
-    //   'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/resetPassword;';
-    // document.cookie =
-    //   'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;';
-    // dispatch(logout());
-
-    const jwtCookie = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='));
-
-    if (jwtCookie) {
-      const token = jwtCookie.split('=')[1];
-      const decodedToken = decode(token) as { id: string };
-      if (decodedToken) {
-        const fetchUserFunc = async () => {
-          const userName = await fetchUser(decodedToken.id);
-          dispatch(loginIn(userName));
-        };
-        fetchUserFunc();
-      }
-    }
-  }, []);
-
   const handleLogout = async () => {
     document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
     dispatch(logout());

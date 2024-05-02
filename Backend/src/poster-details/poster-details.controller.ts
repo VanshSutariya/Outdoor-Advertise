@@ -1,5 +1,3 @@
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import {
   Body,
   Controller,
@@ -43,7 +41,6 @@ export class PosterDetailsController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard())
   async updatePoster(
     @Param('id') id: string,
     @Body() updatePosterDto: UpdatePosterDto,

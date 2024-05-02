@@ -6,6 +6,7 @@ interface PosterItemProps {
   price: number;
   lightingType: string;
   _id: string;
+  id?: string;
 }
 
 const PosterItem: React.FC<PosterItemProps> = ({
@@ -14,13 +15,14 @@ const PosterItem: React.FC<PosterItemProps> = ({
   image,
   price,
   _id,
+  id,
 }) => {
   const capitalizedTitle = title
     .split(' ')
     .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
     .join(' ');
   return (
-    <Link href={`/poster/${_id}`}>
+    <Link href={id ? `posters/${_id}` : `/poster/${_id}`}>
       <div className=" bg-white rounded-lg w-100">
         <div className="relative md:h-[290px] h-[200px] rounded-lg overflow-hidden ">
           <img
@@ -39,7 +41,7 @@ const PosterItem: React.FC<PosterItemProps> = ({
             <span className="">
               <span className="font-semibold font-inter md:text-md">
                 ₹{price}/
-              </span>{' '}
+              </span>
               <span className="font-poppins">day</span>
             </span>
           </div>

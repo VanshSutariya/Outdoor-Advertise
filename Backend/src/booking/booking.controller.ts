@@ -30,9 +30,15 @@ export class BookingController {
   }> {
     return this.bookingService.getRevenueData();
   }
-  @Get('/currMonthData')
-  async getCurrentMonthSales() {
-    return await this.bookingService.getCurrentMonthSales();
+
+  @Get('/currMonthData/:id?')
+  async getCurrentMonthSales(@Param('id') id?: string) {
+    return await this.bookingService.getCurrentMonthSales(id);
+  }
+
+  @Get('memberStats/:id')
+  async getMemberRevenueStats(@Param('id') id: string) {
+    return await this.bookingService.getMemberRevenueStats(id);
   }
 
   @Post('add')

@@ -4,35 +4,18 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginIn, logout } from '../../store/auth-slice';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { loginIn } from '../../store/auth-slice';
 import { decode } from 'jsonwebtoken';
 import ForgotPassword from './forgetPasswordPopUp';
 import fetchUser from '../../utils/http';
-import React from 'react';
-import { Bounce, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { RootState } from '../../store';
-import ToastComponent from '../reactToast/toast';
 import toastFunction from '../reactToast/toast';
-// import Cookies from "js-cookie";
 
 const SignIn: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [showForgotpassword, setShowForgotPassword] = useState(false);
-  const {
-    userId,
-    userName,
-    isLoggedIn,
-    userRole,
-  }: {
-    userId: string | null;
-    userName: string | null;
-    isLoggedIn: boolean;
-    userRole: string | null;
-  } = useSelector((state: RootState) => state.auth);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Email is invalid'),
@@ -42,14 +25,6 @@ const SignIn: React.FC = () => {
   const formOptions = { resolver: yupResolver(validationSchema) };
   const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
-
-  const handleLoginSuccess = () => {
-    toastFunction('success', 'Login Successful!');
-  };
-
-  const handleLoginError = (errorMessage: string) => {
-    toastFunction('error', errorMessage);
-  };
 
   async function onSubmit(data: { email: string; password: string }) {
     const { email, password } = data;
@@ -74,7 +49,7 @@ const SignIn: React.FC = () => {
           const userDetail = await fetchUser(decodedToken.id);
           dispatch(loginIn(userDetail));
 
-          handleLoginSuccess();
+          toastFunction('success', 'Login Successful!');
           if (userDetail?.role === 'admin') {
             router.push('/admin');
           } else {
@@ -85,7 +60,7 @@ const SignIn: React.FC = () => {
         fetchUserFunc();
       }
     } catch (error) {
-      handleLoginError(error.message);
+      toastFunction('error', error.message);
     }
   }
 
@@ -143,10 +118,7 @@ const SignIn: React.FC = () => {
               </button>
             </p>
           </div>
-          <button
-            // onClick={handleErrorToast}
-            className="rounded-lg font-bold font-poppins p-3 bg-slate-200 w-full hover:bg-slate-300 active:bg-slate-200"
-          >
+          <button className="rounded-lg font-bold font-poppins p-3 bg-slate-200 w-full hover:bg-slate-300 active:bg-slate-200">
             LogIn
           </button>
 

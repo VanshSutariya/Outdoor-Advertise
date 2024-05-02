@@ -1,12 +1,12 @@
 'use client';
 import { fetchOnePoster } from '../../utils/http';
 import { useEffect, useState } from 'react';
-import DatePicker from './date-range-picker';
 import { CiLocationOn } from 'react-icons/ci';
 import { LiaTagSolid } from 'react-icons/lia';
 
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import Link from 'next/link';
+import Buttons from './buttons';
 
 interface PosterData {
   id: number;
@@ -32,7 +32,7 @@ interface PosterDetailsProps {
   id: string;
 }
 
-const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
+const MemberPosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   const [loading, setLoading] = useState(true);
   const [posterData, setPosterData] = useState<PosterData>(null);
 
@@ -90,7 +90,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
     <>
       <div>
         <Link
-          href="/"
+          href="/dashboard/posters"
           className="text-2xl md:px-[60px] pt-3 font-inter font-semibold flex text-blue-400 hover:text-blue-800 active:text-blue-500"
         >
           <p className="hover:scale-110 active:scale-95 duration-150 flex">
@@ -99,7 +99,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
         </Link>
       </div>
       <div className="md:flex items-center justify-center">
-        <div className="md:w-1/3  p-5 rounded-lg mb-9">
+        <div className="md:w-1/3 md:mr-16  p-5 rounded-lg mb-9">
           <img
             className="rounded-2xl  md:h-[300px] h-[300px] w-full"
             src={posterData.image}
@@ -187,28 +187,10 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           src={url}
         ></iframe>
       </div> */}
-      <div className="justify-center flex pb-3">
-        <DatePicker
-          title={posterData.title}
-          price={posterData.price}
-          minDays={posterData.minimumDays}
-          mediatype={
-            posterData.mediatype === 'Rickshaws' ||
-            posterData.mediatype === 'Poles'
-              ? posterData.mediatype
-              : false
-          }
-          minQty={posterData.minQty}
-          maxQty={posterData.maxQty}
-          bookingDate={posterData.bookingDate}
-          id={id}
-          image={posterData.image}
-          address={posterData.address}
-          createdBy={posterData.createdBy}
-        />
-      </div>
+
+      <Buttons id={id} />
     </>
   );
 };
 
-export default PosterDetails;
+export default MemberPosterDetails;

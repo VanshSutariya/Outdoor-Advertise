@@ -34,6 +34,9 @@ export class PosterDetailsService {
     if (query?.city) {
       DBQuery['city'] = { $regex: '^' + query?.city, $options: 'i' };
     }
+    if (query?.createdBy) {
+      DBQuery['createdBy'] = query?.createdBy;
+    }
 
     const resPerPage = Number(query?.per_page) || 0;
     const currentPage = Number(query.page) || 1;
@@ -67,45 +70,52 @@ export class PosterDetailsService {
     if (!poster) {
       throw new HttpException('Poster not found', 404);
     }
+    if (updatePosterDto?.bookingDate) {
+      const existingBookingDate = poster.bookingDate;
 
-    const existingBookingDate = poster.bookingDate;
+      const existingBookingDateObjects = existingBookingDate.map(
+        (dateString) => new Date(dateString),
+      );
 
-    const existingBookingDateObjects = existingBookingDate.map(
-      (dateString) => new Date(dateString),
-    );
+      const newBookingDateObjects = updatePosterDto.bookingDate.map(
+        (dateString) => new Date(dateString),
+      );
 
-    const newBookingDateObjects = updatePosterDto.bookingDate.map(
-      (dateString) => new Date(dateString),
-    );
+      const updatedBookingDateObjects = [
+        ...existingBookingDateObjects,
+        ...newBookingDateObjects,
+      ];
 
-    const updatedBookingDateObjects = [
-      ...existingBookingDateObjects,
-      ...newBookingDateObjects,
-    ];
+      updatedBookingDateObjects.sort((a, b) => a.getTime() - b.getTime());
+      const options: Intl.DateTimeFormatOptions = {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
+      };
+      const updatedBookingDate = updatedBookingDateObjects?.map((dateObject) =>
+        dateObject.toLocaleDateString('en-US', options),
+      );
 
-    updatedBookingDateObjects.sort((a, b) => a.getTime() - b.getTime());
-    const options: Intl.DateTimeFormatOptions = {
-      month: 'numeric',
-      day: 'numeric',
-      year: 'numeric',
-    };
-    const updatedBookingDate = updatedBookingDateObjects.map((dateObject) =>
-      dateObject.toLocaleDateString('en-US', options),
-    );
-    console.log(updatedBookingDate);
+      const updatedPoster = await this.postersModel.findByIdAndUpdate(
+        id,
+        { bookingDate: updatedBookingDate },
+        { new: true },
+      );
 
-    const updatedPoster = await this.postersModel.findByIdAndUpdate(
-      id,
-      { bookingDate: updatedBookingDate },
-      { new: true },
-    );
+      if (!updatedPoster) {
+        throw new HttpException('Failed to update poster', 500);
+      }
 
-    if (!updatedPoster) {
-      throw new HttpException('Failed to update poster', 500);
+      // Return the updated poster document
+      return updatedPoster;
+    } else {
+      const newUpdate = await this.postersModel.findByIdAndUpdate(
+        id,
+        updatePosterDto,
+        { new: true },
+      );
+      return newUpdate;
     }
-
-    // Return the updated poster document
-    return updatedPoster;
   }
 
   // delete poster
