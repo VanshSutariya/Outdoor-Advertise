@@ -22,10 +22,10 @@ const SuccessPage = () => {
               Thank you for completing your secure online payment.
             </p>
             <p> Have a great day! </p>
-            <div className="py-10 text-center">
+            <div className="py-10 text-center hover:scale-105 active:scale-100 delay-300 transition-transform">
               <Link
                 href="/outdoorAd/account"
-                className="px-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3"
+                className="px-12 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-white font-semibold py-3"
               >
                 Go to Account
               </Link>

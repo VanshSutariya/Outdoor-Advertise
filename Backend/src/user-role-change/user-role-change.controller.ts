@@ -24,7 +24,7 @@ export class UserRoleChangeController {
   }
 
   @Post()
-  async createRoleChangeReq(@Body() _id: string) {
+  async createRoleChangeReq(@Body() _id: string,) {
     return this.roleChangeService.createUserRoleChange(_id);
   }
 

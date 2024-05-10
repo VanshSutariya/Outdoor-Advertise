@@ -38,12 +38,10 @@ export default function AdminHomePage() {
 
   const {
     userId,
-    userName,
-    userRole,
+    token,
   }: {
-    userName: string | null;
     userId: string | null;
-    userRole: string | null;
+    token: string;
   } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -51,11 +49,11 @@ export default function AdminHomePage() {
       const data = async () => {
         // Countusers
         const role = "user";
-        const userCount = await fetchAllUsers(role);
+        const userCount = await fetchAllUsers(role, token);
         setTotalUsers(userCount);
         // count member
         const memberrole = "member";
-        const memberCount = await fetchAllUsers(memberrole);
+        const memberCount = await fetchAllUsers(memberrole, token);
         setTotalMembers(memberCount);
         const data = await fetchAllBookingsData();
         setTodayEarning(data.todayRevenue);
@@ -71,7 +69,7 @@ export default function AdminHomePage() {
     } catch (error) {
       console.log(error);
     }
-  }, [userId]);
+  }, [token, userId]);
 
   function formatRevenue(revenue: any) {
     const crore = 10000000; // 1 crore = 10,000,000

@@ -11,6 +11,8 @@ import { BookingModule } from './booking/booking.module';
 import { UserRoleChangeController } from './user-role-change/user-role-change.controller';
 import { UserRoleChangeService } from './user-role-change/user-role-change.service';
 import { UserRoleChangeModule } from './user-role-change/user-role-change.module';
+import { GatewayModule } from './gateway/gateway.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,6 +38,7 @@ import { UserRoleChangeModule } from './user-role-change/user-role-change.module
     StripeWebhookModule,
     BookingModule,
     UserRoleChangeModule,
+    GatewayModule,
   ],
   controllers: [],
   providers: [],

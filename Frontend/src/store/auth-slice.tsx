@@ -1,16 +1,18 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthState {
   userName: string | null;
   userRole: string | null;
-  userId: string | null;
+  userId: string;
   isLoggedIn: boolean;
+  token: string;
 }
 const initialState: AuthState = {
   userName: null,
-  userId: null,
+  userId: "",
   userRole: null,
   isLoggedIn: false,
+  token: "",
 };
 const authSlice = createSlice({
   name: "auth",
@@ -19,16 +21,18 @@ const authSlice = createSlice({
     loginIn(state, action) {
       state.isLoggedIn = true;
       const data = action.payload;
-      state.userId = data._id;
+      state.token = data.resData.token;
+      state.userId = data.userDetail._id;
       const name =
-        data.name.substring(0, 1).toUpperCase() + data.name.substring(1);
+        data.userDetail.name.substring(0, 1).toUpperCase() +
+        data.userDetail.name.substring(1);
       state.userName = name;
-      state.userRole = data?.role;
+      state.userRole = data.userDetail?.role;
     },
     logout(state) {
       state.isLoggedIn = false;
       state.userName = null;
-      state.userId = null;
+      state.userId = "";
       state.userRole = null;
     },
     changeRole(state) {

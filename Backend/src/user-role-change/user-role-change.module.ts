@@ -9,6 +9,7 @@ import {
 } from './schema/userRoleChange.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthModule } from 'src/auth/auth.module';
+import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { AuthModule } from 'src/auth/auth.module';
     ]),
   ],
   controllers: [UserRoleChangeController],
-  providers: [UserRoleChangeService, AuthService],
+  providers: [UserRoleChangeService, AuthService, RoleChangeGateway],
 })
 export class UserRoleChangeModule {}

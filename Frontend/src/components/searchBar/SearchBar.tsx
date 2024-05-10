@@ -61,11 +61,6 @@ const SearchBar: React.FC = (props) => {
       category: formValues?.mediatype,
     };
 
-    // If click same category, that category will remove
-    // if (params?.get('category') === label) {
-    //   delete udpatedQuery.category;
-    // }
-
     const url = qs.stringifyUrl(
       {
         url: "/outdoorAd/",

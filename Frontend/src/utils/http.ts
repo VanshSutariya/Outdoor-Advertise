@@ -92,7 +92,7 @@ export async function fetchOnePoster(id: string): Promise<any> {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
-  if (!resData.ok) throw new Error("Poster no more Exists.");
+  if (!resData.ok) throw new Error("Poster doesn't Exists Ø.");
   const poster = await resData.json();
   return poster;
 }
@@ -144,10 +144,16 @@ export async function fetchMonthlyData(id?: string) {
   return bookings;
 }
 
-export async function fetchAllUsers(role: string): Promise<number> {
+export async function fetchAllUsers(
+  role: string,
+  token: string
+): Promise<number> {
   const resData = await fetch(`http://localhost:4000/auth?role=${role}`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
   });
   const users = await resData.json();
   const countUsers = users.length;
@@ -156,24 +162,34 @@ export async function fetchAllUsers(role: string): Promise<number> {
 export async function fetchUsers({
   page,
   per_page,
+  token,
 }: {
   page: number;
   per_page: number;
+  token: string;
 }): Promise<any[]> {
   const resData = await fetch(
     `http://localhost:4000/auth?page=${page}&per_page=${per_page}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
+
   const users = await resData.json();
+  console.log(users);
   return users;
 }
-export async function Allusers(): Promise<number> {
+export async function Allusers(token: string): Promise<number> {
   const resData = await fetch(`http://localhost:4000/auth`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
   });
   const users = await resData.json();
   return users.length;

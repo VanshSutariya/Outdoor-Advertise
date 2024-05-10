@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { log } from 'console';
-import { BookingService } from 'src/booking/booking.service';
 import { CartService } from 'src/cart/cart.service';
 import { UpdatePosterDto } from 'src/poster-details/dto/updatePoster.dto';
 // import { UpdatePosterDto } from 'src/poster-details/dto/updatePoster.dto';
 import { PosterDetailsService } from 'src/poster-details/poster-details.service';
 import { Stripe } from 'stripe';
+import { EmailService } from './bookingEmail.service';
+import { BookingService } from 'src/booking/booking.service';
 
 @Injectable()
 export class StripeWebhookService {
@@ -17,26 +18,13 @@ export class StripeWebhookService {
     private cartService: CartService,
     private bookingService: BookingService,
     private posterService: PosterDetailsService,
+    private emailService: EmailService,
   ) {
     this.stripe = new Stripe(this.configService.get('STRIPE_SECRET_KEY'), {
       apiVersion: '2024-04-10', // Specify the Stripe API version
     });
   }
 
-  // async verifySignature(signature: string, body: string) {
-  //   try {
-  //     const event = this.stripe.webhooks.constructEvent(
-  //       body,
-  //       signature,
-  //       process.env.STRIPE_WEBHOOK_SECRET,
-  //     );
-  //     return event;
-  //   } catch (error) {
-  //     console.log(error);
-
-  //     throw new Error('Webhook signature verification failed');
-  //   }
-  // }
   async handleEvent(event: any) {
     switch (event.type) {
       case 'checkout.session.completed':
@@ -59,6 +47,7 @@ export class StripeWebhookService {
                   totalPrice: cartItem.totalPrice,
                   createdBy: cartItem.createdBy,
                   bookingDate: cartItem.bookingDate,
+                  customerPosterImage: cartItem.customerPosterImage,
                 };
 
                 const booking =
@@ -67,6 +56,29 @@ export class StripeWebhookService {
                   console.log('booking failed----------', booking);
                   return;
                 }
+
+                const id = booking._id.toString();
+                const bookingDetails =
+                  await this.bookingService.getBookingById(id);
+
+                console.log(bookingDetails);
+
+                // send customer details, email----------------------------------
+
+                const receiverEmail = bookingDetails.createdBy.email;
+                const bookingId = bookingDetails._id.toString();
+                const customerPosterImage = bookingDetails.customerPosterImage;
+                const name = bookingDetails.userId.name;
+                const title = bookingDetails.posterId.title;
+                const address = bookingDetails.posterId.address;
+                const email = await this.emailService.sendEmail(
+                  receiverEmail,
+                  bookingId,
+                  name,
+                  title,
+                  address,
+                  customerPosterImage,
+                );
 
                 // updating the booking dates in the posters-----------------------
                 const updatePosterDto: UpdatePosterDto = {

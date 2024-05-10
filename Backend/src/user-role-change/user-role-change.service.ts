@@ -12,12 +12,14 @@ import { AuthService } from 'src/auth/auth.service';
 import { UpdateDto } from 'src/auth/dto/login.dto';
 import { Roles } from 'src/auth/roles.constants';
 import { Query } from 'express-serve-static-core';
+import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
 
 @Injectable()
 export class UserRoleChangeService {
   constructor(
     @InjectModel(UserRoleChange.name) private roleChange: Model<UserRoleChange>,
     private authService: AuthService,
+    private readonly roleChangeGateway: RoleChangeGateway,
   ) {}
 
   async getAllRequests(query: Query) {
@@ -52,6 +54,11 @@ export class UserRoleChangeService {
 
     if (!newUserRoleChange)
       throw new HttpException('enter valid Credentials.', 401);
+    console.log(newUserRoleChange);
+    const userData = await this.roleChange
+      .find(newUserRoleChange._id)
+      .populate({ path: 'user', select: 'email role name' });
+    this.roleChangeGateway.userRoleReq(userData);
     return newUserRoleChange;
   }
 
@@ -73,6 +80,9 @@ export class UserRoleChangeService {
       const id = updatedUserRoleChange.user._id;
       await this.authService.updateUserDetails(id, updateDto);
     }
+    console.log(updatedUserRoleChange);
+
+    this.roleChangeGateway.sendRoleChangeUpdate(updatedUserRoleChange);
 
     return updatedUserRoleChange;
   }

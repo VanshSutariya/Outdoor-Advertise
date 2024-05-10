@@ -2,11 +2,18 @@
 import Sidebar from "@/components/admincomponents/sidebar";
 import { Allusers, fetchUsers } from "@/utils/http";
 import React, { useEffect, useState } from "react";
+import { parseCookies } from "nookies";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
 const UserTable = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
-  const [tp, setTp] = useState<number>();
+  const [tp, setTp] = useState<number>(1);
+
+  const { token }: { token: string } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   let isPageOutOfRange: boolean;
   let per_page: number = 8;
@@ -14,20 +21,20 @@ const UserTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resData = await Allusers();
+        const resData = await Allusers(token);
         const totalPages = Math.ceil(resData / 8);
         setTp(totalPages);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
     fetchData();
-  }, []);
+  }, [token]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resData = await fetchUsers({ page, per_page });
+        const resData = await fetchUsers({ page, per_page, token });
         setUsers(resData);
 
         let pageNumbers: number[] = [];
@@ -46,7 +53,7 @@ const UserTable = () => {
     };
 
     fetchData();
-  }, [page, tp]);
+  }, [tp, page]);
 
   const handlePrevClick = () => {
     setPage(page - 1);
@@ -84,36 +91,38 @@ const UserTable = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user.email}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <img
-                          className="h-10 w-10 rounded-full"
-                          src={
-                            user.image !== undefined
-                              ? user.image
-                              : "/profile.png"
-                          }
-                          alt={`${user.name}'s avatar`}
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.name}
+              {users.length > 0 &&
+                token &&
+                users.map((user) => (
+                  <tr key={user.email}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <img
+                            className="h-10 w-10 rounded-full"
+                            src={
+                              user.image !== undefined
+                                ? user.image
+                                : "/profile.png"
+                            }
+                            alt={`${user.name}'s avatar`}
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {user.name}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.role}</div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{user.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{user.role}</div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

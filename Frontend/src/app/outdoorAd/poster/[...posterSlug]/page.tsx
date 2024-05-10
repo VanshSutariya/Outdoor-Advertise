@@ -3,15 +3,18 @@ import NavBar from "@/components/Header";
 import Footer from "@/components/Footer";
 import PosterDetails from "@/components/Poster-Details/poster-details";
 
-const PosterSlugPage: React.FC<{ params: { posterSlug: any } }> = ({
+interface PosterSlugPageProps {
+  params: { posterSlug: any };
+}
+const PosterSlugPage: React.FC<PosterSlugPageProps> = ({
   params,
-}): { params: { posterSlug: any } } => {
-  const resetToken = params.posterSlug[0];
+}): JSX.Element => {
+  const id = params.posterSlug[0];
 
   return (
     <main className="overflow-auto">
       <NavBar />
-      <PosterDetails id={resetToken} />
+      <PosterDetails id={id} />
 
       <Footer />
     </main>

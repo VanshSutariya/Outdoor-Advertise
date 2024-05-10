@@ -41,14 +41,15 @@ const SignIn: React.FC = () => {
         throw new Error(resData.message || "Invalid Credentials");
 
       document.cookie = `jwt=${resData.token}; expires=${new Date(
-        new Date().getTime() + 20 * 60 * 1000
+        new Date().getTime() + 2 * 60 * 60 * 1000
       )}; path=/; secure;`;
 
       const decodedToken = decode(resData.token) as { id: string };
       if (decodedToken) {
         const fetchUserFunc = async () => {
           const userDetail = await fetchUser(decodedToken.id);
-          dispatch(loginIn(userDetail));
+          const data = { userDetail, resData };
+          dispatch(loginIn(data));
 
           toastFunction("success", "Login Successful!");
           if (userDetail?.role === "admin") {

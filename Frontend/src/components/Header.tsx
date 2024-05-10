@@ -1,11 +1,11 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { FaUserLarge } from 'react-icons/fa6';
-import { RootState } from '@/store';
-import { logout } from '@/store/auth-slice';
-import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
+"use client";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { FaUserLarge } from "react-icons/fa6";
+import { RootState } from "@/store";
+import { logout } from "@/store/auth-slice";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
@@ -25,7 +25,7 @@ const NavBar: React.FC = () => {
   } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = async () => {
-    document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
     dispatch(logout());
   };
 
@@ -34,7 +34,7 @@ const NavBar: React.FC = () => {
   };
 
   function handleAccountPage() {
-    router.push('/outdoorAd/account');
+    router.push("/outdoorAd/account");
   }
 
   return (
@@ -76,7 +76,7 @@ const NavBar: React.FC = () => {
         </div>
         <div className="container hidden mx-auto md:flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="hidden md:flex pt-1 font-thin text-lg space-x-4">
+            <div className="hidden md:flex pt-1 font-inter  text-lg space-x-4">
               <Link href="/outdoorAd">
                 <span className="text-black">Home</span>
               </Link>
@@ -144,7 +144,7 @@ const NavBar: React.FC = () => {
                       <button onClick={handleLogout}>Logout</button>
                     </Link>
                   </li>
-                  {userRole && userRole !== 'user' && (
+                  {userRole && userRole !== "user" && (
                     <li className=" items-center">
                       <Link href="/outdoorAd/createPoster">Create Poster</Link>
                     </li>
@@ -203,7 +203,7 @@ const NavBar: React.FC = () => {
                         Update Password
                       </button>
                     </Link>
-                    {userRole && userRole !== 'user' && (
+                    {userRole && userRole !== "user" && (
                       <Link href="/outdoorAd/createPoster">
                         <button className="block my-2 text-black cursor-pointer">
                           Create Poster

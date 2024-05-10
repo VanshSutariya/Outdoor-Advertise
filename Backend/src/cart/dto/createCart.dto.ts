@@ -25,6 +25,10 @@ export class CreateCartDto {
 
   @IsString()
   @IsNotEmpty()
+  customerPosterImage: string;
+
+  @IsString()
+  @IsNotEmpty()
   address: string;
 
   @IsString()

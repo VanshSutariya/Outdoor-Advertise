@@ -16,9 +16,9 @@ const ProfileDropDown: React.FC = () => {
   } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = async () => {
-    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     dispatch(logout());
     router.push("/outdoorAd/login");
+    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   };
 
   function handleAccountPage() {

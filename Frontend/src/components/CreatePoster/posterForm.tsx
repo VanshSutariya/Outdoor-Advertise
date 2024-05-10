@@ -20,9 +20,8 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
   const router = useRouter();
   const [imgUrl, setImgUrl] = useState<string | null>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { userId }: { userId: string | null } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { userId, token }: { userId: string | null; token: string } =
+    useSelector((state: RootState) => state.auth);
 
   const [formValues, setFormValues] = useState({
     title: "",
@@ -147,7 +146,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
       await validateSchema.validate(formValues, { abortEarly: false });
 
       if (formValues.facingFrom?.trim() === "") {
-        delete formValues.facingFrom;
+        delete formValues?.facingFrom;
       }
 
       if (!formValues.minQty) delete formValues.maxQty;
@@ -168,7 +167,10 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
       if (id) {
         const resData = await fetch(`http://localhost:4000/poster/${id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify(postdata),
         });
         const response = await resData.json();
@@ -180,7 +182,10 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
       } else {
         const resData = await fetch("http://localhost:4000/poster/add", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify(postdata),
         });
         const response = await resData.json();

@@ -1,21 +1,27 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
+import { User } from 'src/auth/schemas/user.schema';
+import { Posters } from 'src/poster-details/schemas/posters.schema';
 
 @Schema({ timestamps: true })
 export class Booking {
-  @Prop({ required: true })
-  userId: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  userId: User;
 
-  @Prop({ required: true })
-  posterId: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Posters' })
+  posterId: Posters;
 
-  @Prop({ required: false })
-  createdBy: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  createdBy: User;
 
   @Prop({ required: true })
   title: string;
 
   @Prop({ required: true })
   image: string;
+
+  @Prop({ required: true })
+  customerPosterImage: string;
 
   @Prop({ required: true })
   address: string;

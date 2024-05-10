@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreatePosterDto } from './dto/createPoster.dto';
 import { UpdatePosterDto } from './dto/updatePoster.dto';
 import { Query } from 'express-serve-static-core';
+import { BookingModule } from 'src/booking/booking.module';
 
 @Injectable()
 export class PosterDetailsService {
@@ -34,6 +35,12 @@ export class PosterDetailsService {
     if (query?.city) {
       DBQuery['city'] = { $regex: '^' + query?.city, $options: 'i' };
     }
+    if (query?.address) {
+      DBQuery['address'] = { $regex: query?.address, $options: 'i' };
+    }
+    if (query?.mediatype) {
+      DBQuery['mediatype'] = query?.mediatype;
+    }
     if (query?.createdBy) {
       DBQuery['createdBy'] = query?.createdBy;
     }
@@ -45,12 +52,21 @@ export class PosterDetailsService {
       .find(DBQuery)
       .limit(resPerPage)
       .skip(skip);
-    return resData;
+    const totalPagesResponse = await this.postersModel.find(DBQuery);
+    const totalLength = totalPagesResponse.length;
+    if (resData.length === 0) {
+      throw new HttpException(
+        'There are no posters available here. Please search for  another location.',
+        404,
+      );
+    }
+
+    return { totalLength, resData };
   }
 
   // Get One
-  getPosterById(id: string) {
-    return this.postersModel.findById(id);
+  async getPosterById(id: string) {
+    return await this.postersModel.findById(id);
   }
 
   // Create Poster

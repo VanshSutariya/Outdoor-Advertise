@@ -25,6 +25,10 @@ export class CreateBookingDto {
 
   @IsString()
   @IsNotEmpty()
+  customerPosterImage: string;
+
+  @IsString()
+  @IsNotEmpty()
   address: string;
 
   @IsNumber()
@@ -32,7 +36,7 @@ export class CreateBookingDto {
   totalPrice: number;
 
   @IsString()
-  // @IsNotEmpty()
+  @IsNotEmpty()
   @IsOptional()
   createdBy: string;
 

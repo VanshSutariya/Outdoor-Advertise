@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/store";
 import { cartActions } from "@/store/cart-slice";
 import { UploadButton } from "@/utils/uploadthing";
+import { FaRegEdit } from "react-icons/fa";
 
 interface BillingType {
   handleAutoChange: () => void;
@@ -49,7 +50,7 @@ const Billing: React.FC<BillingType> = ({
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();
-
+  const [editImg, setEditImg] = useState<boolean>(false);
   const [customerPosterImage, setCustomerPosterImage] = useState<string>();
 
   const {
@@ -59,8 +60,6 @@ const Billing: React.FC<BillingType> = ({
   }: { userId: string | null; isLoggedIn: boolean } = useSelector(
     (state: RootState) => state.auth
   );
-
-  const [bookingDates, setBookingDates] = useState<string[]>([]);
 
   const handleBookingQuantityError = (errorMessage: string) => {
     toastFunction("warning", errorMessage);
@@ -78,10 +77,6 @@ const Billing: React.FC<BillingType> = ({
     ) {
       datesArray.push(new Date(date).toLocaleDateString());
     }
-
-    const updatedBookingDates = [...bookingDate, ...datesArray];
-    setBookingDates(updatedBookingDates);
-
     const posterId = id;
     console.log(createdBy);
 
@@ -103,9 +98,9 @@ const Billing: React.FC<BillingType> = ({
   };
 
   function handleCart() {
-    if (customerPosterImage) {
+    if (customerPosterImage && customerPosterImage.trim() !== "") {
       if (mediatype === "Rickshaws" || mediatype === "Poles") {
-        const qty = Number(noOfAuto.current.value);
+        const qty = Number(noOfAuto.current?.value);
         if (qty < minQty || qty > maxQty) {
           handleBookingQuantityError(
             qty < minQty
@@ -123,6 +118,10 @@ const Billing: React.FC<BillingType> = ({
     }
   }
 
+  const handlEditImage = () => {
+    setEditImg((prev) => !prev);
+    setCustomerPosterImage("");
+  };
   return (
     <>
       <div className=" p-5 border-[2px]   border-gray-200 shadow-md shadow-gray-300 rounded-2xl">
@@ -228,22 +227,44 @@ const Billing: React.FC<BillingType> = ({
           </div>
         </div>
         <div>
-          <div className="mt-6 font-poppins text-lg">
-            Upload your Ad Poster image
-          </div>
-          <div className="mr-[100px] ">
-            <UploadButton
-              className="mt-3  ut-button:text-sm    ut-button:bg-blue-500 font-poppins  "
-              endpoint="imageUploader"
-              onClientUploadComplete={(res: { url: string }[]) => {
-                setCustomerPosterImage(res[0].url);
-                toastFunction("success", "Image Uploaded Successfully!");
-              }}
-              onUploadError={(error: Error) => {
-                toastFunction("error", error.message);
-              }}
-            />
-          </div>
+          {customerPosterImage && !editImg && (
+            <>
+              <div className=" text-xl md:mt-10 font-poppins font-semibold text-green-500 ">
+                Image Uploaded Successfully
+              </div>
+              <div className="flex">
+                <p className="pt-[4px] items-center text-red-500 font-poppins font-medium text-lg">
+                  Edit Image
+                </p>
+                <button
+                  onClick={handlEditImage}
+                  className="ml-3 hover:text-green-600"
+                >
+                  <FaRegEdit size={28} />
+                </button>
+              </div>
+            </>
+          )}
+          {(!customerPosterImage || editImg) && (
+            <>
+              <div className="mt-6 font-poppins text-lg ">
+                Upload your Advertise image
+              </div>
+              <div className="mr-[100px] ">
+                <UploadButton
+                  className="mt-3  ut-button:text-sm  ut-button:bg-blue-500 font-poppins  "
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res: { url: string }[]) => {
+                    setCustomerPosterImage(res[0].url);
+                    toastFunction("success", "Image Uploaded Successfully!");
+                  }}
+                  onUploadError={(error: Error) => {
+                    toastFunction("error", error.message);
+                  }}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>

@@ -1,18 +1,21 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Query } from 'express-serve-static-core';
 import { Booking } from './schema/booking.schema';
 import { CreateBookingDto } from './dto/createBooking.dto';
 import { User } from 'src/auth/schemas/user.schema';
+import { Posters } from 'src/poster-details/schemas/posters.schema';
 
 @Injectable()
 export class BookingService {
   constructor(
     @InjectModel(Booking.name) private bookingModel: Model<Booking>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Posters.name) private readonly posterModel: Model<Posters>,
   ) {}
 
+  // get all data--------------------------------------
   async getAll(query: Query) {
     let DBQuery = {};
 
@@ -29,6 +32,9 @@ export class BookingService {
     const skip = resPerPage * (currPage - 1);
     const resData = await this.bookingModel
       .find(DBQuery)
+      .populate({ path: 'userId', select: 'name email' })
+      .populate({ path: 'posterId', select: 'title address' })
+      .populate({ path: 'createdBy', select: 'name email' })
       .limit(resPerPage)
       .skip(skip)
       .sort({ createdAt: -1 });
@@ -36,17 +42,45 @@ export class BookingService {
     if (!resData) throw new HttpException('You have no order placed yet.', 404);
     return resData;
   }
+  // get booking data using id ---------------------------------------------------
+  async getBookingById(id: string) {
+    return await this.bookingModel
+      .findById(id)
+      .populate({ path: 'userId', select: 'name email' })
+      .populate({ path: 'posterId', select: 'title address' })
+      .populate({ path: 'createdBy', select: 'name email' });
+  }
+  // create booking data-----------------------------------------
+  async createBooking(createBookingDto: CreateBookingDto) {
+    const newBooking = await this.bookingModel.create(createBookingDto);
+    if (!newBooking)
+      throw new HttpException('Booking details is not added.', 404);
+    return newBooking;
+  }
 
-  async getRevenueData(): Promise<{
-    todayRevenue: number;
-    yearlyRevenue: number[];
-    totalRevenue: number;
-  }> {
-    const todayRevenue = await this.getTodaysRevenue();
-    const yearlyRevenue = await this.getYearlyRevenue();
-    const totalRevenue = await this.getTotalRevenue();
+  // delete data by id---------------------------------------------
+  async deleteCartById(id: string) {
+    return this.bookingModel.findByIdAndDelete(id);
+  }
 
-    return { totalRevenue, todayRevenue, yearlyRevenue };
+  // delete cart with user and poster data
+  async deleteFromCart(userId: string, posterId: string): Promise<Booking> {
+    return this.bookingModel.findOneAndDelete({ userId, posterId });
+  }
+
+  // delete all data of specific user
+  async deleteAll(userId: string): Promise<string> {
+    try {
+      const result = await this.bookingModel.deleteMany({ userId }).exec();
+      if (result.deletedCount === 0) {
+        throw new NotFoundException(`No data found for userId: ${userId}`);
+      }
+      return `Successfully deleted data for userId: ${userId}`;
+    } catch (error) {
+      throw new Error(
+        `Failed to delete data for userId: ${userId}. Error: ${error.message}`,
+      );
+    }
   }
 
   // current month sales ------------------------------------------------
@@ -74,10 +108,9 @@ export class BookingService {
       if (id) {
         matchQuery = {
           ...matchQuery,
-          createdBy: id,
+          createdBy: new mongoose.Types.ObjectId(id),
         };
       }
-
       const totalSalesResult = await this.bookingModel.aggregate([
         {
           $match: matchQuery,
@@ -89,12 +122,10 @@ export class BookingService {
           },
         },
       ]);
-
       const totalSales =
         totalSalesResult.length > 0 ? totalSalesResult[0].totalSales : 0;
 
       const bookings = await this.bookingModel.find(matchQuery);
-
       const topPayments = await Promise.all(
         bookings
           .sort((a, b) => b.totalPrice - a.totalPrice)
@@ -126,34 +157,146 @@ export class BookingService {
       throw new HttpException('An error occurred', 500);
     }
   }
+  // memberstats----------------------------------------------------------------------------------
+  async getMemberRevenueStats(id: string): Promise<{
+    currentYearTotalRevenue: number;
+    yearlyRevenue: number[];
+    todayEarning: number;
+    currentMonthEarning: number;
+    totalPosters: number;
+  }> {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // Adjust month to be 1-indexed for MongoDB
+    currentDate.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(currentDate);
+    endOfDay.setUTCDate(currentDate.getUTCDate() + 1);
+    const startOfYear = new Date(Date.UTC(currentYear, 0, 1));
+    const endOfYear = new Date(Date.UTC(currentYear + 1, 0, 1));
 
-  async createBooking(createBookingDto: CreateBookingDto) {
-    const newBooking = await this.bookingModel.create(createBookingDto);
-    if (!newBooking)
-      throw new HttpException('Booking details is not added.', 404);
-    return newBooking;
+    const [totalRevenue, monthResult, dayResult, currentYearData, yourPosters] =
+      await Promise.all([
+        // totalRevenue
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+              createdAt: {
+                $gte: new Date(currentYear, 0, 1),
+                $lte: new Date(currentYear, 11, 31),
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalRevenue: { $sum: '$totalPrice' },
+            },
+          },
+        ]),
+        // current month revenue
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+              $expr: { $eq: [{ $year: '$createdAt' }, currentYear] },
+            },
+          },
+          {
+            $group: {
+              _id: { $month: '$createdAt' },
+              totalEarning: { $sum: '$totalPrice' },
+            },
+          },
+          {
+            $match: { _id: currentMonth }, // Filter to current month
+          },
+        ]),
+        // per day revenue
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdAt: {
+                $gte: currentDate,
+                $lt: endOfDay,
+              },
+              createdBy: new mongoose.Types.ObjectId(id),
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              todayEarning: { $sum: '$totalPrice' },
+            },
+          },
+        ]),
+        // curr year data
+        this.bookingModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+              createdAt: {
+                $gte: startOfYear,
+                $lt: endOfYear,
+              },
+            },
+          },
+          {
+            $group: {
+              _id: { $month: '$createdAt' },
+              totalRevenue: { $sum: '$totalPrice' },
+            },
+          },
+          {
+            $sort: { _id: 1 },
+          },
+        ]),
+        // no. of member posters
+        this.posterModel.aggregate([
+          {
+            $match: {
+              createdBy: id,
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalPosters: { $sum: 1 },
+            },
+          },
+          {
+            $sort: { _id: 1 },
+          },
+        ]),
+      ]);
+
+    const yearlyRevenue: number[] = new Array(12).fill(0);
+    currentYearData.forEach((item: any) => {
+      const monthIndex = item._id - 1;
+      yearlyRevenue[monthIndex] = item.totalRevenue;
+    });
+    return {
+      currentYearTotalRevenue:
+        totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0,
+      currentMonthEarning:
+        monthResult.length > 0 ? monthResult[0].totalEarning : 0,
+      todayEarning: dayResult.length > 0 ? dayResult[0].todayEarning : 0,
+      totalPosters: yourPosters.length > 0 ? yourPosters[0].totalPosters : 0,
+      yearlyRevenue,
+    };
   }
 
-  async deleteCartById(id: string) {
-    return this.bookingModel.findByIdAndDelete(id);
-  }
+  // get all revenue data for admin pannel ----------------------------------
+  async getRevenueData(): Promise<{
+    todayRevenue: number;
+    yearlyRevenue: number[];
+    totalRevenue: number;
+  }> {
+    const todayRevenue = await this.getTodaysRevenue();
+    const yearlyRevenue = await this.getYearlyRevenue();
+    const totalRevenue = await this.getTotalRevenue();
 
-  async deleteFromCart(userId: string, posterId: string): Promise<Booking> {
-    return this.bookingModel.findOneAndDelete({ userId, posterId });
-  }
-
-  async deleteAll(userId: string): Promise<string> {
-    try {
-      const result = await this.bookingModel.deleteMany({ userId }).exec();
-      if (result.deletedCount === 0) {
-        throw new NotFoundException(`No data found for userId: ${userId}`);
-      }
-      return `Successfully deleted data for userId: ${userId}`;
-    } catch (error) {
-      throw new Error(
-        `Failed to delete data for userId: ${userId}. Error: ${error.message}`,
-      );
-    }
+    return { totalRevenue, todayRevenue, yearlyRevenue };
   }
 
   async getTodaysRevenue(): Promise<number> {
@@ -227,131 +370,5 @@ export class BookingService {
     const totalRevenue = revenue.length > 0 ? revenue[0].totalRevenue : 0;
 
     return totalRevenue;
-  }
-
-  // memberstats----------------------------------------------------------------------------------
-  async getMemberRevenueStats(id: string): Promise<{
-    currentYearTotalRevenue: number;
-    yearlyRevenue: number[];
-    todayEarning: number;
-    currentMonthEarning: number;
-    totalPosters: number;
-  }> {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // Adjust month to be 1-indexed for MongoDB
-    currentDate.setUTCHours(0, 0, 0, 0);
-    const endOfDay = new Date(currentDate);
-    endOfDay.setUTCDate(currentDate.getUTCDate() + 1);
-    const currYear = new Date().getUTCFullYear();
-    const startOfYear = new Date(Date.UTC(currYear, 0, 1));
-    const endOfYear = new Date(Date.UTC(currYear + 1, 0, 1));
-
-    const [totalRevenue, monthResult, dayResult, currentYearData, yourPosters] =
-      await Promise.all([
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-              createdAt: {
-                $gte: new Date(currentYear, 0, 1),
-                $lte: new Date(currentYear, 11, 31),
-              },
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              totalRevenue: { $sum: '$totalPrice' },
-            },
-          },
-        ]),
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-              $expr: { $eq: [{ $year: '$createdAt' }, currentYear] },
-            },
-          },
-          {
-            $group: {
-              _id: { $month: '$createdAt' },
-              totalEarning: { $sum: '$totalPrice' },
-            },
-          },
-          {
-            $match: { _id: currentMonth }, // Filter to current month
-          },
-        ]),
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-              createdAt: {
-                $gte: currentDate,
-                $lt: endOfDay,
-              },
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              todayEarning: { $sum: '$totalPrice' },
-            },
-          },
-        ]),
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-              createdAt: {
-                $gte: startOfYear,
-                $lt: endOfYear,
-              },
-            },
-          },
-          {
-            $group: {
-              _id: { $month: '$createdAt' },
-              totalRevenue: { $sum: '$totalPrice' },
-            },
-          },
-          {
-            $sort: { _id: 1 },
-          },
-        ]),
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              totalPosters: { $sum: 1 },
-            },
-          },
-          {
-            $sort: { _id: 1 },
-          },
-        ]),
-      ]);
-
-    const yearlyRevenue: number[] = new Array(12).fill(0);
-    currentYearData.forEach((item: any) => {
-      const monthIndex = item._id - 1;
-      yearlyRevenue[monthIndex] = item.totalRevenue;
-    });
-
-    return {
-      currentYearTotalRevenue:
-        totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0,
-      currentMonthEarning:
-        monthResult.length > 0 ? monthResult[0].totalEarning : 0,
-      todayEarning: dayResult.length > 0 ? dayResult[0].totalEarning : 0,
-      totalPosters: yourPosters.length > 0 ? yourPosters[0].totalPosters : 0,
-      yearlyRevenue,
-    };
   }
 }

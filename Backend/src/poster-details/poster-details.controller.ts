@@ -15,7 +15,9 @@ import { CreatePosterDto } from './dto/createPoster.dto';
 import { UpdatePosterDto } from './dto/updatePoster.dto';
 import mongoose from 'mongoose';
 import { Query as ExpressQuery } from 'express-serve-static-core';
-import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/RoleGuard/role.guard';
+import { HasRoles } from 'src/RoleGuard/roles.decorater';
+import { Roles } from 'src/auth/roles.constants';
 
 @Controller('poster')
 export class PosterDetailsController {
@@ -23,7 +25,7 @@ export class PosterDetailsController {
 
   @Get()
   async getAllPosters(@Query() query: ExpressQuery) {
-    return this.posterdetailsService.getAllPosters(query);
+    return await this.posterdetailsService.getAllPosters(query);
   }
 
   @Get(':id')
@@ -36,6 +38,8 @@ export class PosterDetailsController {
   }
 
   @Post('add')
+  @UseGuards(RolesGuard)
+  @HasRoles(Roles.member, Roles.admin)
   async createPoster(@Body() createPosterDto: CreatePosterDto) {
     return await this.posterdetailsService.createPoster(createPosterDto);
   }
@@ -56,6 +60,6 @@ export class PosterDetailsController {
     if (!validId) throw new HttpException('Invalid user id ', 404);
     const deletePoster = await this.posterdetailsService.deletePoster(id);
     if (!deletePoster) throw new HttpException('UserNotFound', 404);
-    return;
+    return { message: 'Poster deleted successfully' };
   }
 }

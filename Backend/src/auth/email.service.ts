@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class EmailService {
-  private transporter;
+  private transporter: any;
 
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,

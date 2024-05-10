@@ -1,6 +1,7 @@
 import Link from "next/link";
+import React from "react";
 
-export default function Home() {
+const NotFound = () => {
   return (
     <div className="h-screen w-screen bg-white flex items-center font-poppins">
       <div className="container flex flex-col md:flex-row items-center justify-center px-5 text-gray-700">
@@ -290,4 +291,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+
+export default NotFound;

@@ -9,9 +9,9 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { BookingService } from './booking.service';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { CreateBookingDto } from './dto/createBooking.dto';
+import { BookingService } from './booking.service';
 
 @Controller('booking')
 export class BookingController {
@@ -21,6 +21,10 @@ export class BookingController {
   async getAll(@Query() query: ExpressQuery) {
     return await this.bookingService.getAll(query);
   }
+  @Get('id/:id')
+  async getBookingById(@Param('id') id: string) {
+    return await this.bookingService.getBookingById(id);
+  }
 
   @Get('data')
   async getRevenueData(): Promise<{
@@ -28,10 +32,10 @@ export class BookingController {
     todayRevenue: number;
     yearlyRevenue: number[];
   }> {
-    return this.bookingService.getRevenueData();
+    return await this.bookingService.getRevenueData();
   }
 
-  @Get('/currMonthData/:id?')
+  @Get('currMonthData/:id?')
   async getCurrentMonthSales(@Param('id') id?: string) {
     return await this.bookingService.getCurrentMonthSales(id);
   }

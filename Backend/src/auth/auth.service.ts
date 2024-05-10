@@ -33,9 +33,13 @@ export class AuthService {
       };
     }
     const resPerPage = Number(query?.per_page) || 0;
-    const currPage = Number(query.page) || 1;
+    const currPage = Number(query?.page) || 1;
     const skip = resPerPage * (currPage - 1);
-    return await this.userModel.find(DBQuery).limit(resPerPage).skip(skip);
+    const result = await this.userModel
+      .find(DBQuery)
+      .limit(resPerPage)
+      .skip(skip);
+    return result;
   }
 
   async getUsersById(id: string) {
@@ -86,7 +90,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password.');
     }
     const token = this.jwtService.sign(
-      { id: user._id },
+      { id: user._id, role: user.role, name: user.name },
       { expiresIn: process.env.JWT_EXPIRES, secret: process.env.JWT_SECRET },
     );
 

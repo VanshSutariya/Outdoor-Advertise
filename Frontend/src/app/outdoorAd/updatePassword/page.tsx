@@ -130,7 +130,7 @@ const UpdatePasswordPage = () => {
               </div>
             </div>
             {isError && <p className="text-lg text-red-700">{errorState}</p>}
-            <button className="p-3 text-black font-bold bg-slate-200 w-full ">
+            <button className="p-3 text-black font-bold bg-slate-200 w-full hover:bg-slate-300 active:bg-slate-200 rounded-lg">
               Submit
             </button>
           </form>

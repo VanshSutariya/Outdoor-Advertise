@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, UpdateDto } from './dto/login.dto';
@@ -19,6 +20,9 @@ import { emailDto } from './dto/email.dto';
 import { EmailService } from './email.service';
 import { UpdatePassDto, resetDto } from './dto/resetPass.dto';
 import { Query as ExpressQuery } from 'express-serve-static-core';
+import { RolesGuard } from 'src/RoleGuard/role.guard';
+import { HasRoles } from 'src/RoleGuard/roles.decorater';
+import { Roles } from './roles.constants';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +32,8 @@ export class AuthController {
   ) {}
 
   @Get()
+  @UseGuards(RolesGuard)
+  @HasRoles(Roles.admin)
   async getAllUser(@Query() query: ExpressQuery) {
     return await this.authService.getAllUsers(query);
   }
@@ -50,7 +56,7 @@ export class AuthController {
     const token = await this.authService.login(loginDto);
     const expirationTime = new Date();
     expirationTime.setTime(expirationTime.getTime() + 60 * 60 * 1000);
-    response.cookie('Authentication', token, {
+    response.cookie('Authentication', token.token, {
       secure: true,
       httpOnly: true,
       expires: expirationTime,

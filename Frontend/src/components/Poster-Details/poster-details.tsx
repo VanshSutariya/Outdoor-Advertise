@@ -61,10 +61,10 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
       <>
         {error ? (
           <div className=" flex-col font-poppins text-center text-3xl font-bold pt-16  h-screen ">
-            <div className="pb-4">error</div>
+            <div className="pb-4">{error}</div>
             <button
               onClick={() => router.back()}
-              className="text-2xl md:px-[60px] pt-3 font-inter font-semibold flex text-blue-400 hover:text-blue-500 active:text-blue-500"
+              className="text-2xl w-full items-center md:px-[60px] pt-3 font-inter font-semibold flex text-blue-400 hover:text-blue-500 active:text-blue-500"
             >
               <div className=" hover:scale-110 active:scale-95 duration-150 flex w-full text-center justify-center md:mr-5">
                 <IoIosArrowRoundBack size={33} /> Back

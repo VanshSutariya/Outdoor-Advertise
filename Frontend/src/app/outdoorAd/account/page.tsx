@@ -29,9 +29,9 @@ export default function AccountPage() {
   const {
     userId,
     userRole,
-  }: { userId: string | null; userRole: string | null } = useSelector(
-    (state: RootState) => state.auth
-  );
+    isLoggedIn,
+  }: { isLoggedIn: boolean; userId: string | null; userRole: string | null } =
+    useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const user = async () => {
@@ -74,8 +74,8 @@ export default function AccountPage() {
     return (
       <>
         <NavBar />
-        <div className=" mt-24 text-lg font-bold flex justify-center">
-          Loading....
+        <div className="flex justify-center text-3xl font-poppins h-[260px] mt-32">
+          <div className="rounded-full h-10 w-10 bg-gray-700 animate-ping"></div>
         </div>
       </>
     );
