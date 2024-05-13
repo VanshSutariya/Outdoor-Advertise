@@ -40,6 +40,7 @@ export class BookingService {
       .sort({ createdAt: -1 });
 
     if (!resData) throw new HttpException('You have no order placed yet.', 404);
+
     return resData;
   }
   // get booking data using id ---------------------------------------------------
@@ -59,13 +60,8 @@ export class BookingService {
   }
 
   // delete data by id---------------------------------------------
-  async deleteCartById(id: string) {
+  async deleteBookingtById(id: string) {
     return this.bookingModel.findByIdAndDelete(id);
-  }
-
-  // delete cart with user and poster data
-  async deleteFromCart(userId: string, posterId: string): Promise<Booking> {
-    return this.bookingModel.findOneAndDelete({ userId, posterId });
   }
 
   // delete all data of specific user

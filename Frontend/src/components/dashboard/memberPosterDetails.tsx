@@ -8,6 +8,8 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import Link from "next/link";
 import Buttons from "./buttons";
 import DeletePopUp from "./deletePopUp";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 interface PosterData {
   id: number;
@@ -37,6 +39,9 @@ const MemberPosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [posterData, setPosterData] = useState<PosterData>();
+  const { token }: { token: string } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   useEffect(() => {
     const fetchData = async () => {

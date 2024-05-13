@@ -12,13 +12,11 @@ export class RoleChangeGateway {
 
   @SubscribeMessage('roleChange')
   sendRoleChangeUpdate(update: any) {
-    console.log(update, 'sockettttttttttt..............');
     this.server.emit('roleChange', update);
   }
 
   @SubscribeMessage('roleReq')
   userRoleReq(data: any) {
-    console.log(data, 'rolechangeReq..................');
     this.server.emit('roleReq', data);
   }
 }

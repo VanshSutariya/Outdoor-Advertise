@@ -1,64 +1,71 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
-import { SiBillboard, SiHomeassistantcommunitystore } from "react-icons/si";
-import { PiBusDuotone } from "react-icons/pi";
-import { GiRialtoBridge, GiStreetLight, GiBus } from "react-icons/gi";
-import { BsBuildingsFill } from "react-icons/bs";
-import { MdTrain, MdLocalAirport, MdElectricRickshaw } from "react-icons/md";
+import { useSearchParams } from "next/navigation";
 
 import Container from "./container";
 import CategoryBox from "./categaryBox";
+import Airport, {
+  Billboard,
+  Buildings,
+  BusStands,
+  Buses,
+  FootOverBridges,
+  Poles,
+  Railway,
+  Rickshaws,
+  ShoppingMalls,
+} from "./images";
 
 export const categories = [
   {
     label: "Airports",
-    icon: MdLocalAirport,
+    icon: Airport,
     description: "Advertisement on Airports.",
   },
   {
     label: "Billboard",
-    icon: SiBillboard,
+    icon: Billboard,
     description: "This property is has windmills!",
   },
   {
     label: "RailwayPlatforms",
-    icon: MdTrain,
+    icon: Railway,
     description: "Advertisement on Railway Platforms.",
   },
   {
-    label: "BusStands",
-    icon: PiBusDuotone,
-    description: "Advertisement on Government BusStands.",
+    label: "Shopping Malls",
+    icon: ShoppingMalls,
+    description: "Advertisement in shopping malls!",
   },
+
   {
     label: "FootOverBridges",
-    icon: GiRialtoBridge,
+    icon: FootOverBridges,
     description: "Advertisement on FottOverBridges",
   },
   {
     label: "Poles",
-    icon: GiStreetLight,
+    icon: Poles,
     description: "Advertisement on poles.",
   },
   {
     label: "Buses",
-    icon: GiBus,
+    icon: Buses,
     description: "Advertisement on Buses.",
   },
   {
     label: "Rickshaws",
-    icon: MdElectricRickshaw,
+    icon: Rickshaws,
     description: "Advertisement on local Rickshaws.",
   },
   {
-    label: "Shopping Malls",
-    icon: SiHomeassistantcommunitystore,
-    description: "Advertisement in shopping malls!",
+    label: "BusStands",
+    icon: BusStands,
+    description: "Advertisement on Government BusStands.",
   },
   {
     label: "Buildings",
-    icon: BsBuildingsFill,
+    icon: Buildings,
     description: "Advertisement on buildings.",
   },
 ];
@@ -66,7 +73,6 @@ export const categories = [
 const Categories = () => {
   const params = useSearchParams();
   const category = params?.get("category");
-  const pathname = usePathname();
 
   return (
     <Container>

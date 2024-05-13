@@ -2,9 +2,12 @@
 import Sidebar from "@/components/admincomponents/sidebar";
 import MemberPosterDetails from "@/components/dashboard/memberPosterDetails";
 
-const PosterSlugPage: React.FC<{ params: { posterId: any } }> = ({
+interface PosterSlugPageProps {
+  params: { posterId: any };
+}
+const PosterSlugPage: React.FC<PosterSlugPageProps> = ({
   params,
-}): { params: { posterId: any } } => {
+}): JSX.Element => {
   const id = params.posterId[0];
   return (
     <Sidebar>

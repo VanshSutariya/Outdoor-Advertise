@@ -15,7 +15,6 @@ const PosterSlugPage: React.FC<PosterSlugPageProps> = ({
     <main className="overflow-auto">
       <NavBar />
       <PosterDetails id={id} />
-
       <Footer />
     </main>
   );

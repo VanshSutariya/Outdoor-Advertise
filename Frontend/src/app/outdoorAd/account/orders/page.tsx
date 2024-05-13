@@ -1,11 +1,9 @@
 "use client";
+import Link from "next/link";
 import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
-import Link from "next/link";
 import { RootState } from "@/store";
-import Image from "next/image";
 import NavBar from "@/components/Header";
 
 interface Orders {
@@ -17,27 +15,28 @@ interface Orders {
   totalPrice: number;
 }
 export default function OrderPage() {
-  const router = useRouter();
   const [orders, setOrders] = useState<Orders[]>();
-  const { userId }: { userId: string | null } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { userId, token }: { userId: string | null; token: string } =
+    useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const func = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/booking?userId=${userId}`
+          `http://localhost:4000/booking?userId=${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
+        const data = await res.json();
         if (!res.ok) {
           throw new Error("Failed to fetch booking orders data.");
         }
-        const data = await res.json();
-        console.log(data);
-
         setOrders(data);
-
-        // Dispatch an action to update Redux state with fetched cart data
       } catch (error: any) {
         console.error("Error fetching cart data:", error.message);
       }

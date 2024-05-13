@@ -7,15 +7,19 @@ interface PosterItemProps {
   lightingType: string;
   _id: string;
   id?: string;
+  totalBooking?: number;
+  avgBooking: number;
 }
 
 const PosterItem: React.FC<PosterItemProps> = ({
   title,
+  totalBooking,
   lightingType,
   image,
   price,
   _id,
   id,
+  avgBooking,
 }) => {
   const capitalizedTitle = title
     .split(" ")
@@ -30,9 +34,13 @@ const PosterItem: React.FC<PosterItemProps> = ({
             src={image}
             alt={title}
           />
-          {/* <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 m-2 rounded-md text-sm font-medium">
-            Popular
-          </div> */}
+          {totalBooking !== undefined &&
+            avgBooking !== undefined &&
+            totalBooking > avgBooking && (
+              <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 m-2 rounded-md text-sm font-medium">
+                Popular
+              </div>
+            )}
         </div>
         <div className="px-1 ">
           <h3 className="pt-2 text-[19px] font-inter">{capitalizedTitle}</h3>

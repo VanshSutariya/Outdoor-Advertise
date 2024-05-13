@@ -4,6 +4,7 @@ import { PosterDetailsService } from './poster-details.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Posters, PostersSchema } from './schemas/posters.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
 
 @Module({
   imports: [

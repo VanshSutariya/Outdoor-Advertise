@@ -40,24 +40,21 @@ export default function DashboardPage() {
     totalPosters: 0,
   });
   const [monthlyData, setMonthlyData] = useState<number[]>([]);
-  const [totalMembers, setTotalMembers] = useState<number | null>(null);
 
   const {
     userId,
+    token,
   }: {
     userId: string | null;
+    token: string;
   } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     try {
       const data = async () => {
         if (userId) {
-          // count member
-          const memberrole = "member";
-          const memberCount = await fetchAllUsers(memberrole);
-          setTotalMembers(memberCount);
           const id = userId;
-          const data = await fetchMemberPosterStats(id);
+          const data = await fetchMemberPosterStats(id, token);
           setMemberStats((prev) => {
             const newState = { ...prev };
             newState.totalRevenue = data.currentYearTotalRevenue;
@@ -68,7 +65,7 @@ export default function DashboardPage() {
           });
           setMonthlyData(data.yearlyRevenue);
 
-          const monthlydata = await fetchMonthlyData(userId);
+          const monthlydata = await fetchMonthlyData(token, userId);
           setTopPayments(monthlydata);
         } else {
           throw new Error("No Data Available for this user.");
@@ -181,8 +178,8 @@ export default function DashboardPage() {
                 </p>
               </div>
               <ul>
-                {topPayment &&
-                  topPayment.topMonthlyPayment.map((item, index) => (
+                {topPayment !== null &&
+                  topPayment.topMonthlyPayment?.map((item, index) => (
                     <li
                       key={index}
                       className="md:flex items-center justify-between py-2 border-b mb-3"

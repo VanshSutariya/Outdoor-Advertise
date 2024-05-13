@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Http2ServerResponse } from 'http2';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -24,14 +25,15 @@ export class RolesGuard implements CanActivate {
     }
     const token = authHeader.substring(7);
     try {
-      const decoded: any = jwt.decode(token);
+      const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
       const userRole = decoded.role;
-      if (userRole.includes(requiredRoles)) {
+
+      if (requiredRoles.includes(userRole)) {
         return true;
       }
     } catch (error) {
       console.error('Error decoding token:', error.message);
-      throw new Error(error);
+      throw new UnauthorizedException(error.message);
     }
     throw new UnauthorizedException(
       `Only ${requiredRoles.join(' or ')} can access this service`,

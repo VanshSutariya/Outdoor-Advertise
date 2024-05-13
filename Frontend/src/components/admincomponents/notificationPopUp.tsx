@@ -2,9 +2,16 @@ import { useEffect, useState } from "react";
 import { CiBellOn } from "react-icons/ci";
 import { fetchAllRoleChanges } from "../../utils/http";
 import { io, Socket } from "socket.io-client";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
 
 const NotificationPopUp: React.FC = () => {
   const [notification, setNotification] = useState<boolean>(false);
+  const {
+    token,
+  }: {
+    token: string;
+  } = useSelector((state: RootState) => state.auth);
 
   const socket = io("http://localhost:4040");
 
@@ -23,7 +30,7 @@ const NotificationPopUp: React.FC = () => {
   useEffect(() => {
     try {
       const data = async () => {
-        const alerts = await fetchAllRoleChanges();
+        const alerts = await fetchAllRoleChanges(token);
         console.log(alerts);
 
         if (alerts > 0) {

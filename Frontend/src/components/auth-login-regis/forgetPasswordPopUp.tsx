@@ -33,7 +33,7 @@ const ForgotPasswordPopup: React.FC<ForgotPasswordPopupProps> = ({
 
       onClose();
       setHandleError(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       setHandleError(error.message || "An error occurred.");
     } finally {

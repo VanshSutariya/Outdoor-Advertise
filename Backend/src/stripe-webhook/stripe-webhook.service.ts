@@ -63,6 +63,11 @@ export class StripeWebhookService {
 
                 console.log(bookingDetails);
 
+                // increase the poster totalBooking count
+                await this.posterService.totalBookingCounter(
+                  filteredCartItem.posterId,
+                );
+
                 // send customer details, email----------------------------------
 
                 const receiverEmail = bookingDetails.createdBy.email;
@@ -84,7 +89,7 @@ export class StripeWebhookService {
                 const updatePosterDto: UpdatePosterDto = {
                   bookingDate: cartItem.bookingDate, // Example array of booking dates
                 };
-                this.posterService.updatePoster(
+                await this.posterService.updatePoster(
                   cartItem.posterId,
                   updatePosterDto,
                 );

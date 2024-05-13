@@ -41,7 +41,7 @@ const SignIn: React.FC = () => {
         throw new Error(resData.message || "Invalid Credentials");
 
       document.cookie = `jwt=${resData.token}; expires=${new Date(
-        new Date().getTime() + 2 * 60 * 60 * 1000
+        new Date().getTime() + 12 * 60 * 60 * 1000
       )}; path=/; secure;`;
 
       const decodedToken = decode(resData.token) as { id: string };

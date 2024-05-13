@@ -9,12 +9,11 @@ import Link from "next/link";
 import { RootState } from "@/store";
 import { cartActions } from "@/store/cart-slice";
 import NavBar from "@/components/Header";
-import { UploadButton } from "@/utils/uploadthing";
-import toastFunction from "@/components/reactToast/toast";
 
 export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [paymentLoading, setPaymentLoading] = useState<boolean>(false);
   const { userId }: { userId: string | null } = useSelector(
     (state: RootState) => state.auth
   );
@@ -28,7 +27,6 @@ export default function CartPage() {
           throw new Error("Failed to fetch cart data.");
         }
         const data = await res.json();
-        // Dispatch an action to update Redux state with fetched cart data
         dispatch(cartActions.setCartItems(data));
       } catch (error: any) {
         console.error("Error fetching cart data:", error.message);
@@ -47,6 +45,7 @@ export default function CartPage() {
   }
 
   async function handleCheckout() {
+    setPaymentLoading(true);
     try {
       const response = await fetch("http://localhost:4000/stripe/checkout", {
         method: "POST",
@@ -59,6 +58,7 @@ export default function CartPage() {
       if (response.ok) {
         const data = await response.text();
         router.push(data);
+        setPaymentLoading(false);
       } else {
         throw new Error("Error creating checkout session.");
       }
@@ -77,8 +77,8 @@ export default function CartPage() {
           </h1>
           <div className="flex flex-col justify-center md:flex-row gap-4">
             <div className="md:w-3/4 ">
-              <div className="bg-slate-100 rounded-lg shadow-md p-6 mb-4">
-                <table className="w-full font-poppins">
+              <div className="bg-slate-100 rounded-lg shadow-md  p-6 mb-4">
+                <table className="w-full font-poppins ">
                   <thead>
                     <tr className="border-b-2 border-b-gray-300">
                       <th className="text-left font-semibold pl-8">Product</th>
@@ -145,30 +145,31 @@ export default function CartPage() {
                           </td>
                         </tr>
                       ))}
-
-                    {/* <!-- More product rows --> */}
                   </tbody>
                 </table>
               </div>
             </div>
-            <div className="md:w-1/4">
+            <div className="md:w-1/4 font-poppins text-lg">
               <div className="bg-slate-100 rounded-lg shadow-md p-6">
                 <h2 className="text-lg font-semibold mb-4">Summary</h2>
                 <div className="flex justify-between mb-2">
-                  <span>Subtotal</span>
-                  <span>₹{finalTotal}</span>
+                  <span>No. Of Posters </span>
+                  <span> {items ? items.length : 0}</span>
                 </div>
 
-                {/* <hr className="my-2"> */}
                 <div className="flex justify-between mb-2">
-                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold">Total Paylable Amount </span>
                   <span className="font-semibold">₹{finalTotal}</span>
                 </div>
                 <button
                   onClick={handleCheckout}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full"
+                  className={`text-white py-2 px-4 rounded-lg mt-4 w-full ${
+                    paymentLoading ? "bg-green-500" : "bg-blue-500"
+                  }`}
                 >
-                  Checkout
+                  {!paymentLoading
+                    ? "Checkout"
+                    : "Wait for payment page.........."}
                 </button>
               </div>
               <Link href="/outdoorAd" className="">

@@ -4,10 +4,17 @@ import { Cart } from './schemas/cart.schemas';
 import { Model } from 'mongoose';
 import { CreateCartDto } from './dto/createCart.dto';
 import { Query } from 'express-serve-static-core';
+import { v2 } from 'cloudinary';
 
 @Injectable()
 export class CartService {
-  constructor(@InjectModel(Cart.name) private cartModal: Model<Cart>) {}
+  constructor(@InjectModel(Cart.name) private cartModal: Model<Cart>) {
+    v2.config({
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.CLOUDNERY_KEY,
+      api_secret: process.env.CLOUDNERY_SECRET_KEY,
+    });
+  }
 
   async getAll(query: Query) {
     let DBQuery = {};
@@ -31,6 +38,22 @@ export class CartService {
     const newCart = await this.cartModal.create(createCartDto);
     if (!newCart) throw new HttpException('Cart details is not added.', 404);
     return newCart;
+  }
+
+  async uploadImage(filepath: Buffer) {
+    return new Promise((resolve, reject) => {
+      v2.uploader
+        .upload_stream(
+          { folder: 'Customer Ad Images', resource_type: 'auto' },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          },
+        )
+        .end(filepath);
+    });
   }
 
   async deleteCartById(id: string) {

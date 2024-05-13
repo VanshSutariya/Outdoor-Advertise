@@ -2,20 +2,14 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
 import Sidebar from "../../../../components/admincomponents/sidebar";
-import { useEffect, useState } from "react";
-import { fetchAllPosters } from "../../../../utils/http";
 import PosterGrid from "../../../../components/Poster/poster-grid";
 import ProfileDropDown from "../../../../components/admincomponents/profileDropDown";
 
 export default function PosterDetails() {
   const {
     userId,
-    userName,
-    userRole,
   }: {
-    userName: string | null;
     userId: string | null;
-    userRole: string | null;
   } = useSelector((state: RootState) => state.auth);
 
   return (

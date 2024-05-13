@@ -128,7 +128,7 @@ const UserTable = () => {
         </div>
       </div>
       <div className="flex justify-center gap-2 mb-5 ">
-        {isPageOutOfRange ? (
+        {page >= tp ? (
           <div>No more pages...</div>
         ) : (
           <div className="flex justify-center items-center mt-16">

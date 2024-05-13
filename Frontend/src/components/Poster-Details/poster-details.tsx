@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import DatePicker from "./date-range-picker";
 import { CiLocationOn } from "react-icons/ci";
 import { LiaTagSolid } from "react-icons/lia";
-
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { fetchOnePoster } from "@/utils/http";
@@ -40,13 +39,10 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(false);
       try {
         const resData: PosterData = await fetchOnePoster(id);
-        // Simulate loading for 1 second
         setPosterData(resData);
-        setTimeout(() => {
-          setLoading(false);
-        }, 500);
       } catch (error: any) {
         setError(error.message);
         console.error("Error fetching data:", error);
@@ -81,11 +77,11 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   }
 
   if (!posterData) {
-    return <div>Error: Failed to fetch poster data</div>;
+    return <div>Something Went Wrong Reload the Page!</div>;
   }
-  const lat: number = 23.02436884189762;
-  const lng: number = 72.53198504447938;
-  const url: string = `https://maps.google.com/maps?q=${lat},${lng}&output=embed`;
+  // const lat: number = 23.02436884189762;
+  // const lng: number = 72.53198504447938;
+  // const url: string = `https://maps.google.com/maps?q=${lat},${lng}&output=embed`;
 
   const excludeFields = [
     "_id",
@@ -96,10 +92,6 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
     "createdAt",
     "updatedAt",
   ];
-
-  const dataEntries = Object.entries(posterData).filter(
-    ([key]) => !excludeFields.includes(key)
-  );
 
   const capitalizedTitle = posterData.title
     .split(" ")

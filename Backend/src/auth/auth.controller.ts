@@ -10,12 +10,14 @@ import {
   Put,
   Query,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, UpdateDto } from './dto/login.dto';
 import { SignUpDto } from './dto/signup.dto';
-import { Response, response } from 'express';
+import { Response } from 'express';
 import { emailDto } from './dto/email.dto';
 import { EmailService } from './email.service';
 import { UpdatePassDto, resetDto } from './dto/resetPass.dto';
@@ -23,6 +25,8 @@ import { Query as ExpressQuery } from 'express-serve-static-core';
 import { RolesGuard } from 'src/RoleGuard/role.guard';
 import { HasRoles } from 'src/RoleGuard/roles.decorater';
 import { Roles } from './roles.constants';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
 
 @Controller('auth')
 export class AuthController {
@@ -80,7 +84,7 @@ export class AuthController {
 
   @Patch(':id')
   async updateUser(@Param('id') id: string, @Body() updatedto: UpdateDto) {
-    const up = this.authService.updateUserDetails(id, updatedto);
+    const up = await this.authService.updateUserDetails(id, updatedto);
     return up;
   }
 
@@ -100,5 +104,19 @@ export class AuthController {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  @Post('/upload/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadFile(
+    @Param('id') id: string,
+    @Body() updatedto: UpdateDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log(file);
+    const imageUrl: any = await this.authService.uploadImage(file.buffer);
+    updatedto.image = imageUrl.secure_url;
+    await this.authService.updateUserDetails(id, updatedto);
+    return imageUrl;
   }
 }

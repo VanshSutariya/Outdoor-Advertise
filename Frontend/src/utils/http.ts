@@ -10,13 +10,20 @@ export default async function fetchUser(id: string): Promise<any> {
   if (!resData.ok) throw new Error("user id is not vaid.");
   return user;
 }
-export async function deletePosterById(id: string): Promise<any> {
-  const resData = await fetch(`http://localhost:4000/poster/${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export async function deletePosterById(
+  id: string,
+  token: string
+): Promise<any> {
+  const resData = await fetch(
+    `http://localhost:4000/poster/deletePoster/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return resData;
 }
 
@@ -40,7 +47,8 @@ export async function fetchAllPoster(
   location?: string,
   state?: string,
   city?: string,
-  mediatype?: string
+  mediatype?: string,
+  isPopularClicked?: string
 ): Promise<any[]> {
   let url: string;
   const queryParams: Record<string, string> = {
@@ -68,9 +76,13 @@ export async function fetchAllPoster(
     queryParams["mediatype"] = mediatype.trim();
   }
 
+  if (isPopularClicked !== undefined && isPopularClicked.trim() !== "") {
+    queryParams["isPopularClicked"] = isPopularClicked.trim();
+  }
+
   const queryString = new URLSearchParams(queryParams).toString();
 
-  url = `http://localhost:4000/poster?${queryString}&price=`;
+  url = `http://localhost:4000/poster?${queryString}`;
   console.log(url);
 
   const resData = await fetch(url, {
@@ -78,7 +90,6 @@ export async function fetchAllPoster(
     headers: { "Content-Type": "application/json" },
   });
   const posters = await resData.json();
-  console.log(posters);
 
   if (!resData.ok)
     throw new Error(
@@ -86,13 +97,15 @@ export async function fetchAllPoster(
     );
   return posters;
 }
-//----------------------------------------------------------------------
-export async function fetchOnePoster(id: string): Promise<any> {
+
+export async function fetchOnePoster(id: string | undefined): Promise<any> {
   const resData = await fetch(`http://localhost:4000/poster/${id}`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
-  if (!resData.ok) throw new Error("Poster doesn't Exists Ø.");
+  if (!resData.ok) throw new Error("Poster doesn't Exists .");
   const poster = await resData.json();
   return poster;
 }
@@ -116,29 +129,33 @@ export async function deleteAllCartData(userId: string): Promise<String> {
   return resp;
 }
 
-export async function fetchAllBookingsData(): Promise<{
+export async function fetchAllBookingsData(token: string): Promise<{
   totalRevenue: number;
   todayRevenue: number;
   yearlyRevenue: number[];
 }> {
   const resData = await fetch(`http://localhost:4000/booking/data`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
   });
   const bookings = await resData.json();
   return bookings;
 }
 
-export async function fetchMonthlyData(id?: string) {
+export async function fetchMonthlyData(token: string, id?: string) {
   let url = "http://localhost:4000/booking/currMonthData/";
   if (id) {
     url += id;
   }
-  console.log(url);
-
   const resData = await fetch(url, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
   });
   const bookings = await resData.json();
   return bookings;
@@ -159,6 +176,7 @@ export async function fetchAllUsers(
   const countUsers = users.length;
   return countUsers;
 }
+
 export async function fetchUsers({
   page,
   per_page,
@@ -183,6 +201,7 @@ export async function fetchUsers({
   console.log(users);
   return users;
 }
+
 export async function Allusers(token: string): Promise<number> {
   const resData = await fetch(`http://localhost:4000/auth`, {
     method: "GET",
@@ -195,32 +214,47 @@ export async function Allusers(token: string): Promise<number> {
   return users.length;
 }
 
-export async function fetchRoleChangeRequests() {
+export async function fetchRoleChangeRequests(token: string) {
   const data = await fetch(
     `http://localhost:4000/userRoleChange?status=pending`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   const newData = await data.json();
   return newData;
 }
-export async function fetchAllRoleChanges() {
+
+export async function fetchAllRoleChanges(token: string) {
   const data = await fetch(
     `http://localhost:4000/userRoleChange?status=pending`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   const newData = await data.json();
   return newData.length;
 }
-export async function updateUserRole(id: string, status: string) {
+
+export async function updateUserRole(
+  id: string,
+  status: string,
+  token: string
+) {
   const data = await fetch(`http://localhost:4000/userRoleChange/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ status }),
   });
   const userRoleUpdates = await data.json();
@@ -240,6 +274,7 @@ export async function sendRoleChangeRequest(_id?: string) {
 
   return newRoleChangeReq;
 }
+
 export async function UserRoleChangeStatus(userId: any) {
   const data = await fetch(
     `http://localhost:4000/userRoleChange?user=${userId}`,
@@ -255,15 +290,20 @@ export async function UserRoleChangeStatus(userId: any) {
 export async function fetchAllBookingsOrders({
   page,
   per_page,
+  token,
 }: {
   page: number;
   per_page: number;
+  token: string;
 }): Promise<any[]> {
   const resData = await fetch(
     `http://localhost:4000/booking?page=${page}&per_page=${per_page}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   const orders = await resData.json();
@@ -271,7 +311,10 @@ export async function fetchAllBookingsOrders({
   return orders;
 }
 
-export async function fetchMemberPosterStats(id: string): Promise<{
+export async function fetchMemberPosterStats(
+  id: string,
+  token: string
+): Promise<{
   currentYearTotalRevenue: number;
   yearlyRevenue: number[];
   todayEarning: number;
@@ -282,7 +325,10 @@ export async function fetchMemberPosterStats(id: string): Promise<{
     `http://localhost:4000/booking/memberStats/${id}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   const bookings = await resData.json();

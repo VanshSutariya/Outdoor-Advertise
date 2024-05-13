@@ -9,7 +9,6 @@ interface Poster {
   image: string;
   price: number;
   lightingType: string;
-  // Define other properties of the poster object
 }
 
 interface PosterGridProps {
@@ -22,24 +21,30 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
   const address = searchParams.get("address") || undefined;
   const state = searchParams.get("state") || undefined;
   const city = searchParams.get("city") || undefined;
+  const isPopularClicked = searchParams.get("isPopularClicked") || undefined;
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [posterData, setPosterData] = useState<Poster[]>([]);
   const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1); // Initialize totalPages
+  const [avgBooking, setAvgBooking] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
 
   const per_page: number = 6;
 
   useEffect(() => {
     setError(null);
-    setLoading(true);
     const fetchData = async () => {
       try {
         let resData: any;
         if (props.id) {
-          resData = await fetchAllPoster(page, per_page, props.id);
+          resData = await fetchAllPoster(
+            page,
+            per_page,
+            props.id,
+            isPopularClicked
+          );
         } else {
           const mediatype = category;
           resData = await fetchAllPoster(
@@ -49,16 +54,18 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
             address,
             state,
             city,
-            mediatype
+            mediatype,
+            isPopularClicked
           );
         }
+        setLoading(false);
+
         setTotalPages(Math.ceil(resData.totalLength / per_page));
         setPosterData(resData.resData);
-        setLoading(false);
+        setAvgBooking(resData.averageBooking);
 
         let pageNumbers: number[] = [];
         const offsetNumber: number = 2;
-        const isPageOutOfRange: boolean = page > totalPages;
         for (let i = page - offsetNumber; i <= page + offsetNumber; i++) {
           if (i >= 1 && i <= totalPages) {
             pageNumbers.push(i);
@@ -72,10 +79,8 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
       }
     };
 
-    setTimeout(() => {
-      fetchData();
-    }, 500);
-  }, [page, totalPages, category, address, state, city]);
+    fetchData();
+  }, [page, totalPages, category, address, state, city, isPopularClicked]);
 
   if (error || loading) {
     return (
@@ -109,9 +114,9 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
               key={poster._id}
             >
               {props.id ? (
-                <PosterItem {...poster} id={props.id} />
+                <PosterItem {...poster} avgBooking={avgBooking} id={props.id} />
               ) : (
-                <PosterItem {...poster} />
+                <PosterItem {...poster} avgBooking={avgBooking} />
               )}
             </div>
           ))}

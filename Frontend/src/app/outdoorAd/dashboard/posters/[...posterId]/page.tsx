@@ -1,10 +1,10 @@
 "use client";
 import Sidebar from "@/components/admincomponents/sidebar";
 import MemberPosterDetails from "@/components/dashboard/memberPosterDetails";
-
-const PosterSlugPage: React.FC<{ params: { posterId: any } }> = ({
-  params,
-}): { params: { posterId: any } } => {
+interface PosterId {
+  params: { posterId: any };
+}
+const PosterIdHomePage: React.FC<PosterId> = ({ params }): JSX.Element => {
   const id = params.posterId[0];
   return (
     <Sidebar>
@@ -12,4 +12,4 @@ const PosterSlugPage: React.FC<{ params: { posterId: any } }> = ({
     </Sidebar>
   );
 };
-export default PosterSlugPage;
+export default PosterIdHomePage;

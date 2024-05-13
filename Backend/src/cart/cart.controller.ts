@@ -8,10 +8,13 @@ import {
   Param,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/createCart.dto';
 import { Query as ExpressQuery } from 'express-serve-static-core';
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('cart')
 export class CartController {
   constructor(private cartService: CartService) {}
@@ -29,6 +32,14 @@ export class CartController {
   @Post('add')
   async createCart(@Body() createCartdto: CreateCartDto) {
     return await this.cartService.createCart(createCartdto);
+  }
+
+  @Post('/upload')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    const imageUrl: any = await this.cartService.uploadImage(file.buffer);
+    return imageUrl;
   }
 
   //delete an specific poster

@@ -5,16 +5,19 @@ import { Model } from 'mongoose';
 import { CreatePosterDto } from './dto/createPoster.dto';
 import { UpdatePosterDto } from './dto/updatePoster.dto';
 import { Query } from 'express-serve-static-core';
-import { BookingModule } from 'src/booking/booking.module';
-
+import { v2 } from 'cloudinary';
 @Injectable()
 export class PosterDetailsService {
-  constructor(
-    @InjectModel(Posters.name) private postersModel: Model<Posters>,
-  ) {}
+  constructor(@InjectModel(Posters.name) private postersModel: Model<Posters>) {
+    v2.config({
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.CLOUDNERY_KEY,
+      api_secret: process.env.CLOUDNERY_SECRET_KEY,
+    });
+  }
 
   // get all posters
-  async getAllPosters(query: Query) {
+  async getAllPosters(query: Query, isPopularClicked: boolean = false) {
     // if (query?.price) {
     //   if (query?.priceCondition) {
     //     DBQuery['price'] = {
@@ -45,6 +48,19 @@ export class PosterDetailsService {
       DBQuery['createdBy'] = query?.createdBy;
     }
 
+    DBQuery['isActive'] = true;
+
+    if (isPopularClicked) {
+      const posters = await this.postersModel.find();
+      const totalBookings = posters.reduce(
+        (acc, poster) => acc + poster.totalBooking,
+        0,
+      );
+      const averageBooking = totalBookings / posters.length;
+
+      DBQuery['totalBooking'] = { $gt: averageBooking };
+    }
+
     const resPerPage = Number(query?.per_page) || 0;
     const currentPage = Number(query.page) || 1;
     const skip = resPerPage * (currentPage - 1);
@@ -52,16 +68,23 @@ export class PosterDetailsService {
       .find(DBQuery)
       .limit(resPerPage)
       .skip(skip);
-    const totalPagesResponse = await this.postersModel.find(DBQuery);
-    const totalLength = totalPagesResponse.length;
+
     if (resData.length === 0) {
       throw new HttpException(
-        'There are no posters available here. Please search for  another location.',
+        'There are no posters available here. Please search for another location.',
         404,
       );
     }
 
-    return { totalLength, resData };
+    const posters = await this.postersModel.find();
+    const totalBookings = posters.reduce(
+      (acc, poster) => acc + poster.totalBooking,
+      0,
+    );
+    const averageBooking = totalBookings / posters.length;
+
+    const totalLength = await this.postersModel.countDocuments(DBQuery);
+    return { averageBooking, totalLength, resData };
   }
 
   // Get One
@@ -69,10 +92,24 @@ export class PosterDetailsService {
     return await this.postersModel.findById(id);
   }
 
+  // // get popular posters
+  // async getPopularPosters() {
+  //   const posters = await this.postersModel.find().exec();
+  //   const totalBookings = posters.reduce(
+  //     (acc, poster) => acc + poster.totalBooking,
+  //     0,
+  //   );
+  //   const averageBooking = totalBookings / posters.length;
+
+  //   const popularPosters = await this.postersModel
+  //     .find({ totalBooking: { $gt: averageBooking } })
+  //     .exec();
+
+  //   return popularPosters;
+  // }
+
   // Create Poster
   async createPoster(createposterDto: CreatePosterDto) {
-    // const count = await this.postersModel.countDocuments({});
-    // const id = `pid${count + 1}`;
     const newPoster = await this.postersModel.create(createposterDto);
     if (!newPoster)
       throw new HttpException('New Poster/Hoarding is not Created.', 404);
@@ -134,8 +171,31 @@ export class PosterDetailsService {
     }
   }
 
+  async uploadImage(filepath: Buffer) {
+    return new Promise((resolve, reject) => {
+      v2.uploader
+        .upload_stream(
+          { folder: 'Poster Images', resource_type: 'auto' },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          },
+        )
+        .end(filepath);
+    });
+  }
+
+  // totalBooking counter
+  async totalBookingCounter(id: string) {
+    return await this.postersModel.findByIdAndUpdate(id, {
+      $inc: { totalBooking: 1 },
+    });
+  }
+
   // delete poster
   deletePoster(id: string) {
-    return this.postersModel.findByIdAndDelete(id);
+    return this.postersModel.findByIdAndUpdate(id, { isActive: false });
   }
 }

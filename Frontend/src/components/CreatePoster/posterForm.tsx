@@ -10,20 +10,42 @@ import SelectInput from "./elements/selectInput";
 import TextArea from "./elements/textArea";
 import { RootState } from "@/store";
 import { fetchOnePoster } from "@/utils/http";
-import { UploadButton } from "@/utils/uploadthing";
+import { FaRegEdit } from "react-icons/fa";
 
 interface PosterFormProps {
   id?: string; // Make id optional
 }
+interface FormValues {
+  title: string;
+  mediatype: string;
+  lightingType: string;
+  landmark: string;
+  facingFrom?: string;
+  address: string;
+  state: string;
+  city: string;
+  mindays: number;
+  perDayPrice: number;
+  height: number;
+  width: number;
+  minQty?: number;
+  maxQty?: number;
+}
 
 const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
   const router = useRouter();
+  const [editImg, setEditImg] = useState<boolean>(false);
   const [imgUrl, setImgUrl] = useState<string | null>("");
+
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { userId, token }: { userId: string | null; token: string } =
+  const {
+    userId,
+    token,
+    userRole,
+  }: { userRole: string | null; userId: string | null; token: string } =
     useSelector((state: RootState) => state.auth);
 
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<FormValues>({
     title: "",
     mediatype: "Poles",
     lightingType: "FRONT-LIGHTING",
@@ -52,7 +74,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
             newdata.lightingType = response.lightingType;
             newdata.landmark = response?.landmark;
             newdata.address = response.address;
-            newdata.facingFrom = response?.facinfFrom;
+            newdata.facingFrom = response?.facingFrom;
             newdata.state = response.state;
             newdata.city = response.city;
             newdata.mindays = response.minimumDays;
@@ -145,7 +167,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
     try {
       await validateSchema.validate(formValues, { abortEarly: false });
 
-      if (formValues.facingFrom?.trim() === "") {
+      if (formValues?.facingFrom?.trim() === "") {
         delete formValues?.facingFrom;
       }
 
@@ -178,7 +200,11 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
           throw new Error(response.message || "enter valid data");
         }
         toastFunction("success", "Poster Created Successfully!");
-        router.push("/dashboard/posters");
+        if (userRole === "member") {
+          router.push("/outdoorAd/dashboard/posters");
+        } else {
+          router.push("/outdoorAd/admin/posters");
+        }
       } else {
         const resData = await fetch("http://localhost:4000/poster/add", {
           method: "POST",
@@ -200,7 +226,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
       }
     } catch (error: any) {
       if (error.inner) {
-        const newErrors = {};
+        const newErrors: { [key: string]: string } = {};
 
         error.inner.forEach((err: { path: string | number; message: any }) => {
           newErrors[err.path] = err.message;
@@ -215,7 +241,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
           formattedMessage += part.trim() + "\n";
         }
         console.log(error.message);
-        toastFunction("warning", formattedMessage);
+        toastFunction("warning", error.message);
       }
     }
   };
@@ -263,6 +289,40 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
       );
     }
     return null;
+  };
+
+  const handlEditImage = () => {
+    setEditImg((prev) => !prev);
+    setImgUrl("");
+  };
+  const GenerateImage: any = async (e: { target: { files: any[] } }) => {
+    toastFunction("info", "Image uploading...");
+    const file: File | null = e.target.files?.[0];
+    const formData = new FormData();
+    if (file) {
+      formData.append("image", file);
+    }
+
+    try {
+      const response = await fetch(`http://localhost:4000/poster/upload`, {
+        method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: formData,
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toastFunction("success", "Image Uploaded Successfully.");
+        setImgUrl(data.secure_url);
+        setEditImg(true);
+      } else {
+        toastFunction("warning", "Image upload failed!. Try again");
+        console.error("Failed To Fetch Image", data.errors);
+      }
+    } catch (error: any) {
+      toastFunction("error", error);
+    }
   };
 
   return (
@@ -490,24 +550,41 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
               </div>
             </div>
             {/* upload button  */}
-            <div className="flex flex-wrap items-center justify-center  -mx-3 ">
-              <div className="w-full md:w-3/4  mb-3 md:mb-0">
-                <UploadButton
-                  className="mt-4 ut-button:bg-red-500 ut-readying:bg-red-100 ut-upload-icon:"
-                  endpoint="imageUploader"
-                  onClientUploadComplete={(res: { url: string }[]) => {
-                    setImgUrl(res[0].url);
-                    // console.log('Files: ', res);
-                    toastFunction("success", "Image Uploaded Successfully!");
-                  }}
-                  onUploadError={(error: Error) => {
-                    toastFunction("error", error.message);
-                  }}
-                />
-                {imgUrl && (
-                  <p className="md:ml-[170px] text-[18px] items-center font-poppins">
-                    Image Uploaded Successfully
-                  </p>
+            <div className="flex  items-center font-poppins ">
+              <div className="w-full md:w-3/4 justify-center mb-3 md:mb-0">
+                {!editImg && (
+                  <div className="flex justify-center">
+                    <input
+                      type="file"
+                      id="file-upload"
+                      onChange={GenerateImage}
+                      className="w-full hidden "
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="bg-orange-400  cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2  rounded-lg "
+                    >
+                      Choose file
+                    </label>
+                  </div>
+                )}
+                {editImg && (
+                  <>
+                    <div className=" text-center text-xl  transition-all font-semibold text-green-500 ">
+                      Image Uploaded Successfully
+                    </div>
+                    <div className="flex justify-center">
+                      <p className="pt-[4px] items-center text-red-500  font-medium text-lg">
+                        Edit Image
+                      </p>
+                      <button
+                        onClick={handlEditImage}
+                        className="ml-3 hover:text-orange-600"
+                      >
+                        <FaRegEdit size={28} />
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
               <div className="w-full md:w-1/4 flex justify-end pr-10 mb-3 md:mb-0">

@@ -12,8 +12,8 @@ import { LoginDto, UpdateDto } from './dto/login.dto';
 import { UpdatePassDto, resetDto } from './dto/resetPass.dto';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
-import { ConfigService } from '@nestjs/config';
 import { Query } from 'express-serve-static-core';
+import { v2 } from 'cloudinary';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,13 @@ export class AuthService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     private jwtService: JwtService,
-  ) {}
+  ) {
+    v2.config({
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.CLOUDNERY_KEY,
+      api_secret: process.env.CLOUDNERY_SECRET_KEY,
+    });
+  }
 
   async getAllUsers(query: Query) {
     let DBQuery = {};
@@ -116,7 +122,6 @@ export class AuthService {
 
   async resetpass(resetinfo: resetDto) {
     try {
-      // Verify reset token
       const checkResetToken = jwt.verify(
         resetinfo.reset_token,
         process.env.JWT_SECRET,
@@ -124,10 +129,8 @@ export class AuthService {
 
       const id: number = checkResetToken['id'] as unknown as number;
 
-      // Hash the new password
       const hash = await bcrypt.hash(resetinfo.password, 10);
 
-      // Update user password in the database
       const updatePassword = await this.userModel.findByIdAndUpdate(
         id,
         { password: hash },
@@ -137,13 +140,11 @@ export class AuthService {
       if (!updatePassword)
         throw new HttpException('Password is not updated. ', 404);
 
-      // Return success message
       return {
         success: true,
         message: 'Successfully password has been updated',
       };
     } catch (error) {
-      // Handle errors and return failure message
       console.error('Password reset failed:', error.message);
       return {
         success: false,
@@ -178,5 +179,21 @@ export class AuthService {
       console.error('Password reset failed:', error.message);
       throw error;
     }
+  }
+
+  async uploadImage(filepath: Buffer) {
+    return new Promise((resolve, reject) => {
+      v2.uploader
+        .upload_stream(
+          { folder: 'UserProfileImages', resource_type: 'auto' },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          },
+        )
+        .end(filepath);
+    });
   }
 }

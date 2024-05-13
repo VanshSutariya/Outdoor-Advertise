@@ -1,19 +1,18 @@
 "use client";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FaRegEdit } from "react-icons/fa";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import React from "react";
-import { Bounce, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
 import { RootState } from "@/store";
 import fetchUser from "@/utils/http";
-import { logout } from "@/store/auth-slice";
-import { UploadButton } from "@/utils/uploadthing";
 import NavBar from "@/components/Header";
-import PopUpModal from "@/components/account/popupModal";
 import Footer from "@/components/Footer";
+import { FaRegEdit } from "react-icons/fa";
+import { logout } from "@/store/auth-slice";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import "react-toastify/dist/ReactToastify.css";
+import { useDispatch, useSelector } from "react-redux";
+import PopUpModal from "@/components/account/popupModal";
+import toastFunction from "@/components/reactToast/toast";
 interface UserDetails {
   image: string;
   name: string;
@@ -22,7 +21,6 @@ interface UserDetails {
 export default function AccountPage() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [editImg, setEditImg] = useState<boolean>(false);
   const [userDetails, setUserDetails] = useState<UserDetails>();
@@ -48,28 +46,6 @@ export default function AccountPage() {
     user();
   }, [userId]);
 
-  useEffect(() => {
-    if (imgUrl) {
-      const imgUpload = async () => {
-        console.log("imageurl", imgUrl);
-
-        const image = imgUrl;
-        const rsdata = await fetch(`http://localhost:4000/auth/${userId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image }),
-        });
-        const data = await rsdata.json();
-        if (!rsdata.ok) {
-          console.log(data.message, data, rsdata);
-        }
-        console.log(data);
-
-        setImage(data.image);
-      };
-      imgUpload();
-    }
-  }, [imgUrl]);
   if (!userDetails || !userId) {
     return (
       <>
@@ -80,26 +56,50 @@ export default function AccountPage() {
       </>
     );
   }
-  const handleLogout = async () => {
+  const handleLogout = () => {
     document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     dispatch(logout());
-    router.push("/outdoorAd");
+    setTimeout(() => {
+      router.push("/outdoorAd");
+    }, 500);
   };
   const handlEditImage = () => {
     setEditImg((prev) => !prev);
   };
-  const notify = () =>
-    toast.success("New image Uploaded.", {
-      position: "top-right",
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Bounce,
-    });
+
+  const GenerateImage: any = async (e: { target: { files: any[] } }) => {
+    toastFunction("info", "Image uploading...");
+    const file: File | null = e.target.files?.[0];
+    const formData = new FormData();
+    if (file) {
+      formData.append("image", file);
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:4000/auth/upload/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+          },
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        toastFunction("success", "Image Uploaded Successfully.");
+        setImage(data.secure_url);
+        setEditImg(false);
+      } else {
+        toastFunction("warning", "Image upload failed!. Try again");
+        console.error("Failed To Fetch Image", data.errors);
+      }
+    } catch (error: any) {
+      toastFunction("error", error);
+    }
+  };
+
   return (
     <>
       <NavBar />
@@ -132,19 +132,20 @@ export default function AccountPage() {
               )}
 
               {editImg && (
-                <UploadButton
-                  className="mt-4 ut-button:bg-red-500 ut-readying:bg-red-100"
-                  endpoint="imageUploader"
-                  onClientUploadComplete={(res: { url: string }[]) => {
-                    setImgUrl(res[0].url);
-                    notify();
-                    setEditImg(false);
-                  }}
-                  onUploadError={(error: Error) => {
-                    // Do something with the error.
-                    alert(`ERROR! ${error.message}`);
-                  }}
-                />
+                <div className="justify-center md:ml-6 mt-2  ">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    onChange={GenerateImage}
+                    className="w-full hidden "
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="bg-orange-400 cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2 mt-4 rounded-lg "
+                  >
+                    Choose file
+                  </label>
+                </div>
               )}
             </div>
             <button
@@ -164,7 +165,7 @@ export default function AccountPage() {
         </div>
         <div className="flex-col">
           <div className="md:flex gap-8 md:mt-8">
-            <Link href="account/orders" className="w-[285px]">
+            <Link href="/outdoorAd/account/orders" className="w-[285px]">
               <div className="flex border-[2px] border-slate-200 mt-3 shadow-md rounded-md p-3 w-full  hover:bg-slate-200 active:bg-white">
                 <img src="/order.png" alt="order" />
                 <div>

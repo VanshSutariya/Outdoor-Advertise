@@ -5,7 +5,6 @@ import toastFunction from "../reactToast/toast";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/store";
 import { cartActions } from "@/store/cart-slice";
-import { UploadButton } from "@/utils/uploadthing";
 import { FaRegEdit } from "react-icons/fa";
 
 interface BillingType {
@@ -21,10 +20,9 @@ interface BillingType {
   createdBy: string;
   totalPrice: number;
   diffInDays: number;
-  autoInputError: string;
+  autoInputError: string | undefined;
   mediatype: string | boolean;
   isLoggedIn: boolean;
-  bookingDate: string[];
   noOfAuto: React.RefObject<HTMLInputElement>;
   state: { startDate: Date; endDate: Date; key: string }[];
 }
@@ -45,7 +43,6 @@ const Billing: React.FC<BillingType> = ({
   title,
   address,
   noOfAuto,
-  bookingDate,
   createdBy,
 }) => {
   const router = useRouter();
@@ -87,7 +84,7 @@ const Billing: React.FC<BillingType> = ({
         userId,
         title,
         address,
-        totalPrice,
+        totalPrice: finalTotalPrice,
         bookingDates: datesArray,
         createdBy,
         customerPosterImage,
@@ -122,6 +119,40 @@ const Billing: React.FC<BillingType> = ({
     setEditImg((prev) => !prev);
     setCustomerPosterImage("");
   };
+
+  const GenerateImage: any = async (e: { target: { files: any[] } }) => {
+    toastFunction("info", "Image uploading...");
+    const file: File | null = e.target.files?.[0];
+    const formData = new FormData();
+    if (file) {
+      formData.append("image", file);
+    }
+
+    try {
+      const response = await fetch(`http://localhost:4000/cart/upload`, {
+        method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: formData,
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toastFunction("success", "Image Uploaded Successfully.");
+        setCustomerPosterImage(data.secure_url);
+        setEditImg(false);
+      } else {
+        toastFunction("warning", "Image upload failed!. Try again");
+        console.error("Failed To Fetch Image", data.errors);
+      }
+    } catch (error: any) {
+      toastFunction("error", error);
+    }
+  };
+
+  const extraCharges = Math.round(totalPrice * 0.05);
+  const finalTotalPrice = Math.round(totalPrice * 1.05);
+
   return (
     <>
       <div className=" p-5 border-[2px]   border-gray-200 shadow-md shadow-gray-300 rounded-2xl">
@@ -136,12 +167,12 @@ const Billing: React.FC<BillingType> = ({
           </span>
         </p>
 
-        <div className=" flex gap-2 border-2">
-          <p className="text-base font-inter p-3 text-red-950">
+        <div className=" flex gap-2 border-2 font-inter">
+          <p className="text-base p-3">
             Start:{" "}
             <strong>{state[0].startDate.toLocaleDateString("en-IN")}</strong>
           </p>
-          <p className="text-base font-inter p-3 text-red-950">
+          <p className="text-base p-3 ">
             End: <strong>{state[0].endDate.toLocaleDateString("en-IN")}</strong>
           </p>
         </div>
@@ -210,11 +241,13 @@ const Billing: React.FC<BillingType> = ({
             </div>
           </div>
           <div className="font-inter flex p-2 text-lg pb-5">
-            <div className="w-1/2">
-              <p>Extra Charges</p>
+            <div className="w-1/2 flex">
+              <p>Extra Charges : </p>
+              <p className="md:ml-4">5%</p>
             </div>
-            <div className=" w-1/2 flex justify-end">
-              <p> ₹0</p>
+
+            <div className="w-1/2 flex justify-end">
+              <p>₹{extraCharges}</p>
             </div>
           </div>
         </div>
@@ -223,7 +256,7 @@ const Billing: React.FC<BillingType> = ({
             <p className="">Total Price:</p>
           </div>
           <div className=" w-1/2 flex justify-end">
-            <p> ₹{totalPrice}</p>
+            <p> ₹{finalTotalPrice}</p>
           </div>
         </div>
         <div>
@@ -247,22 +280,21 @@ const Billing: React.FC<BillingType> = ({
           )}
           {(!customerPosterImage || editImg) && (
             <>
-              <div className="mt-6 font-poppins text-lg ">
+              <div className="mt-6 md:mb-3 font-poppins text-lg ">
                 Upload your Advertise image
               </div>
-              <div className="mr-[100px] ">
-                <UploadButton
-                  className="mt-3  ut-button:text-sm  ut-button:bg-blue-500 font-poppins  "
-                  endpoint="imageUploader"
-                  onClientUploadComplete={(res: { url: string }[]) => {
-                    setCustomerPosterImage(res[0].url);
-                    toastFunction("success", "Image Uploaded Successfully!");
-                  }}
-                  onUploadError={(error: Error) => {
-                    toastFunction("error", error.message);
-                  }}
-                />
-              </div>
+              <input
+                type="file"
+                id="file-upload"
+                onChange={GenerateImage}
+                className="w-full hidden  "
+              />
+              <label
+                htmlFor="file-upload"
+                className="bg-orange-400 cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2 mt-4 rounded-lg "
+              >
+                Choose file
+              </label>
             </>
           )}
         </div>

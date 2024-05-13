@@ -8,7 +8,9 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PosterDetailsService } from './poster-details.service';
 import { CreatePosterDto } from './dto/createPoster.dto';
@@ -18,14 +20,22 @@ import { Query as ExpressQuery } from 'express-serve-static-core';
 import { RolesGuard } from 'src/RoleGuard/role.guard';
 import { HasRoles } from 'src/RoleGuard/roles.decorater';
 import { Roles } from 'src/auth/roles.constants';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('poster')
 export class PosterDetailsController {
   constructor(private posterdetailsService: PosterDetailsService) {}
 
   @Get()
-  async getAllPosters(@Query() query: ExpressQuery) {
-    return await this.posterdetailsService.getAllPosters(query);
+  async getAll(
+    @Query() query: ExpressQuery,
+    @Query('isPopularClicked') isPopularClicked: string,
+  ) {
+    if (isPopularClicked === 'true') {
+      return await this.posterdetailsService.getAllPosters(query, true);
+    } else {
+      return await this.posterdetailsService.getAllPosters(query);
+    }
   }
 
   @Get(':id')
@@ -45,6 +55,8 @@ export class PosterDetailsController {
   }
 
   @Patch(':id')
+  @UseGuards(RolesGuard)
+  @HasRoles(Roles.member, Roles.admin)
   async updatePoster(
     @Param('id') id: string,
     @Body() updatePosterDto: UpdatePosterDto,
@@ -54,7 +66,20 @@ export class PosterDetailsController {
     return this.posterdetailsService.updatePoster(id, updatePosterDto);
   }
 
-  @Delete(':id')
+  @Post('/upload')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    const imageUrl: any = await this.posterdetailsService.uploadImage(
+      file.buffer,
+    );
+    return imageUrl;
+  }
+
+  // soft delete
+  @Patch('deletePoster/:id')
+  @UseGuards(RolesGuard)
+  @HasRoles(Roles.member, Roles.admin)
   async deletePoster(@Param('id') id: string) {
     const validId = mongoose.Types.ObjectId.isValid(id);
     if (!validId) throw new HttpException('Invalid user id ', 404);

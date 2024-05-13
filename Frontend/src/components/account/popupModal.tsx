@@ -7,7 +7,6 @@ import { changeRole } from "@/store/auth-slice";
 
 const PopUpModal: React.FC = () => {
   const dispatch = useDispatch();
-  const [roleChanges, setRoleChanges] = useState([]);
   const [status, setStatus] = useState<string | null>(null);
 
   // const [socket, setSocket] = useState<Socket>();
@@ -116,7 +115,6 @@ const PopUpModal: React.FC = () => {
           </div>
           <div className="modal-action">
             <form method="dialog">
-              {/* if there is a button, it will close the modal */}
               <button className="btn">Close</button>
             </form>
           </div>

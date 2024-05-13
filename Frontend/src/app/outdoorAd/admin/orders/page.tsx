@@ -3,13 +3,17 @@ import { useEffect, useState } from "react";
 import numeral from "numeral";
 import { fetchAllBookingsOrders } from "@/utils/http";
 import Sidebar from "@/components/admincomponents/sidebar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const OrderAdminPage = () => {
-  const [orders, setOrders] = useState();
+  const [orders, setOrders] = useState<any[]>();
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
-  const [tp, setTp] = useState<number>();
-
+  const [tp, setTp] = useState<number>(1);
+  const { token }: { token: string } = useSelector(
+    (state: RootState) => state.auth
+  );
   let isPageOutOfRange: boolean;
   let per_page: number = 8;
 
@@ -18,7 +22,7 @@ const OrderAdminPage = () => {
       try {
         const page = 0;
         const per_page = 0;
-        const resData = await fetchAllBookingsOrders({ page, per_page });
+        const resData = await fetchAllBookingsOrders({ page, per_page, token });
         const totalOrders = resData.length;
         const totalPages = Math.ceil(totalOrders / 8);
         setTp(totalPages);
@@ -32,7 +36,11 @@ const OrderAdminPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const newOrders: any = await fetchAllBookingsOrders({ page, per_page });
+        const newOrders: any = await fetchAllBookingsOrders({
+          page,
+          per_page,
+          token,
+        });
         setOrders(newOrders);
 
         let pageNumbers: number[] = [];
@@ -102,7 +110,7 @@ const OrderAdminPage = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 font-poppins">
               {orders &&
-                orders.map((item: any) => (
+                orders?.map((item: any) => (
                   <tr key={item._id}>
                     <td className="py-4 ">
                       <div className="flex items-center">
@@ -134,7 +142,7 @@ const OrderAdminPage = () => {
         </div>
       </div>
       <div className="flex justify-center gap-2 mb-5 ">
-        {isPageOutOfRange ? (
+        {page > tp ? (
           <div>No more pages...</div>
         ) : (
           <div className="flex justify-center items-center mt-16">

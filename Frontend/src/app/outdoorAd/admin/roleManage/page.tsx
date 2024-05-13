@@ -1,15 +1,16 @@
 "use client";
 import Sidebar from "@/components/admincomponents/sidebar";
-import {
-  fetchAllRoleChanges,
-  fetchRoleChangeRequests,
-  updateUserRole,
-} from "@/utils/http";
+import { RootState } from "@/store";
+import { fetchRoleChangeRequests, updateUserRole } from "@/utils/http";
 import React, { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 const AssignRole = () => {
   const [users, setUsers] = useState<any[]>([]);
+  const { token }: { token: string } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const socket = io("http://localhost:4040");
 
@@ -30,7 +31,7 @@ const AssignRole = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resData = await fetchRoleChangeRequests();
+        const resData = await fetchRoleChangeRequests(token);
         setUsers(resData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -42,7 +43,7 @@ const AssignRole = () => {
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
-      await updateUserRole(id, status);
+      await updateUserRole(id, status, token);
       setUsers(
         users.map((user) => {
           if (user._id === id) {
@@ -95,7 +96,7 @@ const AssignRole = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {users &&
-                users.map((user) => (
+                users?.map((user) => (
                   <tr key={user._id} className="font-poppins">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">

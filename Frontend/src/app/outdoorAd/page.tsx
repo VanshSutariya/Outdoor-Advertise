@@ -1,4 +1,3 @@
-"use client";
 import Categories from "@/components/filter/categarious";
 import Header from "../../components/Header";
 import SearchBar from "@/components/searchBar/SearchBar";

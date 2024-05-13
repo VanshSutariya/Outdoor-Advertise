@@ -55,12 +55,12 @@ export default function AdminHomePage() {
         const memberrole = "member";
         const memberCount = await fetchAllUsers(memberrole, token);
         setTotalMembers(memberCount);
-        const data = await fetchAllBookingsData();
+        const data = await fetchAllBookingsData(token);
         setTodayEarning(data.todayRevenue);
         setTotalRevenue(data.totalRevenue);
         setMonthlyData(data.yearlyRevenue);
 
-        const monthlydata = await fetchMonthlyData();
+        const monthlydata = await fetchMonthlyData(token);
         console.log(monthlyData);
 
         setTopPayments(monthlydata);

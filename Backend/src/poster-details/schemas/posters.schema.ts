@@ -63,6 +63,12 @@ export class Posters {
   @Prop({ type: [String] })
   bookingDate: string[];
 
+  @Prop({ default: false })
+  isActive: boolean;
+
+  @Prop({ required: false, default: 0 })
+  totalBooking: number;
+
   @Prop({ type: String, required: false })
   createdBy: string;
 }
