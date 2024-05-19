@@ -33,13 +33,13 @@ export const categories = [
     description: "Advertisement on Railway Platforms.",
   },
   {
-    label: "Shopping Malls",
+    label: "ShoppingMalls",
     icon: ShoppingMalls,
     description: "Advertisement in shopping malls!",
   },
 
   {
-    label: "FootOverBridges",
+    label: "Footoverbridges",
     icon: FootOverBridges,
     description: "Advertisement on FottOverBridges",
   },

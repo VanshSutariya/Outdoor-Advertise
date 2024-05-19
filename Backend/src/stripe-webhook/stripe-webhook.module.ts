@@ -13,6 +13,7 @@ import {
 import { User, UserSchema } from 'src/auth/schemas/user.schema';
 import { EmailService } from './bookingEmail.service';
 import { BookingService } from 'src/booking/booking.service';
+import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { BookingService } from 'src/booking/booking.service';
     BookingService,
     PosterDetailsService,
     EmailService,
+    RoleChangeGateway,
   ],
 })
 export class StripeWebhookModule {}

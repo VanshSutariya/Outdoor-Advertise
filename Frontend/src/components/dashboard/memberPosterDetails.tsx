@@ -205,14 +205,6 @@ const MemberPosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           </div>
         </div>
       </div>
-      {/* <div className="rounded-lg pb-10 w-full flex ">
-        <iframe
-          title="Google Maps"
-          width="100%"
-          height="300"
-          src={url}
-        ></iframe>
-      </div> */}
 
       <Buttons id={id} />
     </>

@@ -11,7 +11,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { MEDIA_PLAN } from '../constants/mediaPlan.constants';
+import { MEDIA_PLAN, PosterStatus } from '../constants/mediaPlan.constants';
 
 @Injectable()
 export class UpdatePosterDto {
@@ -54,32 +54,44 @@ export class UpdatePosterDto {
   @IsString({ each: true })
   bookingDate?: string[];
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   title?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  @IsOptional()
   category?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   @IsEnum(MEDIA_PLAN)
   mediatype?: MEDIA_PLAN;
 
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  @IsEnum(PosterStatus)
+  status?: PosterStatus;
+
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   state?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   city?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   address?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   landmark?: string;
@@ -99,6 +111,7 @@ export class UpdatePosterDto {
   @IsNumber()
   maxAutos?: number;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   createdBy?: string;

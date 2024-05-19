@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import PosterItem from "./poster-item";
 import { useSearchParams } from "next/navigation";
 import { fetchAllPoster } from "@/utils/http";
+import { io } from "socket.io-client";
 
 interface Poster {
   _id: string;
@@ -9,10 +10,13 @@ interface Poster {
   image: string;
   price: number;
   lightingType: string;
+  createdBy: string;
+  mediatype: string;
 }
 
 interface PosterGridProps {
   id?: string;
+  isPopularClicked?: string;
 }
 
 const PosterGrid: React.FC<PosterGridProps> = (props) => {
@@ -21,7 +25,6 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
   const address = searchParams.get("address") || undefined;
   const state = searchParams.get("state") || undefined;
   const city = searchParams.get("city") || undefined;
-  const isPopularClicked = searchParams.get("isPopularClicked") || undefined;
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +36,23 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
 
   const per_page: number = 6;
 
+  const socket = io("http://localhost:4040");
+
+  useEffect(() => {
+    socket.on("posterRes", (val) => {
+      console.log("call data", val, val[0]);
+      const data = val;
+
+      setPosterData((prev) => [...prev, data]);
+    });
+
+    return () => {
+      socket.off("connection");
+      socket.off("posterRes");
+      socket.off("disconnect");
+    };
+  }, []);
+
   useEffect(() => {
     setError(null);
     const fetchData = async () => {
@@ -43,7 +63,7 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
             page,
             per_page,
             props.id,
-            isPopularClicked
+            props.isPopularClicked
           );
         } else {
           const mediatype = category;
@@ -55,7 +75,7 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
             state,
             city,
             mediatype,
-            isPopularClicked
+            props.isPopularClicked
           );
         }
         setLoading(false);
@@ -80,7 +100,7 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
     };
 
     fetchData();
-  }, [page, totalPages, category, address, state, city, isPopularClicked]);
+  }, [page, totalPages, searchParams, props]);
 
   if (error || loading) {
     return (
@@ -113,11 +133,10 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
               className="mt-8 rounded-lg transform inline-block overflow-hidden transition-transform duration-300  hover:scale-130"
               key={poster._id}
             >
-              {props.id ? (
+              {props.id && props.id === poster.createdBy && (
                 <PosterItem {...poster} avgBooking={avgBooking} id={props.id} />
-              ) : (
-                <PosterItem {...poster} avgBooking={avgBooking} />
               )}
+              {!props.id && <PosterItem {...poster} avgBooking={avgBooking} />}
             </div>
           ))}
       </div>

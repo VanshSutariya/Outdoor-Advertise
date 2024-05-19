@@ -6,5 +6,13 @@ export enum MEDIA_PLAN {
   FOOTOVERBRIDGES = 'Footoverbridges',
   POLES = 'Poles',
   RICKSHAWS = 'Rickshaws',
-  BUSSES = 'Busses',
+  SHOPPINGMALLS = 'ShoppingMalls',
+  BUSES = 'Buses',
+  BUILDINGS = 'Buildings',
+}
+
+export enum PosterStatus {
+  PENDING = 'pending',
+  REJECTED = 'rejected',
+  APPROVE = 'approved',
 }

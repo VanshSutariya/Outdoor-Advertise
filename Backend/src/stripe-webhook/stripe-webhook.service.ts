@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { log } from 'console';
 import { CartService } from 'src/cart/cart.service';
 import { UpdatePosterDto } from 'src/poster-details/dto/updatePoster.dto';
-// import { UpdatePosterDto } from 'src/poster-details/dto/updatePoster.dto';
 import { PosterDetailsService } from 'src/poster-details/poster-details.service';
 import { Stripe } from 'stripe';
 import { EmailService } from './bookingEmail.service';
@@ -21,7 +20,7 @@ export class StripeWebhookService {
     private emailService: EmailService,
   ) {
     this.stripe = new Stripe(this.configService.get('STRIPE_SECRET_KEY'), {
-      apiVersion: '2024-04-10', // Specify the Stripe API version
+      apiVersion: '2024-04-10',
     });
   }
 

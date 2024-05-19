@@ -10,29 +10,13 @@ const OrderAdminPage = () => {
   const [orders, setOrders] = useState<any[]>();
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
-  const [tp, setTp] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const { token }: { token: string } = useSelector(
     (state: RootState) => state.auth
   );
-  let isPageOutOfRange: boolean;
+
   let per_page: number = 8;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const page = 0;
-        const per_page = 0;
-        const resData = await fetchAllBookingsOrders({ page, per_page, token });
-        const totalOrders = resData.length;
-        const totalPages = Math.ceil(totalOrders / 8);
-        setTp(totalPages);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,14 +25,15 @@ const OrderAdminPage = () => {
           per_page,
           token,
         });
-        setOrders(newOrders);
+        setTotalPages(Math.ceil(newOrders.totalLength / per_page));
+
+        setOrders(newOrders.resData);
 
         let pageNumbers: number[] = [];
         const offsetNumber: number = 2;
-        isPageOutOfRange = page >= tp;
 
         for (let i = page - offsetNumber; i <= page + offsetNumber; i++) {
-          if (i >= 1 && i <= tp) {
+          if (i >= 1 && i <= totalPages) {
             pageNumbers.push(i);
           }
         }
@@ -59,7 +44,7 @@ const OrderAdminPage = () => {
     };
 
     fetchData();
-  }, [page, tp]);
+  }, [page, totalPages]);
 
   const handlePrevClick = () => {
     setPage(page - 1);
@@ -142,7 +127,7 @@ const OrderAdminPage = () => {
         </div>
       </div>
       <div className="flex justify-center gap-2 mb-5 ">
-        {page > tp ? (
+        {page > totalPages ? (
           <div>No more pages...</div>
         ) : (
           <div className="flex justify-center items-center mt-16">
@@ -175,7 +160,7 @@ const OrderAdminPage = () => {
                 </button>
               ))}
 
-              {page === tp ? (
+              {page === totalPages ? (
                 <div className="opacity-60" aria-disabled="true">
                   Next
                 </div>

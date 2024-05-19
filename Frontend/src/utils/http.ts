@@ -27,6 +27,7 @@ export async function deletePosterById(
   return resData;
 }
 
+//-------------------------------------------------------------------------------------------
 export async function fetchAllPosters(id?: string): Promise<any[]> {
   let url = "http://localhost:4000/poster";
   if (id) {
@@ -39,7 +40,6 @@ export async function fetchAllPosters(id?: string): Promise<any[]> {
   const posters = await resData.json();
   return posters;
 }
-//-------------------------------------------------------------------------------------------
 export async function fetchAllPoster(
   page: number,
   per_page: number,
@@ -77,7 +77,7 @@ export async function fetchAllPoster(
   }
 
   if (isPopularClicked !== undefined && isPopularClicked.trim() !== "") {
-    queryParams["isPopularClicked"] = isPopularClicked.trim();
+    queryParams["isPopularClicked"] = isPopularClicked;
   }
 
   const queryString = new URLSearchParams(queryParams).toString();
@@ -85,17 +85,114 @@ export async function fetchAllPoster(
   url = `http://localhost:4000/poster?${queryString}`;
   console.log(url);
 
-  const resData = await fetch(url, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  const posters = await resData.json();
+  try {
+    const resData = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const posters = await resData.json();
 
-  if (!resData.ok)
-    throw new Error(
-      "No poster found. Please search by different location, city, state or mediatype."
+    if (!resData.ok)
+      throw new Error("No posters available. Please try again later.");
+    return posters;
+  } catch (error: any) {
+    if (error instanceof TypeError) {
+      throw new Error("Network error. Please check your connection.");
+    }
+
+    throw new Error(error.message || "An unknown error occurred.");
+  }
+}
+
+export async function fetchAllPosterStatus(
+  page: number,
+  per_page: number,
+  id: string,
+  isActive: string
+) {
+  let url: string;
+  const queryParams: Record<string, string> = {
+    page: page.toString(),
+    per_page: per_page.toString(),
+  };
+  if (id) {
+    queryParams["createdBy"] = id;
+  }
+
+  if (isActive !== undefined) {
+    queryParams["isActive"] = isActive;
+  }
+
+  const queryString = new URLSearchParams(queryParams).toString();
+
+  url = `http://localhost:4000/poster?${queryString}`;
+  console.log(url);
+
+  try {
+    const resData = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const posters = await resData.json();
+
+    if (!resData.ok)
+      throw new Error(
+        "No poster found. Please search by different location, city, state or mediatype."
+      );
+    return posters;
+  } catch (error: any) {
+    if (error instanceof TypeError) {
+      throw new Error("Network error. Please check your connection.");
+    }
+
+    throw new Error(error.message || "An unknown error occurred.");
+  }
+}
+
+export async function ManagePoster(
+  status: string,
+  page?: number,
+  per_page?: number
+): Promise<any> {
+  try {
+    const resData = await fetch(
+      `http://localhost:4000/poster?status=${status}&page=${page}&per_page=${per_page}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
-  return posters;
+
+    if (!resData.ok) {
+      throw new Error("No Poster Available to manage.");
+    }
+    const poster = await resData.json();
+    return poster;
+  } catch (error: any) {
+    throw new Error(
+      error.message || "An error occurred while fetching posters."
+    );
+  }
+}
+
+export async function updatePosterStatus(
+  id: string,
+  status: string,
+  token: string
+): Promise<any> {
+  const resData = await fetch(`http://localhost:4000/poster/status/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status: status }),
+  });
+  if (!resData.ok) throw new Error("Poster doesn't Exists .");
+  const poster = await resData.json();
+  return poster;
 }
 
 export async function fetchOnePoster(id: string | undefined): Promise<any> {
@@ -173,7 +270,10 @@ export async function fetchAllUsers(
     },
   });
   const users = await resData.json();
-  const countUsers = users.length;
+  let countUsers = users.result.length;
+  // if (countUsers === undefined) {
+  //   countUsers = 0;
+  // }
   return countUsers;
 }
 
@@ -186,32 +286,37 @@ export async function fetchUsers({
   per_page: number;
   token: string;
 }): Promise<any[]> {
-  const resData = await fetch(
-    `http://localhost:4000/auth?page=${page}&per_page=${per_page}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+  try {
+    const resData = await fetch(
+      `http://localhost:4000/auth?page=${page}&per_page=${per_page}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!resData.ok) {
+      let errorMessage = "Failed to fetch users";
+      try {
+        const errorResponse = await resData.json();
+        if (errorResponse && errorResponse.message) {
+          errorMessage = errorResponse.message;
+        }
+      } catch {}
+      throw new Error(`${errorMessage}`);
     }
-  );
 
-  const users = await resData.json();
-  console.log(users);
-  return users;
-}
-
-export async function Allusers(token: string): Promise<number> {
-  const resData = await fetch(`http://localhost:4000/auth`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const users = await resData.json();
-  return users.length;
+    const users = await resData.json();
+    return users;
+  } catch (error: any) {
+    console.error("Error in fetchUsers:", error);
+    throw new Error(
+      "An error occurred while fetching users. Please try again later."
+    );
+  }
 }
 
 export async function fetchRoleChangeRequests(token: string) {
@@ -230,18 +335,22 @@ export async function fetchRoleChangeRequests(token: string) {
 }
 
 export async function fetchAllRoleChanges(token: string) {
-  const data = await fetch(
-    `http://localhost:4000/userRoleChange?status=pending`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const newData = await data.json();
-  return newData.length;
+  try {
+    const data = await fetch(
+      `http://localhost:4000/userRoleChange?status=pending`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const newData = await data.json();
+    return newData.length;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function updateUserRole(

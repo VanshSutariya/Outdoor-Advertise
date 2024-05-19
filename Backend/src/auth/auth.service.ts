@@ -30,22 +30,31 @@ export class AuthService {
   }
 
   async getAllUsers(query: Query) {
-    let DBQuery = {};
+    try {
+      let DBQuery: any = {};
 
-    if (query?.role) {
-      DBQuery['role'] = {
-        $regex: '^' + query?.role,
-        $options: 'i',
-      };
+      if (query?.role) {
+        DBQuery['role'] = {
+          $regex: '^' + query?.role,
+          $options: 'i',
+        };
+      }
+
+      const resPerPage = Number(query?.per_page) || 0;
+      const currPage = Number(query?.page) || 1;
+      const skip = resPerPage * (currPage - 1);
+
+      const result = await this.userModel
+        .find(DBQuery)
+        .limit(resPerPage)
+        .skip(skip);
+
+      const totalLength = await this.userModel.countDocuments(DBQuery);
+
+      return { totalLength, result };
+    } catch (error: any) {
+      console.error('Error in getAllUsers:', error);
     }
-    const resPerPage = Number(query?.per_page) || 0;
-    const currPage = Number(query?.page) || 1;
-    const skip = resPerPage * (currPage - 1);
-    const result = await this.userModel
-      .find(DBQuery)
-      .limit(resPerPage)
-      .skip(skip);
-    return result;
   }
 
   async getUsersById(id: string) {

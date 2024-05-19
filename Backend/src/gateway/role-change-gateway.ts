@@ -3,7 +3,6 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
 
 @WebSocketGateway(4040, { cors: '*:*' })
 export class RoleChangeGateway {
@@ -19,15 +18,14 @@ export class RoleChangeGateway {
   userRoleReq(data: any) {
     this.server.emit('roleReq', data);
   }
+
+  @SubscribeMessage('posterReq')
+  posterReq(data: any) {
+    this.server.emit('posterReq', data);
+  }
+
+  @SubscribeMessage('posterRes')
+  posterRes(data: any) {
+    this.server.emit('posterRes', data);
+  }
 }
-
-// @WebSocketGateway(8001, { cors: "*:*"})
-// export class ChatGateway {
-//   @WebSocketServer()
-//   server;
-
-//   @SubscribeMessage('message')
-//   handleMessage(@MessageBody() message: string): void {
-//     this.server.emit('message', message);
-//   }
-// }

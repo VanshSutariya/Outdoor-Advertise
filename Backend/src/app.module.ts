@@ -8,10 +8,12 @@ import { CartModule } from './cart/cart.module';
 import { StripeModule } from './stripe/stripe.module';
 import { StripeWebhookModule } from './stripe-webhook/stripe-webhook.module';
 import { BookingModule } from './booking/booking.module';
-import { UserRoleChangeController } from './user-role-change/user-role-change.controller';
-import { UserRoleChangeService } from './user-role-change/user-role-change.service';
 import { UserRoleChangeModule } from './user-role-change/user-role-change.module';
 import { GatewayModule } from './gateway/gateway.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { HttpMetricsInterceptor } from './metrics/metrics.intercepter';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ContactUsModule } from './contact-us/contact-us.module';
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { GatewayModule } from './gateway/gateway.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.DB_URL),
+    MongooseModule.forRoot(process.env.Mongodb_Cluster),
     AuthModule,
     PosterDetailsModule,
     MailerModule.forRoot({
@@ -39,8 +41,22 @@ import { GatewayModule } from './gateway/gateway.module';
     BookingModule,
     UserRoleChangeModule,
     GatewayModule,
+    PrometheusModule.register({
+      defaultLabels: {
+        application: 'outdoorAd', // Customize application name
+      },
+      defaultMetrics: {
+        enabled: true,
+      },
+    }),
+    ContactUsModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpMetricsInterceptor,
+    },
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}

@@ -48,15 +48,26 @@ const Sidebar = ({ children }: any) => {
             </li>
 
             {userRole === "member" && (
-              <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100">
-                <Link
-                  href="/outdoorAd/dashboard/posters"
-                  className=" flex items-center active:bg-black active:text-white w-full md:ml-3"
-                >
-                  <MdOutlineAnalytics size={22} className=" mr-2 " />
-                  <p>My Posters</p>
-                </Link>
-              </li>
+              <>
+                <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100">
+                  <Link
+                    href="/outdoorAd/dashboard/posters"
+                    className=" flex items-center active:bg-black active:text-white w-full md:ml-3"
+                  >
+                    <MdOutlineAnalytics size={22} className=" mr-2 " />
+                    <p>My Posters</p>
+                  </Link>
+                </li>
+                <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100">
+                  <Link
+                    href="/outdoorAd/dashboard/posterStatus"
+                    className=" flex items-center active:bg-black active:text-white w-full md:ml-3"
+                  >
+                    <MdOutlineSettings size={22} className=" mr-2 " />
+                    <p>Poster Status</p>
+                  </Link>
+                </li>
+              </>
             )}
 
             {userRole === "admin" && (
@@ -95,6 +106,15 @@ const Sidebar = ({ children }: any) => {
                   >
                     <MdOutlineSettings size={22} className=" mr-2 " />
                     <p>Manage Roles</p>
+                  </Link>
+                </li>
+                <li className="px-4 py-2 flex  items-center justify-center text-lg font-poppins  hover:bg-slate-200 rounded-lg active:bg-black active:text-white hover:scale-105 duration-100 ">
+                  <Link
+                    href="/outdoorAd/admin/managePoster"
+                    className=" flex items-center w-full md:ml-3"
+                  >
+                    <MdOutlineAnalytics size={22} className=" mr-2 " />
+                    <p>Manage Posters</p>
                   </Link>
                 </li>
               </>

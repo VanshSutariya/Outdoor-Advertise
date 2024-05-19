@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Http2ServerResponse } from 'http2';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()

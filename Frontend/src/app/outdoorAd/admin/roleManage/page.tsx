@@ -60,8 +60,6 @@ const AssignRole = () => {
     }
   };
 
-  console.log(users, "users");
-
   return (
     <Sidebar>
       <div className="overflow-x-auto">

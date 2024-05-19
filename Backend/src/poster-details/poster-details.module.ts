@@ -4,7 +4,7 @@ import { PosterDetailsService } from './poster-details.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Posters, PostersSchema } from './schemas/posters.schema';
 import { AuthModule } from 'src/auth/auth.module';
-import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
+import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
 
 @Module({
   imports: [
@@ -12,6 +12,7 @@ import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
     MongooseModule.forFeature([{ name: Posters.name, schema: PostersSchema }]),
   ],
   controllers: [PosterDetailsController],
-  providers: [PosterDetailsService],
+  providers: [PosterDetailsService, RoleChangeGateway],
+  exports: [PosterDetailsModule, RoleChangeGateway, PosterDetailsService],
 })
 export class PosterDetailsModule {}

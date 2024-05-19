@@ -7,10 +7,13 @@ import * as Yup from "yup";
 import { useSelector } from "react-redux";
 import toastFunction from "../reactToast/toast";
 import SelectInput from "./elements/selectInput";
-import TextArea from "./elements/textArea";
 import { RootState } from "@/store";
 import { fetchOnePoster } from "@/utils/http";
 import { FaRegEdit } from "react-icons/fa";
+import PlacesAutocomplete, {
+  geocodeByAddress,
+  getLatLng,
+} from "react-places-autocomplete";
 
 interface PosterFormProps {
   id?: string; // Make id optional
@@ -36,6 +39,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
   const router = useRouter();
   const [editImg, setEditImg] = useState<boolean>(false);
   const [imgUrl, setImgUrl] = useState<string | null>("");
+  const [newaddress, setAddress] = useState("");
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const {
@@ -52,7 +56,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
     landmark: "",
     facingFrom: "",
     address: "",
-    state: "Gujarat",
+    state: "",
     city: "",
     mindays: 2,
     perDayPrice: 1,
@@ -186,6 +190,10 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
         createdBy: userId,
       };
 
+      const results = await geocodeByAddress(postdata.address);
+      const googleLatLng = await getLatLng(results[0]);
+      const latLng = [googleLatLng.lat, googleLatLng.lng];
+
       if (id) {
         const resData = await fetch(`http://localhost:4000/poster/${id}`, {
           method: "PATCH",
@@ -193,7 +201,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(postdata),
+          body: JSON.stringify({ ...postdata, latLng }),
         });
         const response = await resData.json();
         if (!resData.ok) {
@@ -212,7 +220,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(postdata),
+          body: JSON.stringify({ ...postdata, latLng }),
         });
         const response = await resData.json();
 
@@ -235,13 +243,17 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
         setErrors(newErrors);
       } else {
         setErrors({});
-        const errorParts = error.message.split(",");
-        let formattedMessage = "";
-        for (const part of errorParts) {
-          formattedMessage += part.trim() + "\n";
-        }
+        // const errorParts = error.message.split(",");
+        // let formattedMessage = "";
+        // for (const part of errorParts) {
+        //   formattedMessage += part.trim() + "\n";
+        // }
         console.log(error.message);
-        toastFunction("warning", error.message);
+        if (error.message === undefined) {
+          toastFunction("warning", "Address is not valid.");
+        } else {
+          toastFunction("warning", error.message);
+        }
       }
     }
   };
@@ -249,7 +261,8 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
   const renderAdditionalInputs = () => {
     if (
       formValues.mediatype === "Rickshaws" ||
-      formValues.mediatype === "Poles"
+      formValues.mediatype === "Poles" ||
+      formValues.mediatype === "Buses"
     ) {
       return (
         <>
@@ -325,6 +338,14 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
     }
   };
 
+  const handlePlaceAutoChange = (address: string) => {
+    setAddress(address);
+    setFormValues({
+      ...formValues,
+      address: address,
+    });
+  };
+
   return (
     <>
       <div>
@@ -381,7 +402,10 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
                     "Rickshaws",
                     "Billboard",
                     "BusStands",
+                    "ShoppingMalls",
                     "Footoverbridges",
+                    "Buildings",
+                    "Buses",
                   ]}
                   label="MediaType"
                 />
@@ -444,13 +468,53 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
             {/* address-------------------------------------- */}
             <div className="flex flex-wrap -mx-3 mb-3">
               <div className="w-full px-3">
-                <TextArea
-                  name="address"
-                  value={formValues.address}
-                  onChange={handleChange}
-                  placeholder="xy-201, near business, city"
-                  label="Address"
-                />
+                <PlacesAutocomplete
+                  value={newaddress}
+                  onChange={handlePlaceAutoChange}
+                  // onSelect={handleSelect}
+                >
+                  {({
+                    getInputProps,
+                    suggestions,
+                    getSuggestionItemProps,
+                    loading,
+                  }) => (
+                    <div>
+                      <label
+                        className="block tracking-wide font-poppins text-sm font-bold mb-2"
+                        htmlFor="Address"
+                      >
+                        Address
+                      </label>
+                      <input
+                        {...getInputProps({
+                          placeholder: "vesu cross road",
+                        })}
+                        className="appearance-none font-poppins block w-full hover:bg-slate-200 bg-slate-100 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-100 focus:border-gray-100"
+                      />
+                      <div className="relative">
+                        {loading ? <div>Loading...</div> : null}
+
+                        <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 z-10 max-h-52 overflow-y-auto">
+                          {suggestions.map((suggestion) => {
+                            const style = suggestion.active
+                              ? "bg-blue-400"
+                              : "bg-white";
+                            return (
+                              <div
+                                {...getSuggestionItemProps(suggestion, {
+                                  className: `p-2 ${style}`,
+                                })}
+                              >
+                                {suggestion.description}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </PlacesAutocomplete>
                 {errors.address && (
                   <span className="text-red-500 ml-2 text-sm">
                     {errors.address}
@@ -462,11 +526,12 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
             {/* state & city & mindays--------------------------------------  */}
             <div className="flex flex-wrap -mx-3 mb-6">
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <SelectInput
+                <Input
                   name="state"
                   value={formValues.state}
                   onChange={handleChange}
-                  options={["Gujarat", "Maharashtra", "Delhi"]}
+                  type="text"
+                  placeholder="gujarat"
                   label="State"
                 />
               </div>
@@ -476,7 +541,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
                   value={formValues.city}
                   onChange={handleChange}
                   type="text"
-                  placeholder="Ahmedabad"
+                  placeholder="ahmedabad"
                   label="City"
                 />
                 {errors.city && (

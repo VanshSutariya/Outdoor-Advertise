@@ -40,8 +40,9 @@ export class BookingService {
       .sort({ createdAt: -1 });
 
     if (!resData) throw new HttpException('You have no order placed yet.', 404);
+    const totalLength = await this.userModel.countDocuments(DBQuery);
 
-    return resData;
+    return { totalLength, resData };
   }
   // get booking data using id ---------------------------------------------------
   async getBookingById(id: string) {

@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpException,
   Param,
@@ -64,6 +63,19 @@ export class PosterDetailsController {
     const validId = mongoose.Types.ObjectId.isValid(id);
     if (!validId) throw new HttpException('Invalid user id ', 404);
     return this.posterdetailsService.updatePoster(id, updatePosterDto);
+  }
+
+  @Patch('status/:id')
+  @UseGuards(RolesGuard)
+  @HasRoles(Roles.admin)
+  async updatePosterStatus(
+    @Param('id') id: string,
+    @Body() updatePosterDto: UpdatePosterDto,
+  ) {
+    const validId = mongoose.Types.ObjectId.isValid(id);
+    if (!validId) throw new HttpException('Invalid poster id', 404);
+
+    return this.posterdetailsService.updatePosterStatus(id, updatePosterDto);
   }
 
   @Post('/upload')

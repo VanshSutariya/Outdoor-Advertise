@@ -6,6 +6,7 @@ import { LiaTagSolid } from "react-icons/lia";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { fetchOnePoster } from "@/utils/http";
+import GoogleMaps from "./googleMap";
 
 interface PosterData {
   id: number;
@@ -25,6 +26,7 @@ interface PosterData {
   city: string;
   bookingDate: string[];
   createdBy: string;
+  latLng: number[];
 }
 
 interface PosterDetailsProps {
@@ -79,9 +81,9 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   if (!posterData) {
     return <div>Something Went Wrong Reload the Page!</div>;
   }
-  // const lat: number = 23.02436884189762;
-  // const lng: number = 72.53198504447938;
-  // const url: string = `https://maps.google.com/maps?q=${lat},${lng}&output=embed`;
+
+  const latitude: number = posterData.latLng[0];
+  const longitude: number = posterData.latLng[1];
 
   const excludeFields = [
     "_id",
@@ -112,7 +114,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
       <div className="md:flex items-center justify-center">
         <div className="md:w-1/3  p-5 rounded-lg mb-9">
           <img
-            className="rounded-2xl  md:h-[300px] h-[300px] w-full"
+            className="rounded-2xl  md:h-[350px] h-[300px] w-full"
             src={posterData.image}
             alt="poster1-image"
           />
@@ -164,13 +166,15 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
               </div>
               <div className="text-slate-600 md:ml-5">
                 <p>
-                  {" "}
-                  Minimum Booking Days : {posterData.minimumDays} days{" "}
+                  Minimum Booking Days : {posterData.minimumDays} days
                   {posterData.mediatype === "Rickshaws"
-                    ? `| MinAutos :${posterData.minQty} | MaxAutos:${posterData.maxQty} `
+                    ? ` | MinAutos :${posterData.minQty} | MaxAutos:${posterData.maxQty} `
                     : ""}
                   {posterData.mediatype === "Poles"
-                    ? `| MinPoles :${posterData.minQty} | MaxPoles:${posterData.maxQty} `
+                    ? ` | MinPoles :${posterData.minQty} | MaxPoles:${posterData.maxQty} `
+                    : ""}
+                  {posterData.mediatype === "Buses"
+                    ? ` | MinBuses :${posterData.minQty} | MaxBuses:${posterData.maxQty} `
                     : ""}
                 </p>
               </div>
@@ -183,6 +187,8 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                     ? `₹${posterData.price}/ auto`
                     : posterData.mediatype === "Poles"
                     ? `₹${posterData.price}/ pole`
+                    : posterData.mediatype === "Buses"
+                    ? `₹${posterData.price}/ bus`
                     : `₹${posterData.price}/ day`}
                 </span>
               </p>
@@ -190,14 +196,11 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           </div>
         </div>
       </div>
-      {/* <div className="rounded-lg pb-10 w-full flex ">
-        <iframe
-          title="Google Maps"
-          width="100%"
-          height="300"
-          src={url}
-        ></iframe>
-      </div> */}
+      {/*Google Map------------------------------------------------------------- */}
+      <div className="pb-8 flex justify-center ">
+        <GoogleMaps latitude={latitude} longitude={longitude}></GoogleMaps>
+      </div>
+      {/* DatePicker -------------------------------------------------------------*/}
       <div className="justify-center flex pb-3">
         <DatePicker
           title={posterData.title}
@@ -205,7 +208,8 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           minDays={posterData.minimumDays}
           mediatype={
             posterData.mediatype === "Rickshaws" ||
-            posterData.mediatype === "Poles"
+            posterData.mediatype === "Poles" ||
+            posterData.mediatype === "Buses"
               ? posterData.mediatype
               : false
           }

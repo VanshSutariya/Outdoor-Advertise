@@ -6,11 +6,15 @@ import PosterGrid from "../Poster/poster-grid";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import qs from "query-string";
+import PlacesAutocomplete, {
+  geocodeByAddress,
+  getLatLng,
+} from "react-places-autocomplete";
 import ToggleBtn from "./toggleBtn";
-
 const SearchBar: React.FC = (props) => {
   const router = useRouter();
   const params = useSearchParams();
+
   const category = params.get("category") || "";
   const address = params.get("address") || "";
   const state = params.get("state") || "";
@@ -81,6 +85,7 @@ const SearchBar: React.FC = (props) => {
     >
   ) => {
     const { name, value } = e.target;
+    console.log(value, name);
 
     setFormValues({ ...formValues, [name]: value });
   };
@@ -108,35 +113,6 @@ const SearchBar: React.FC = (props) => {
     setIsPopularClicked(!isPopularClicked);
   };
 
-  useEffect(() => {
-    let currentQuery = {};
-    if (params) {
-      currentQuery = qs.parse(params.toString());
-    }
-    const udpatedQuery: any = {
-      ...currentQuery,
-      city: formValues?.city,
-      state: formValues?.state,
-      address: formValues?.location,
-      category: formValues?.mediatype,
-    };
-    if (isPopularClicked) {
-      udpatedQuery.isPopularClicked = "true";
-    } else {
-      delete udpatedQuery.isPopularClicked;
-    }
-
-    const url = qs.stringifyUrl(
-      {
-        url: "/outdoorAd/",
-        query: udpatedQuery,
-      },
-      { skipNull: true }
-    );
-    window.history.replaceState({}, document.title, "/");
-    router.push(url);
-  }, [isPopularClicked]);
-
   return (
     <>
       <div className="md:flex justify-center">
@@ -151,6 +127,7 @@ const SearchBar: React.FC = (props) => {
           <div className="bar w-700 md:border-[1px] bg-white shadow-md  md:rounded-full  md:flex justify-center md:text-sm ">
             <div className="md:w-1/3 flex-col items-center justify-center w-full  rounded-full px-6 py-2 transition-all duration-250 ease-in-out  hover:bg-gray-200">
               <p>Location</p>
+
               <Input
                 name="location"
                 placeholder="vesu cross road"
@@ -194,8 +171,10 @@ const SearchBar: React.FC = (props) => {
                 <option value="RailwayPlatforms">RailwayPlatforms</option>
                 <option value="Footoverbridges">Footoverbridges</option>
                 <option value="Rickshaws">Rickshaws</option>
-                <option value="Busses">Busses</option>
+                <option value="ShoppingMalls">ShoppingMalls</option>
+                <option value="Busses">Buses</option>
                 <option value="Poles">Poles</option>
+                <option value="Busses">Buildings</option>
               </select>
             </div>
             <button className="flex w-full md:w-[60px] mr-[4px] mt-[5px] md:h-14 h-[50px] items-center justify-center  text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600">
@@ -218,7 +197,10 @@ const SearchBar: React.FC = (props) => {
         </div>
       </div>
 
-      <PosterGrid key={JSON.stringify(search)} />
+      <PosterGrid
+        key={JSON.stringify(search)}
+        isPopularClicked={isPopularClicked ? "true" : "false"}
+      />
     </>
   );
 };

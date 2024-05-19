@@ -15,6 +15,7 @@ import Sidebar from "@/components/admincomponents/sidebar";
 import NotificationPopUp from "@/components/admincomponents/notificationPopUp";
 import ProfileDropDown from "@/components/admincomponents/profileDropDown";
 import BarGraph from "@/components/admincomponents/barChart";
+import toastFunction from "@/components/reactToast/toast";
 interface MonthlyPayment {
   userId: string;
   totalPrice: number;
@@ -50,10 +51,13 @@ export default function AdminHomePage() {
         // Countusers
         const role = "user";
         const userCount = await fetchAllUsers(role, token);
+        console.log(userCount);
+
         setTotalUsers(userCount);
         // count member
         const memberrole = "member";
         const memberCount = await fetchAllUsers(memberrole, token);
+        console.log(memberCount);
         setTotalMembers(memberCount);
         const data = await fetchAllBookingsData(token);
         setTodayEarning(data.todayRevenue);
@@ -61,12 +65,12 @@ export default function AdminHomePage() {
         setMonthlyData(data.yearlyRevenue);
 
         const monthlydata = await fetchMonthlyData(token);
-        console.log(monthlyData);
 
         setTopPayments(monthlydata);
       };
       data();
-    } catch (error) {
+    } catch (error: any) {
+      toastFunction("error", error.message);
       console.log(error);
     }
   }, [token, userId]);
@@ -106,7 +110,7 @@ export default function AdminHomePage() {
               <p className="text-2xl font-medium ">
                 {totalRevenue && totalRevenue !== null
                   ? formatRevenue(totalRevenue)
-                  : "Loading..."}
+                  : "₹0"}
               </p>
             </div>
 

@@ -67,8 +67,6 @@ export default function DashboardPage() {
 
           const monthlydata = await fetchMonthlyData(token, userId);
           setTopPayments(monthlydata);
-        } else {
-          throw new Error("No Data Available for this user.");
         }
       };
       data();

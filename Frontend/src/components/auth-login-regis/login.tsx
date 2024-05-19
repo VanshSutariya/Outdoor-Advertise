@@ -126,7 +126,7 @@ const SignIn: React.FC = () => {
 
           <div className="text-center text-blue-500 font-medium mt-4">
             Not registered?
-            <Link href="/register" className="text-gray-900 ml-1">
+            <Link href="/outdoorAd/register" className="text-gray-900 ml-1">
               Create account
             </Link>
           </div>

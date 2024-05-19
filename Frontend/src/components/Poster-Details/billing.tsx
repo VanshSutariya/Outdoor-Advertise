@@ -96,7 +96,11 @@ const Billing: React.FC<BillingType> = ({
 
   function handleCart() {
     if (customerPosterImage && customerPosterImage.trim() !== "") {
-      if (mediatype === "Rickshaws" || mediatype === "Poles") {
+      if (
+        mediatype === "Rickshaws" ||
+        mediatype === "Poles" ||
+        mediatype === "Buses"
+      ) {
         const qty = Number(noOfAuto.current?.value);
         if (qty < minQty || qty > maxQty) {
           handleBookingQuantityError(
@@ -163,6 +167,8 @@ const Billing: React.FC<BillingType> = ({
               ? "auto"
               : mediatype === "Poles"
               ? "pole"
+              : mediatype === "Buses"
+              ? "bus"
               : "day"}
           </span>
         </p>
@@ -232,6 +238,8 @@ const Billing: React.FC<BillingType> = ({
                         ? "auto"
                         : mediatype === "Poles"
                         ? "pole"
+                        : mediatype === "Buses"
+                        ? "bus"
                         : "day"
                     } x ${diffInDays}days `}
               </p>

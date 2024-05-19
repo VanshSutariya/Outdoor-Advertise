@@ -17,6 +17,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GMAPS_KEY}&libraries=places&callback=initMap`}
+          async
+        ></script>
+      </head>
+
       <body>
         <Providers>
           {children}

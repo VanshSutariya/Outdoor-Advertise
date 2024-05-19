@@ -135,7 +135,7 @@ const SignUp: React.FC = () => {
 
           <div className="text-center text-blue-500 font-medium mt-4">
             Already registered?
-            <Link href="/login" className="text-gray-900 ml-1">
+            <Link href="/outdoorAd/login" className="text-gray-900 ml-1">
               Login
             </Link>
           </div>

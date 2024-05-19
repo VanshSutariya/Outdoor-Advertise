@@ -6,9 +6,14 @@ import { CreatePosterDto } from './dto/createPoster.dto';
 import { UpdatePosterDto } from './dto/updatePoster.dto';
 import { Query } from 'express-serve-static-core';
 import { v2 } from 'cloudinary';
+import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
+import { title } from 'process';
 @Injectable()
 export class PosterDetailsService {
-  constructor(@InjectModel(Posters.name) private postersModel: Model<Posters>) {
+  constructor(
+    @InjectModel(Posters.name) private postersModel: Model<Posters>,
+    private readonly posterreqGateway: RoleChangeGateway,
+  ) {
     v2.config({
       cloud_name: process.env.CLOUD_NAME,
       api_key: process.env.CLOUDNERY_KEY,
@@ -18,16 +23,7 @@ export class PosterDetailsService {
 
   // get all posters
   async getAllPosters(query: Query, isPopularClicked: boolean = false) {
-    // if (query?.price) {
-    //   if (query?.priceCondition) {
-    //     DBQuery['price'] = {
-    //       [`$${query?.priceCondition}`]: query?.price,
-    //     };
-    //   } else {
-    //     DBQuery['price'] = query?.price;
-    //   }
-    // }
-    let DBQuery = {};
+    let DBQuery: any = {};
 
     if (query?.state) {
       DBQuery['state'] = {
@@ -47,8 +43,15 @@ export class PosterDetailsService {
     if (query?.createdBy) {
       DBQuery['createdBy'] = query?.createdBy;
     }
+    if (query?.status) {
+      DBQuery['status'] = query?.status;
+    }
 
-    DBQuery['isActive'] = true;
+    if (query.status || query.isActive) {
+      DBQuery['isActive'] = false;
+    } else {
+      DBQuery['isActive'] = true;
+    }
 
     if (isPopularClicked) {
       const posters = await this.postersModel.find();
@@ -57,13 +60,13 @@ export class PosterDetailsService {
         0,
       );
       const averageBooking = totalBookings / posters.length;
-
       DBQuery['totalBooking'] = { $gt: averageBooking };
     }
 
     const resPerPage = Number(query?.per_page) || 0;
     const currentPage = Number(query.page) || 1;
     const skip = resPerPage * (currentPage - 1);
+
     const resData = await this.postersModel
       .find(DBQuery)
       .limit(resPerPage)
@@ -71,8 +74,8 @@ export class PosterDetailsService {
 
     if (resData.length === 0) {
       throw new HttpException(
-        'There are no posters available here. Please search for another location.',
-        404,
+        'No posters available. Please try again later.',
+        400,
       );
     }
 
@@ -84,6 +87,10 @@ export class PosterDetailsService {
     const averageBooking = totalBookings / posters.length;
 
     const totalLength = await this.postersModel.countDocuments(DBQuery);
+
+    if (totalLength <= 0) {
+      throw new Error('No posters available. Please try again later.');
+    }
     return { averageBooking, totalLength, resData };
   }
 
@@ -92,27 +99,20 @@ export class PosterDetailsService {
     return await this.postersModel.findById(id);
   }
 
-  // // get popular posters
-  // async getPopularPosters() {
-  //   const posters = await this.postersModel.find().exec();
-  //   const totalBookings = posters.reduce(
-  //     (acc, poster) => acc + poster.totalBooking,
-  //     0,
-  //   );
-  //   const averageBooking = totalBookings / posters.length;
-
-  //   const popularPosters = await this.postersModel
-  //     .find({ totalBooking: { $gt: averageBooking } })
-  //     .exec();
-
-  //   return popularPosters;
-  // }
-
   // Create Poster
   async createPoster(createposterDto: CreatePosterDto) {
     const newPoster = await this.postersModel.create(createposterDto);
     if (!newPoster)
       throw new HttpException('New Poster/Hoarding is not Created.', 404);
+
+    const posterData = {
+      _id: newPoster._id,
+      title: newPoster.title,
+      image: newPoster.image,
+      price: newPoster.price,
+      lightingType: newPoster.lightingType,
+    };
+    this.posterreqGateway.posterReq(posterData);
     return newPoster;
   }
 
@@ -169,6 +169,47 @@ export class PosterDetailsService {
       );
       return newUpdate;
     }
+  }
+
+  // update poster status
+  async updatePosterStatus(id: string, updatePosterDto: UpdatePosterDto) {
+    const poster = await this.postersModel.findById(id);
+
+    if (!poster) {
+      throw new HttpException('Poster not found', 404);
+    }
+
+    let updatedPoster: any;
+    if (updatePosterDto.status === 'approved') {
+      updatedPoster = await this.postersModel.findByIdAndUpdate(
+        id,
+        { status: updatePosterDto.status, isActive: true },
+        { new: true },
+      );
+    } else {
+      updatedPoster = await this.postersModel.findByIdAndUpdate(
+        id,
+        { status: updatePosterDto.status },
+        { new: true },
+      );
+    }
+
+    if (!updatedPoster) {
+      throw new HttpException('Failed to update status', 500);
+    }
+    if (updatePosterDto.status === 'approved') {
+      const posterData = {
+        _id: updatedPoster._id,
+        title: updatedPoster.title,
+        image: updatedPoster.image,
+        price: updatedPoster.price,
+        lightingType: updatedPoster.lightingType,
+        createdBy: updatedPoster.createdBy,
+      };
+
+      this.posterreqGateway.posterRes(posterData);
+    }
+    return updatedPoster;
   }
 
   async uploadImage(filepath: Buffer) {

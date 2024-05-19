@@ -12,12 +12,10 @@ import {
 @ValidatorConstraint({ name: 'customText', async: false })
 export class CustomTextValidator implements ValidatorConstraintInterface {
   validate(text: string, args: ValidationArguments) {
-    // Check if the text starts with a character and contains only characters and numbers
-    return /^[a-zA-Z][a-zA-Z0-9]*$/.test(text);
+    return /^[a-zA-Z][a-zA-Z0-9 ]*[a-zA-Z0-9]$/.test(text);
   }
-
   defaultMessage(args: ValidationArguments) {
-    return 'Name must start with a character and contain only characters and numbers';
+    return 'Name must start with a character, contain only characters, numbers, and spaces, and cannot end with a space';
   }
 }
 
