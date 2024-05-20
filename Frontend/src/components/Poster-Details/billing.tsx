@@ -232,7 +232,7 @@ const Billing: React.FC<BillingType> = ({
                 {noOfAuto.current === undefined
                   ? `₹${price} X ${diffInDays}days`
                   : ` ₹${price} x ${
-                      noOfAuto?.current?.value ? noOfAuto?.current?.value : 1
+                      noOfAuto?.current?.value ? noOfAuto.current.value : 1
                     } ${
                       mediatype === "Rickshaws"
                         ? "auto"

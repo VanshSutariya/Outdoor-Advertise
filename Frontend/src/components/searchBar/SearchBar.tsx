@@ -6,15 +6,11 @@ import PosterGrid from "../Poster/poster-grid";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import qs from "query-string";
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from "react-places-autocomplete";
 import ToggleBtn from "./toggleBtn";
-const SearchBar: React.FC = (props) => {
+
+const SearchBar: React.FC = () => {
   const router = useRouter();
   const params = useSearchParams();
-
   const category = params.get("category") || "";
   const address = params.get("address") || "";
   const state = params.get("state") || "";
@@ -116,10 +112,6 @@ const SearchBar: React.FC = (props) => {
   return (
     <>
       <div className="md:flex justify-center">
-        <ToggleBtn
-          isPopularClicked={isPopularClicked}
-          onToggle={handleToggle}
-        />
         <form
           onSubmit={handleFormSubmit}
           className=" md:flex justify-center items-center font-inter pt-5 md:mr-6"
@@ -154,28 +146,11 @@ const SearchBar: React.FC = (props) => {
               />
             </div>
             <div className=" md:w-1/4 items-center justify-center w-full relative rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-gray-200">
-              <p>Media Plans</p>
-              <select
-                id="month"
-                name="mediatype"
-                className="bg-transparent focus:outline-none border-none pt-2"
-                value={formValues.mediatype ? formValues.mediatype : "default"}
-                onChange={handleChange}
-              >
-                <option value="default" disabled>
-                  ---Select Media Type--
-                </option>
-                <option value="Billboard">BillBoard</option>
-                <option value="BusStands">Bus Stands</option>
-                <option value="Airports">Airports</option>
-                <option value="RailwayPlatforms">RailwayPlatforms</option>
-                <option value="Footoverbridges">Footoverbridges</option>
-                <option value="Rickshaws">Rickshaws</option>
-                <option value="ShoppingMalls">ShoppingMalls</option>
-                <option value="Busses">Buses</option>
-                <option value="Poles">Poles</option>
-                <option value="Busses">Buildings</option>
-              </select>
+              <p>Popular</p>
+              <ToggleBtn
+                isPopularClicked={isPopularClicked}
+                onToggle={handleToggle}
+              />
             </div>
             <button className="flex w-full md:w-[60px] mr-[4px] mt-[5px] md:h-14 h-[50px] items-center justify-center  text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600">
               <div>

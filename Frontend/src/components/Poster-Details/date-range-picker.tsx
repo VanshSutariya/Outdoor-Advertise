@@ -1,4 +1,3 @@
-// eslint-disable-line
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { addDays, max } from "date-fns";
@@ -80,7 +79,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
       key: "selection",
     },
   ]);
-  console.log("initial state ================", state);
 
   const NextAvailableDate = (): Date => {
     let nextAvailableDate = new Date();
@@ -108,7 +106,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   }, [state]);
 
   const handleAutoChange = () => {
-    const inputValue = parseInt(noOfAuto.current!.value, 10);
+    const inputValue = parseInt(noOfAuto.current.value, 10);
     if (inputValue < minQty || inputValue > maxQty) {
       setAutoInputError(
         `Book minimum ${minQty} and maximum ${maxQty} Quantity.`

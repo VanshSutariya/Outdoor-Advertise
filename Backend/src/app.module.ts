@@ -22,8 +22,6 @@ import { ContactUsModule } from './contact-us/contact-us.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.Mongodb_Cluster),
-    AuthModule,
-    PosterDetailsModule,
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,
@@ -35,6 +33,8 @@ import { ContactUsModule } from './contact-us/contact-us.module';
         },
       },
     }),
+    AuthModule,
+    PosterDetailsModule,
     CartModule,
     StripeModule,
     StripeWebhookModule,
@@ -43,7 +43,7 @@ import { ContactUsModule } from './contact-us/contact-us.module';
     GatewayModule,
     PrometheusModule.register({
       defaultLabels: {
-        application: 'outdoorAd', // Customize application name
+        application: 'outdoorAd',
       },
       defaultMetrics: {
         enabled: true,

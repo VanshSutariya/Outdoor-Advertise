@@ -37,7 +37,6 @@ export class CreateBookingDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
   createdBy: string;
 
   @IsOptional()

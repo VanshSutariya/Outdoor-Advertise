@@ -29,7 +29,6 @@ export default function middleware(req: NextRequest) {
       const decodedToken: any = decode(token);
 
       const isLoggedIn = decodedToken.id ? true : false;
-      console.log(decodedToken);
 
       const userRole = decodedToken.role;
       if (!isLoggedIn) {
@@ -77,7 +76,7 @@ export default function middleware(req: NextRequest) {
         }
       }
     } catch (error) {
-      console.error("Warningj decoding token:", error);
+      console.error("Warning decoding token:");
     }
   } else if (
     protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))

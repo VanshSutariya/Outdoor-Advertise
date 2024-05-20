@@ -36,7 +36,7 @@ export default function OrderPage() {
         if (!res.ok) {
           throw new Error("Failed to fetch booking orders data.");
         }
-        setOrders(data);
+        setOrders(data.resData);
       } catch (error: any) {
         console.error("Error fetching cart data:", error.message);
       }

@@ -243,11 +243,6 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
         setErrors(newErrors);
       } else {
         setErrors({});
-        // const errorParts = error.message.split(",");
-        // let formattedMessage = "";
-        // for (const part of errorParts) {
-        //   formattedMessage += part.trim() + "\n";
-        // }
         console.log(error.message);
         if (error.message === undefined) {
           toastFunction("warning", "Address is not valid.");

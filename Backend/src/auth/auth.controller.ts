@@ -26,7 +26,6 @@ import { RolesGuard } from 'src/RoleGuard/role.guard';
 import { HasRoles } from 'src/RoleGuard/roles.decorater';
 import { Roles } from './roles.constants';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Multer } from 'multer';
 
 @Controller('auth')
 export class AuthController {

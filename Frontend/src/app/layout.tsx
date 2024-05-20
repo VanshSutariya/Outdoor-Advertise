@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GMAPS_KEY}&libraries=places&callback=initMap`}
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GMAPS_KEY}&libraries=places`}
           async
         ></script>
       </head>

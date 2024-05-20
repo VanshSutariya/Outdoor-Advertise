@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { logout } from "@/store/auth-slice";
 import NavBar from "@/components/Header";
+import toastFunction from "@/components/reactToast/toast";
 
 const UpdatePasswordPage = () => {
   const router = useRouter();
@@ -54,12 +55,11 @@ const UpdatePasswordPage = () => {
 
       if (!response.ok) throw new Error(data.message || "Enter valid inputs.");
 
-      document.cookie =
-        "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/poster";
+      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       dispatch(logout());
-      alert("Password reset successfully");
+      toastFunction("success", "Password reset successfully");
 
-      router.push("/");
+      router.push("/outdoorAd/login");
     } catch (error: any) {
       setIsError(true);
       setErrorState(error.message);

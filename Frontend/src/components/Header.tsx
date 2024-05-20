@@ -7,7 +7,7 @@ import { logout } from "@/store/auth-slice";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 
-const NavBar: React.FC = () => {
+const Header: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -80,13 +80,7 @@ const NavBar: React.FC = () => {
               <Link href="/outdoorAd">
                 <span className="text-black">Home</span>
               </Link>
-              <Link href="/about">
-                <span className="text-black">About</span>
-              </Link>
-              <Link href="/services">
-                <span className="text-black">Services</span>
-              </Link>
-              <Link href="/contact">
+              <Link href="/outdoorAd/contactUs">
                 <span className="text-black">Contact</span>
               </Link>
             </div>
@@ -136,7 +130,7 @@ const NavBar: React.FC = () => {
                   tabIndex={0}
                   className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box "
                 >
-                  <li className=" items-center">
+                  <li className=" items-center ">
                     <button onClick={handleAccountPage}>Account</button>
                   </li>
                   <li className=" items-center">
@@ -221,4 +215,4 @@ const NavBar: React.FC = () => {
   );
 };
 
-export default NavBar;
+export default Header;

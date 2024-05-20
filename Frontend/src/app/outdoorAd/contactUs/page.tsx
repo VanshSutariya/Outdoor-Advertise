@@ -1,5 +1,6 @@
 "use client";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import toastFunction from "@/components/reactToast/toast";
 import { useState } from "react";
 
@@ -71,8 +72,10 @@ export default function ContactUs() {
   };
   return (
     <>
+      <Header />
+
       <div className="bg-white">
-        <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
+        <div className="py-3 px-4 mx-auto max-w-screen-md">
           <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-center text-gray-900">
             Contact Us
           </h2>

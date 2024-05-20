@@ -47,7 +47,6 @@ const ManagePosterGrid: React.FC = () => {
         let resData: any;
         const status = "pending";
         resData = await ManagePoster(status, page, per_page);
-
         setLoading(false);
 
         setTotalPages(Math.ceil(resData.totalLength / per_page));
@@ -97,7 +96,7 @@ const ManagePosterGrid: React.FC = () => {
     <>
       <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-2 mx-auto justify-items-center ">
         {!error &&
-          posterData.length > 0 &&
+          posterData !== undefined &&
           posterData.map((poster: Poster) => (
             <div
               className="mt-8 rounded-lg transform inline-block overflow-hidden transition-transform duration-300  hover:scale-130"

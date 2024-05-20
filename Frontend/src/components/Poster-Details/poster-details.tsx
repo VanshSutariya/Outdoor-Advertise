@@ -36,15 +36,15 @@ interface PosterDetailsProps {
 const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState();
   const [posterData, setPosterData] = useState<PosterData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(false);
       try {
         const resData: PosterData = await fetchOnePoster(id);
         setPosterData(resData);
+        setLoading(false);
       } catch (error: any) {
         setError(error.message);
         console.error("Error fetching data:", error);
@@ -70,7 +70,7 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
             </button>
           </div>
         ) : (
-          <div className="flex justify-center text-3xl font-poppins h-[260px] mt-[90px]">
+          <div className="flex justify-center text-3xl font-poppins h-screen mt-[90px]">
             <div className="md:ml[300px] rounded-full  h-10 w-10 bg-gray-700 animate-ping"></div>
           </div>
         )}

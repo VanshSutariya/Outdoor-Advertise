@@ -159,7 +159,6 @@ export class PosterDetailsService {
         throw new HttpException('Failed to update poster', 500);
       }
 
-      // Return the updated poster document
       return updatedPoster;
     } else {
       const newUpdate = await this.postersModel.findByIdAndUpdate(

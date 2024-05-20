@@ -80,8 +80,6 @@ export class UserRoleChangeService {
       const id = updatedUserRoleChange.user._id;
       await this.authService.updateUserDetails(id, updateDto);
     }
-    console.log(updatedUserRoleChange);
-
     this.roleChangeGateway.sendRoleChangeUpdate(updatedUserRoleChange);
 
     return updatedUserRoleChange;

@@ -154,7 +154,8 @@ export class BookingService {
       throw new HttpException('An error occurred', 500);
     }
   }
-  // memberstats----------------------------------------------------------------------------------
+
+  // Member dashboard data----------------------------------------------------------------------------------
   async getMemberRevenueStats(id: string): Promise<{
     currentYearTotalRevenue: number;
     yearlyRevenue: number[];
@@ -171,107 +172,100 @@ export class BookingService {
     const startOfYear = new Date(Date.UTC(currentYear, 0, 1));
     const endOfYear = new Date(Date.UTC(currentYear + 1, 0, 1));
 
-    const [totalRevenue, monthResult, dayResult, currentYearData, yourPosters] =
-      await Promise.all([
-        // totalRevenue
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-              createdAt: {
-                $gte: new Date(currentYear, 0, 1),
-                $lte: new Date(currentYear, 11, 31),
-              },
-            },
+    const totalRevenue = await this.bookingModel.aggregate([
+      {
+        $match: {
+          createdBy: new mongoose.Types.ObjectId(id),
+          createdAt: {
+            $gte: new Date(currentYear, 0, 1),
+            $lte: new Date(currentYear, 11, 31),
           },
-          {
-            $group: {
-              _id: null,
-              totalRevenue: { $sum: '$totalPrice' },
-            },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$totalPrice' },
+        },
+      },
+    ]);
+    const monthResult = await this.bookingModel.aggregate([
+      {
+        $match: {
+          createdBy: new mongoose.Types.ObjectId(id),
+          $expr: { $eq: [{ $year: '$createdAt' }, currentYear] },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$createdAt' },
+          totalEarning: { $sum: '$totalPrice' },
+        },
+      },
+      {
+        $match: { _id: currentMonth },
+      },
+    ]);
+    const dayResult = await this.bookingModel.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: currentDate,
+            $lt: endOfDay,
           },
-        ]),
-        // current month revenue
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-              $expr: { $eq: [{ $year: '$createdAt' }, currentYear] },
-            },
+          createdBy: new mongoose.Types.ObjectId(id),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          todayEarning: { $sum: '$totalPrice' },
+        },
+      },
+    ]);
+    const currentYearData = await this.bookingModel.aggregate([
+      {
+        $match: {
+          createdBy: new mongoose.Types.ObjectId(id),
+          createdAt: {
+            $gte: startOfYear,
+            $lt: endOfYear,
           },
-          {
-            $group: {
-              _id: { $month: '$createdAt' },
-              totalEarning: { $sum: '$totalPrice' },
-            },
-          },
-          {
-            $match: { _id: currentMonth }, // Filter to current month
-          },
-        ]),
-        // per day revenue
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdAt: {
-                $gte: currentDate,
-                $lt: endOfDay,
-              },
-              createdBy: new mongoose.Types.ObjectId(id),
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              todayEarning: { $sum: '$totalPrice' },
-            },
-          },
-        ]),
-        // curr year data
-        this.bookingModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-              createdAt: {
-                $gte: startOfYear,
-                $lt: endOfYear,
-              },
-            },
-          },
-          {
-            $group: {
-              _id: { $month: '$createdAt' },
-              totalRevenue: { $sum: '$totalPrice' },
-            },
-          },
-          {
-            $sort: { _id: 1 },
-          },
-        ]),
-        // no. of member posters
-        this.posterModel.aggregate([
-          {
-            $match: {
-              createdBy: id,
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              totalPosters: { $sum: 1 },
-            },
-          },
-          {
-            $sort: { _id: 1 },
-          },
-        ]),
-      ]);
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$createdAt' },
+          totalRevenue: { $sum: '$totalPrice' },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+    const yourPosters = await this.posterModel.aggregate([
+      {
+        $match: {
+          createdBy: new mongoose.Types.ObjectId(id),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalPosters: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
 
     const yearlyRevenue: number[] = new Array(12).fill(0);
     currentYearData.forEach((item: any) => {
       const monthIndex = item._id - 1;
       yearlyRevenue[monthIndex] = item.totalRevenue;
     });
+
     return {
       currentYearTotalRevenue:
         totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0,

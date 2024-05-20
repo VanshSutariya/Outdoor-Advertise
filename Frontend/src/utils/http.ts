@@ -171,9 +171,8 @@ export async function ManagePoster(
     const poster = await resData.json();
     return poster;
   } catch (error: any) {
-    throw new Error(
-      error.message || "An error occurred while fetching posters."
-    );
+    console.log(error);
+    throw new Error(error.message || "No Poster available to manage.");
   }
 }
 

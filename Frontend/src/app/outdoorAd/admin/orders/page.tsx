@@ -59,8 +59,8 @@ const OrderAdminPage = () => {
   };
 
   function formatRevenue(revenue: any) {
-    const crore = 10000000; // 1 crore = 10,000,000
-    const lakh = 100000; // 1 lakh = 100,000
+    const crore = 10000000;
+    const lakh = 100000;
 
     if (revenue >= crore) {
       return `₹${(revenue / crore).toFixed(2)} CR`;
@@ -82,7 +82,7 @@ const OrderAdminPage = () => {
           <table className="table-auto min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 font-poppins text-left text-md font-medium text-gray-500 tracking-wider">
+                <th className="px-6 py-3 w-2/3 font-poppins text-left text-md font-medium text-gray-500 tracking-wider">
                   Product
                 </th>
                 <th className="px-6 py-3 font-poppins text-left text-md font-medium text-gray-500 tracking-wider">

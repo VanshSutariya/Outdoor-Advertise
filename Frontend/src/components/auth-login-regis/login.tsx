@@ -45,6 +45,7 @@ const SignIn: React.FC = () => {
       )}; path=/; secure;`;
 
       const decodedToken = decode(resData.token) as { id: string };
+
       if (decodedToken) {
         const fetchUserFunc = async () => {
           const userDetail = await fetchUser(decodedToken.id);

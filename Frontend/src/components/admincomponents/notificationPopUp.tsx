@@ -42,13 +42,11 @@ const NotificationPopUp: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    try {
-      const data = async () => {
+    const data = async () => {
+      try {
         const alerts = await fetchAllRoleChanges(token);
         const status = "pending";
-        const page = 1;
-        const per_page = 1;
-        const resData = await ManagePoster(status, page, per_page);
+        const resData = await ManagePoster(status);
 
         if (resData !== undefined && resData.totalLength > 0) {
           setPosterNotification(true);
@@ -57,12 +55,11 @@ const NotificationPopUp: React.FC = () => {
         if (alerts > 0) {
           setRoleNotification(true);
         }
-      };
-      data();
-    } catch (error: any) {
-      toastFunction("error", error.message);
-      console.log(error);
-    }
+      } catch (error: any) {
+        console.log(error);
+      }
+    };
+    data();
   }, [token]);
 
   return (

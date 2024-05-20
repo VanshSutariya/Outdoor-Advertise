@@ -60,22 +60,19 @@ export class StripeWebhookService {
                 const bookingDetails =
                   await this.bookingService.getBookingById(id);
 
-                console.log(bookingDetails);
-
                 // increase the poster totalBooking count
                 await this.posterService.totalBookingCounter(
                   filteredCartItem.posterId,
                 );
 
                 // send customer details, email----------------------------------
-
                 const receiverEmail = bookingDetails.createdBy.email;
                 const bookingId = bookingDetails._id.toString();
                 const customerPosterImage = bookingDetails.customerPosterImage;
                 const name = bookingDetails.userId.name;
                 const title = bookingDetails.posterId.title;
                 const address = bookingDetails.posterId.address;
-                const email = await this.emailService.sendEmail(
+                await this.emailService.sendEmail(
                   receiverEmail,
                   bookingId,
                   name,

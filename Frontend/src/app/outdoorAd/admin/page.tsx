@@ -134,7 +134,6 @@ export default function AdminHomePage() {
               <p className="text-2xl font-medium ml-3">
                 {totalUsers !== null ? `+${totalUsers}` : "Loading..."}
               </p>
-              {/* <p className="text-green-500">+180.1% from last month</p> */}
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -148,8 +147,6 @@ export default function AdminHomePage() {
               <p className="text-2xl font-medium ml-2">
                 {totalMembers !== null ? `+${totalMembers}` : "Loading..."}
               </p>
-
-              {/* <p className="text-green-500">+19% from last month</p> */}
             </div>
           </div>
 

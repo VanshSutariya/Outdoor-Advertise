@@ -81,7 +81,6 @@ export class PosterDetailsController {
   @Post('/upload')
   @UseInterceptors(FileInterceptor('image'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
     const imageUrl: any = await this.posterdetailsService.uploadImage(
       file.buffer,
     );

@@ -76,8 +76,8 @@ export default function DashboardPage() {
   }, [userId]);
 
   function formatRevenue(revenue: any) {
-    const crore = 10000000; // 1 crore = 10,000,000
-    const lakh = 100000; // 1 lakh = 100,000
+    const crore = 10000000;
+    const lakh = 100000;
 
     if (revenue >= crore) {
       return `₹${(revenue / crore).toFixed(2)} CR`;
@@ -95,7 +95,7 @@ export default function DashboardPage() {
           <div className="text-3xl xs:flex items-center font-semibold -mt-7  font-inter">
             <p>Dashboard</p>
             <Link
-              href="/"
+              href="/outdoorAd"
               className="md:ml-20 md: mt-1 text-xl font-normal font-poppins"
             >
               Home
@@ -131,7 +131,6 @@ export default function DashboardPage() {
                   ? formatRevenue(memberStats.currentMonthRevenue)
                   : "₹0"}
               </p>
-              {/* <p className="text-green-500">+180.1% from last month</p> */}
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -159,8 +158,6 @@ export default function DashboardPage() {
                   ? `+${memberStats.totalPosters}`
                   : "+0"}
               </p>
-
-              {/* <p className="text-green-500">+19% from last month</p> */}
             </div>
           </div>
 
