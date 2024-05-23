@@ -2,6 +2,7 @@ import Categories from "@/components/filter/categarious";
 import Header from "../../components/Header";
 import SearchBar from "@/components/searchBar/SearchBar";
 import Footer from "@/components/Footer";
+import PosterGrid from "@/components/Poster/poster-grid";
 export default function OutdoorAd() {
   return (
     <>
@@ -11,6 +12,7 @@ export default function OutdoorAd() {
           <Categories />
         </div>
         <SearchBar />
+        <PosterGrid />
 
         <Footer />
       </main>

@@ -1,11 +1,12 @@
 "use client";
+
+import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { IoIosArrowRoundBack } from "react-icons/io";
-import Link from "next/link";
 import { RootState } from "@/store";
 import { cartActions } from "@/store/cart-slice";
 import NavBar from "@/components/Header";
@@ -40,8 +41,7 @@ export default function CartPage() {
   }
 
   function handleEdit(posterId: string) {
-    dispatch(cartActions.removeItem({ userId, posterId }));
-    router.push(`/outdoorAd/poster/${posterId}`);
+    router.push(`/outdoorAd/cart/editPoster/${posterId}`);
   }
 
   async function handleCheckout() {
@@ -82,7 +82,7 @@ export default function CartPage() {
                   <thead>
                     <tr className="border-b-2 border-b-gray-300">
                       <th className="text-left font-semibold pl-8">Product</th>
-                      <th className="text-left font-semibold ">
+                      <th className="text-left font-semibold md:w-[170px]  ">
                         Booking Dates
                       </th>
                       <th className="text-left font-semibold md:w-[70px] ">
@@ -108,7 +108,7 @@ export default function CartPage() {
                                 src={item.image}
                                 alt="Product image"
                               />
-                              <span className="flex-col font-semibold text-lg">
+                              <span className="flex-col font-semibold text-lg md:mr-3">
                                 {item.title}
                                 <p className="text-[15px] font-normal">
                                   {item.address}
@@ -116,12 +116,12 @@ export default function CartPage() {
                               </span>
                             </div>
                           </td>
-                          <td className="tracking-tighter pb-1">
+                          <td className="tracking-tighter pb-1 ">
                             {item.bookingDate[0] +
                               "  -  " +
                               item.bookingDate[item.bookingDate.length - 1]}
                           </td>
-                          <td className=" ">
+                          <td className="pl-2 ">
                             <button
                               onClick={() => handleDelete(item?.posterId)}
                               className=""

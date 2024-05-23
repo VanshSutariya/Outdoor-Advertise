@@ -1,4 +1,3 @@
-// ForgotPasswordPopup.tsx
 import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 
@@ -11,7 +10,7 @@ const ForgotPasswordPopup: React.FC<ForgotPasswordPopupProps> = ({
 }) => {
   const [email, setEmail] = useState("");
   const [handleError, setHandleError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // Track loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,7 +36,7 @@ const ForgotPasswordPopup: React.FC<ForgotPasswordPopupProps> = ({
       console.error(error);
       setHandleError(error.message || "An error occurred.");
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 

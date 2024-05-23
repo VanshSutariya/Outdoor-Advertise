@@ -50,11 +50,9 @@ export class UserRoleChangeService {
     const newUserRoleChange = await this.roleChange.create({
       user,
     });
-    console.log(newUserRoleChange);
 
     if (!newUserRoleChange)
       throw new HttpException('enter valid Credentials.', 401);
-    console.log(newUserRoleChange);
     const userData = await this.roleChange
       .find(newUserRoleChange._id)
       .populate({ path: 'user', select: 'email role name' });

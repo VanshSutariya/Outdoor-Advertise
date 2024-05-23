@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { log } from 'console';
 import { CartService } from 'src/cart/cart.service';
 import { UpdatePosterDto } from 'src/poster-details/dto/updatePoster.dto';
 import { PosterDetailsService } from 'src/poster-details/poster-details.service';

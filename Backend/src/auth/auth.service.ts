@@ -47,7 +47,8 @@ export class AuthService {
       const result = await this.userModel
         .find(DBQuery)
         .limit(resPerPage)
-        .skip(skip);
+        .skip(skip)
+        .select('_id name email role image');
 
       const totalLength = await this.userModel.countDocuments(DBQuery);
 
@@ -58,7 +59,9 @@ export class AuthService {
   }
 
   async getUsersById(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel
+      .findById(id)
+      .select('_id name email role image');
     if (!user) throw new HttpException('enter valid Userid.', 404);
     return user;
   }

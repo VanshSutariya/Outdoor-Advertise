@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateCartDto } from './dto/createCart.dto';
 import { Query } from 'express-serve-static-core';
 import { v2 } from 'cloudinary';
+import { UpdateCartDto } from './dto/updateCart.dto';
 
 @Injectable()
 export class CartService {
@@ -38,6 +39,32 @@ export class CartService {
     const newCart = await this.cartModal.create(createCartDto);
     if (!newCart) throw new HttpException('Cart details is not added.', 404);
     return newCart;
+  }
+
+  async updateCart(
+    userId: string,
+    posterId: string,
+    updateCartDto: UpdateCartDto,
+  ): Promise<Cart> {
+    const { bookingDate, customerPosterImage, totalPrice } = updateCartDto;
+
+    const cart = await this.cartModal.findOne({ userId, posterId });
+    if (!cart) {
+      throw new NotFoundException('Cart not found');
+    }
+
+    if (bookingDate) {
+      cart.bookingDate = bookingDate;
+    }
+    if (customerPosterImage) {
+      cart.customerPosterImage = customerPosterImage;
+    }
+    if (totalPrice) {
+      cart.totalPrice = totalPrice;
+    }
+
+    const result = await cart.save();
+    return result;
   }
 
   async uploadImage(filepath: Buffer) {

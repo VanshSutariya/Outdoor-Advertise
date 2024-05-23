@@ -1,23 +1,20 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toastFunction from "../reactToast/toast";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/store";
 import { cartActions } from "@/store/cart-slice";
 import { FaRegEdit } from "react-icons/fa";
+import { updateCart } from "@/utils/http";
 
 interface BillingType {
   handleAutoChange: () => void;
   id: string;
   price: number;
-  image: string;
-  title: string;
-  address: string;
   maxQty: number;
   minQty: number;
   minDays: number;
-  createdBy: string;
   totalPrice: number;
   diffInDays: number;
   autoInputError: string | undefined;
@@ -27,7 +24,7 @@ interface BillingType {
   state: { startDate: Date; endDate: Date; key: string }[];
 }
 
-const Billing: React.FC<BillingType> = ({
+const BillingPoster: React.FC<BillingType> = ({
   handleAutoChange,
   id,
   totalPrice,
@@ -39,11 +36,7 @@ const Billing: React.FC<BillingType> = ({
   price,
   mediatype,
   state,
-  image,
-  title,
-  address,
   noOfAuto,
-  createdBy,
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -53,11 +46,24 @@ const Billing: React.FC<BillingType> = ({
   const { userId, isLoggedIn }: { userId: string | null; isLoggedIn: boolean } =
     useSelector((state: RootState) => state.auth);
 
+  const { items } = useSelector((state: RootState) => state.cart);
+  const existingItem = items.find((item) => item.posterId === id);
+  let matchingItems: any;
+  if (existingItem) {
+    matchingItems = items.filter((item) => item.posterId === id);
+  }
+
+  useEffect(() => {
+    if (existingItem) {
+      setCustomerPosterImage(matchingItems[0].customerPosterImage);
+    }
+  }, [existingItem]);
+
   const handleBookingQuantityError = (errorMessage: string) => {
     toastFunction("warning", errorMessage);
   };
 
-  const addToCartHandler = () => {
+  const addToCartHandler = async () => {
     const startDate = state[0].startDate;
     const endDate = state[0].endDate;
 
@@ -69,23 +75,30 @@ const Billing: React.FC<BillingType> = ({
     ) {
       datesArray.push(new Date(date).toLocaleDateString());
     }
+
     const posterId = id;
+    try {
+      const bodyData = {
+        bookingDate: datesArray,
+        customerPosterImage: customerPosterImage,
+        totalPrice: Math.round(totalPrice * 1.05),
+      };
+      console.log(bodyData);
 
-    dispatch(
-      cartActions.addItemToCart({
-        posterId,
-        image,
-        userId,
-        title,
-        address,
-        totalPrice: finalTotalPrice,
-        bookingDates: datesArray,
-        createdBy,
-        customerPosterImage,
-      })
-    );
+      await updateCart(userId, posterId, bodyData);
+      dispatch(
+        cartActions.updateCartData({
+          id,
+          bookingDates: datesArray,
+          customerPosterImage,
+          finalTotalPrice,
+        })
+      );
 
-    router.push("/outdoorAd/cart");
+      router.push("/outdoorAd/cart");
+    } catch (error: any) {
+      toastFunction("error", error.message);
+    }
   };
 
   function handleCart() {
@@ -107,6 +120,7 @@ const Billing: React.FC<BillingType> = ({
       }
 
       toastFunction("success", "Added to Cart !");
+
       setTimeout(addToCartHandler, 900);
     } else {
       toastFunction("warning", "Please upload your Ad image.");
@@ -138,7 +152,7 @@ const Billing: React.FC<BillingType> = ({
       if (response.ok) {
         toastFunction("success", "Image Uploaded Successfully.");
         setCustomerPosterImage(data.secure_url);
-        setEditImg(true);
+        setEditImg(false);
       } else {
         toastFunction("warning", "Image upload failed!. Try again");
         console.error("Failed To Fetch Image", data.errors);
@@ -262,7 +276,7 @@ const Billing: React.FC<BillingType> = ({
           </div>
         </div>
         <div>
-          {customerPosterImage && editImg && (
+          {customerPosterImage && !editImg && (
             <>
               <div className=" text-xl md:mt-10 font-poppins font-semibold text-green-500 ">
                 Image Uploaded Successfully
@@ -280,7 +294,7 @@ const Billing: React.FC<BillingType> = ({
               </div>
             </>
           )}
-          {!customerPosterImage && !editImg && (
+          {(!customerPosterImage || editImg) && (
             <>
               <div className="mt-6 md:mb-3 font-poppins text-lg ">
                 Upload your Advertise image
@@ -289,13 +303,13 @@ const Billing: React.FC<BillingType> = ({
                 type="file"
                 id="file-upload"
                 onChange={GenerateImage}
-                className="w-full hidden"
+                className="w-full hidden  "
               />
               <label
                 htmlFor="file-upload"
                 className="bg-orange-400 cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2 mt-4 rounded-lg "
               >
-                {editImg ? "Uploading......." : "Choose file"}
+                Choose file
               </label>
             </>
           )}
@@ -305,4 +319,4 @@ const Billing: React.FC<BillingType> = ({
   );
 };
 
-export default Billing;
+export default BillingPoster;

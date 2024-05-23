@@ -69,7 +69,7 @@ export class ContactEmailService {
       <div class="container">
       <h2>  ContactUs </h2>
       <p> Message : ${description}</p>
-      <h2> User Email: ${email}</h2>
+      <p> User Email: ${email}</p>
     </div>
   </body>
 </html>

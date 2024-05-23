@@ -4,16 +4,10 @@ import Link from "next/link";
 const Footer: React.FC = () => {
   return (
     <footer className="text-gray-600 body-font bg-white border-t-[2px] border-t-gray-200 ">
-      <div className="container px-5 py-20 -mt-10 mx-auto flex md:items-center lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
-        <div className="w-64 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
+      <div className="container px-5 pt-20 -mt-10 mx-auto flex md:items-center lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
+        <div className="w-64 md:pl-3 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
           <div className="flex title-font  items-center md:justify-start justify-center ">
-            <Image
-              src="/logo.png"
-              alt="company logo"
-              className="h-14"
-              width={60}
-              height={40}
-            />
+            <img src="/logo.png" alt="logo" className="w-auto h-[60px]" />
             <p className="title-font tracking-widest text-sm mb-2 mx-5 font-bold ">
               Outdoor Advertise
             </p>
@@ -22,7 +16,7 @@ const Footer: React.FC = () => {
             Choose your Outdoor Media Plan for Advertisement
           </p>
         </div>
-        <div className="flex-grow flex flex-wrap md:pl-20 -mb-20 md:mt-0 mt-10 md:text-left text-center">
+        <div className="flex-grow flex mxs:flex-wrap justify-center  md:mt-0 mt-10 md:text-left text-center">
           <div className="lg:w-1/4 md:w-1/2 w-full px-4">
             <h2 className="title-font font-bold text-gray-600 tracking-widest text-lg mb-1 mt-2">
               Features

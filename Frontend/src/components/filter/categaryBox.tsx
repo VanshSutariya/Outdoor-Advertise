@@ -2,7 +2,6 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { FC, useCallback } from "react";
-// import { IconType } from "react-icons";
 import qs from "query-string";
 
 interface CategoryBoxProps {
@@ -27,7 +26,6 @@ const CategoryBox: FC<CategoryBoxProps> = ({ icon: Icon, label, selected }) => {
       category: label,
     };
 
-    // If click same category, that category will remove
     if (params?.get("category") === label) {
       delete udpatedQuery.category;
     }
@@ -52,6 +50,7 @@ const CategoryBox: FC<CategoryBoxProps> = ({ icon: Icon, label, selected }) => {
           items-center 
           justify-center 
           py-2
+          msm:px-3
           border-b-4
           hover:text-neutral-800
           transition
@@ -64,7 +63,7 @@ const CategoryBox: FC<CategoryBoxProps> = ({ icon: Icon, label, selected }) => {
         `}
     >
       <Icon size={26} />
-      <div className="font-medium text-sm">{label}</div>
+      <div className="font-medium text-sm  msm:hidden">{label}</div>
     </div>
   );
 };

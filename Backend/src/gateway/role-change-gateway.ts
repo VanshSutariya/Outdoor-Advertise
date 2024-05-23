@@ -7,7 +7,7 @@ import {
 @WebSocketGateway(4040, { cors: '*:*' })
 export class RoleChangeGateway {
   @WebSocketServer()
-  server;
+  server: any;
 
   @SubscribeMessage('roleChange')
   sendRoleChangeUpdate(update: any) {

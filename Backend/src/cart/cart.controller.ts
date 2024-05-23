@@ -6,6 +6,7 @@ import {
   HttpException,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   UploadedFile,
@@ -15,6 +16,7 @@ import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/createCart.dto';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateCartDto } from './dto/updateCart.dto';
 @Controller('cart')
 export class CartController {
   constructor(private cartService: CartService) {}
@@ -34,10 +36,18 @@ export class CartController {
     return await this.cartService.createCart(createCartdto);
   }
 
+  @Patch(':userId/:posterId')
+  async updateCart(
+    @Param('userId') userId: string,
+    @Param('posterId') posterId: string,
+    @Body() updateCartDto: UpdateCartDto,
+  ) {
+    return await this.cartService.updateCart(userId, posterId, updateCartDto);
+  }
+
   @Post('/upload')
   @UseInterceptors(FileInterceptor('image'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
     const imageUrl: any = await this.cartService.uploadImage(file.buffer);
     return imageUrl;
   }

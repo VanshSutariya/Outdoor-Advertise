@@ -5,9 +5,6 @@ const ToggleBtn = ({ isPopularClicked, onToggle }: any) => {
 
   return (
     <div>
-      {/* <p className="text-lg mr-1 font-poppins text-red-400 font-medium">
-        Popular
-      </p> */}
       <div className="pt-[3px]">
         <input
           type="checkbox"

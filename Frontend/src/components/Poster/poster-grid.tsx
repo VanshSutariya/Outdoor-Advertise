@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import PosterItem from "./poster-item";
 import { useSearchParams } from "next/navigation";
@@ -12,11 +13,11 @@ interface Poster {
   lightingType: string;
   createdBy: string;
   mediatype: string;
+  totalBooking: number;
 }
 
 interface PosterGridProps {
   id?: string;
-  isPopularClicked?: string;
 }
 
 const PosterGrid: React.FC<PosterGridProps> = (props) => {
@@ -25,8 +26,9 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
   const address = searchParams.get("address") || undefined;
   const state = searchParams.get("state") || undefined;
   const city = searchParams.get("city") || undefined;
+  const isPopularClicked = searchParams.get("isPopularClicked") || undefined;
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [posterData, setPosterData] = useState<Poster[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -63,7 +65,7 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
             page,
             per_page,
             props.id,
-            props.isPopularClicked
+            isPopularClicked
           );
         } else {
           const mediatype = category;
@@ -75,10 +77,9 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
             state,
             city,
             mediatype,
-            props.isPopularClicked
+            isPopularClicked
           );
         }
-        setLoading(false);
 
         setTotalPages(Math.ceil(resData.totalLength / per_page));
         setPosterData(resData.resData);
@@ -92,20 +93,21 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
           }
         }
         setPageNumbers(pageNumbers);
+        setLoading(false);
       } catch (error: any) {
         setLoading(false);
         setError(error.message);
         console.error("Error fetching data:", error);
       }
     };
-
+    setLoading(true);
     fetchData();
-  }, [page, totalPages, searchParams, props]);
+  }, [page, totalPages, searchParams]);
 
   if (error || loading) {
     return (
       <div className="flex justify-center text-3xl font-poppins h-[260px] mt-16">
-        {error}
+        {error ? "Something Went Wrong" : ""}
         {loading && (
           <div className="rounded-full h-10 w-10 bg-gray-700 animate-ping"></div>
         )}
@@ -126,9 +128,9 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
 
   return (
     <>
-      <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-2 mx-auto justify-items-center ">
-        {!error &&
-          posterData.map((poster: Poster) => (
+      {!error && posterData.length > 0 ? (
+        <div className=" px-6 grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3   gap-2 mx-auto justify-items-center ">
+          {posterData.map((poster: Poster) => (
             <div
               className="mt-8 rounded-lg transform inline-block overflow-hidden transition-transform duration-300  hover:scale-130"
               key={poster._id}
@@ -139,10 +141,15 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
               {!props.id && <PosterItem {...poster} avgBooking={avgBooking} />}
             </div>
           ))}
-      </div>
+        </div>
+      ) : (
+        <div className="justify-center text-center text-3xl font-poppins h-[260px] mt-16">
+          Currently No Poster Available.
+        </div>
+      )}
       <div className="flex justify-center gap-2 mb-5 ">
         {page > totalPages ? (
-          <div>No more pages...</div>
+          <div></div>
         ) : (
           <div className="flex justify-center items-center mt-16">
             <div className="flex border-[2px] gap-4 rounded-[10px] border-black p-2">

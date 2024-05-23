@@ -66,7 +66,7 @@ const SignUp: React.FC = () => {
           className=" rounded-3xl"
           width={600}
           height={800}
-          priority
+          // priority
         />
       </div>
       <div className="w-full lg:w-3/5 mt-24">

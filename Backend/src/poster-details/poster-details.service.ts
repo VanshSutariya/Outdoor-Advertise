@@ -7,7 +7,6 @@ import { UpdatePosterDto } from './dto/updatePoster.dto';
 import { Query } from 'express-serve-static-core';
 import { v2 } from 'cloudinary';
 import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
-import { title } from 'process';
 @Injectable()
 export class PosterDetailsService {
   constructor(
@@ -23,75 +22,80 @@ export class PosterDetailsService {
 
   // get all posters
   async getAllPosters(query: Query, isPopularClicked: boolean = false) {
-    let DBQuery: any = {};
+    try {
+      let DBQuery: any = {};
 
-    if (query?.state) {
-      DBQuery['state'] = {
-        $regex: '^' + query?.state,
-        $options: 'i',
-      };
-    }
-    if (query?.city) {
-      DBQuery['city'] = { $regex: '^' + query?.city, $options: 'i' };
-    }
-    if (query?.address) {
-      DBQuery['address'] = { $regex: query?.address, $options: 'i' };
-    }
-    if (query?.mediatype) {
-      DBQuery['mediatype'] = query?.mediatype;
-    }
-    if (query?.createdBy) {
-      DBQuery['createdBy'] = query?.createdBy;
-    }
-    if (query?.status) {
-      DBQuery['status'] = query?.status;
-    }
+      if (query?.state) {
+        DBQuery['state'] = {
+          $regex: '^' + query?.state,
+          $options: 'i',
+        };
+      }
+      if (query?.city) {
+        DBQuery['city'] = { $regex: '^' + query?.city, $options: 'i' };
+      }
+      if (query?.address) {
+        DBQuery['address'] = { $regex: query?.address, $options: 'i' };
+      }
+      if (query?.mediatype) {
+        DBQuery['mediatype'] = query?.mediatype;
+      }
+      if (query?.createdBy) {
+        DBQuery['createdBy'] = query?.createdBy;
+      }
+      if (query?.status) {
+        DBQuery['status'] = query?.status;
+      }
 
-    if (query.status || query.isActive) {
-      DBQuery['isActive'] = false;
-    } else {
-      DBQuery['isActive'] = true;
-    }
+      if (query.status || query.isActive) {
+        DBQuery['isActive'] = false;
+      } else {
+        DBQuery['isActive'] = true;
+      }
 
-    if (isPopularClicked) {
+      if (isPopularClicked) {
+        const posters = await this.postersModel.find();
+        const totalBookings = posters.reduce(
+          (acc, poster) => acc + poster.totalBooking,
+          0,
+        );
+        const averageBooking = totalBookings / posters.length;
+        DBQuery['totalBooking'] = { $gt: averageBooking * 2 };
+      }
+
+      const resPerPage = Number(query?.per_page) || 0;
+      const currentPage = Number(query.page) || 1;
+      const skip = resPerPage * (currentPage - 1);
+
+      const resData = await this.postersModel
+        .find(DBQuery)
+        .limit(resPerPage)
+        .skip(skip);
+
+      if (!resData || resData.length === 0) {
+        return {
+          averageBooking: 0,
+          totalLength: 0,
+          resData: [],
+        };
+      }
+
+      const totalLength = await this.postersModel.countDocuments(DBQuery);
+
       const posters = await this.postersModel.find();
       const totalBookings = posters.reduce(
         (acc, poster) => acc + poster.totalBooking,
         0,
       );
       const averageBooking = totalBookings / posters.length;
-      DBQuery['totalBooking'] = { $gt: averageBooking };
-    }
 
-    const resPerPage = Number(query?.per_page) || 0;
-    const currentPage = Number(query.page) || 1;
-    const skip = resPerPage * (currentPage - 1);
-
-    const resData = await this.postersModel
-      .find(DBQuery)
-      .limit(resPerPage)
-      .skip(skip);
-
-    if (resData.length === 0) {
+      return { averageBooking, totalLength, resData };
+    } catch (error) {
       throw new HttpException(
-        'No posters available. Please try again later.',
-        400,
+        'Something went wrong. Please try again later.',
+        500,
       );
     }
-
-    const posters = await this.postersModel.find();
-    const totalBookings = posters.reduce(
-      (acc, poster) => acc + poster.totalBooking,
-      0,
-    );
-    const averageBooking = totalBookings / posters.length;
-
-    const totalLength = await this.postersModel.countDocuments(DBQuery);
-
-    if (totalLength <= 0) {
-      throw new Error('No posters available. Please try again later.');
-    }
-    return { averageBooking, totalLength, resData };
   }
 
   // Get One

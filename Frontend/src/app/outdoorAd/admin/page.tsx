@@ -31,11 +31,11 @@ interface TopPayment {
 
 export default function AdminHomePage() {
   const [topPayment, setTopPayments] = useState<TopPayment>();
-  const [totalRevenue, setTotalRevenue] = useState<number>();
-  const [todayEarning, setTodayEarning] = useState<number>();
+  const [totalRevenue, setTotalRevenue] = useState<number>(0);
+  const [todayEarning, setTodayEarning] = useState<number>(0);
   const [monthlyData, setMonthlyData] = useState<number[]>([]);
-  const [totalUsers, setTotalUsers] = useState<number>();
-  const [totalMembers, setTotalMembers] = useState<number>();
+  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [totalMembers, setTotalMembers] = useState<number>(0);
 
   const {
     userId,
@@ -76,8 +76,8 @@ export default function AdminHomePage() {
   }, [token, userId]);
 
   function formatRevenue(revenue: any) {
-    const crore = 10000000; // 1 crore = 10,000,000
-    const lakh = 100000; // 1 lakh = 100,000
+    const crore = 10000000;
+    const lakh = 100000;
 
     if (revenue >= crore) {
       return `₹${(revenue / crore).toFixed(2)} CR`;
@@ -110,7 +110,7 @@ export default function AdminHomePage() {
               <p className="text-2xl font-medium ">
                 {totalRevenue && totalRevenue !== null
                   ? formatRevenue(totalRevenue)
-                  : "₹0"}
+                  : "Loading..."}
               </p>
             </div>
 
@@ -122,7 +122,7 @@ export default function AdminHomePage() {
               <p className="text-2xl tracking-wider font-medium ">
                 {todayEarning && todayEarning !== null
                   ? formatRevenue(todayEarning)
-                  : "₹0"}
+                  : "Loading..."}
               </p>
             </div>
 
@@ -132,7 +132,7 @@ export default function AdminHomePage() {
                 <LuUsers className="md:ml-[145px] mt-1 text-gray-400" />
               </div>
               <p className="text-2xl font-medium ml-3">
-                {totalUsers !== null ? `+${totalUsers}` : "Loading..."}
+                {totalUsers !== null ? `${totalUsers}` : "Loading..."}
               </p>
             </div>
 
@@ -145,7 +145,7 @@ export default function AdminHomePage() {
                 />
               </div>
               <p className="text-2xl font-medium ml-2">
-                {totalMembers !== null ? `+${totalMembers}` : "Loading..."}
+                {totalMembers !== null ? `${totalMembers}` : "Loading..."}
               </p>
             </div>
           </div>

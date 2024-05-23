@@ -84,15 +84,18 @@ const NotificationPopUp: React.FC = () => {
           <h3 className="font-semibold font-inter text-lg text-red-500">
             Requests!
           </h3>
+          {!roleNotification && !postereNotification && (
+            <p className="py-4 font-poppins text-xl ">
+              Currently there are no request.
+            </p>
+          )}
           {roleNotification && (
             <p className="py-4 font-poppins text-xl ">
               Approve the users role Change requests.
             </p>
           )}
           {postereNotification && (
-            <p className="py-4 font-poppins text-xl ">
-              Approve the Created Posters.
-            </p>
+            <p className="py-4 font-poppins text-xl ">Approve the Posters.</p>
           )}
         </div>
         <form method="dialog" className="modal-backdrop">

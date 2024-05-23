@@ -7,7 +7,7 @@ interface PosterItemProps {
   lightingType: string;
   _id: string;
   id?: string;
-  totalBooking?: number;
+  totalBooking: number;
   avgBooking: number;
   mediatype: string;
 }
@@ -32,8 +32,8 @@ const PosterItem: React.FC<PosterItemProps> = (props) => {
           />
           {props.totalBooking !== undefined &&
             props.avgBooking !== undefined &&
-            props.totalBooking > props.avgBooking * 3 && (
-              <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-medium z-10">
+            props.totalBooking > Number(props.avgBooking * 2) && (
+              <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-medium ">
                 Popular
               </div>
             )}

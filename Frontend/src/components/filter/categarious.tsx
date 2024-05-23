@@ -77,6 +77,7 @@ const Categories = () => {
   return (
     <Container>
       <div
+        data-testid="categoriTest"
         className="
             flex 
             flex-row 

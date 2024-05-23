@@ -10,6 +10,7 @@ export default async function fetchUser(id: string): Promise<any> {
   if (!resData.ok) throw new Error("user id is not vaid.");
   return user;
 }
+
 export async function deletePosterById(
   id: string,
   token: string
@@ -27,7 +28,6 @@ export async function deletePosterById(
   return resData;
 }
 
-//-------------------------------------------------------------------------------------------
 export async function fetchAllPosters(id?: string): Promise<any[]> {
   let url = "http://localhost:4000/poster";
   if (id) {
@@ -40,6 +40,7 @@ export async function fetchAllPosters(id?: string): Promise<any[]> {
   const posters = await resData.json();
   return posters;
 }
+
 export async function fetchAllPoster(
   page: number,
   per_page: number,
@@ -83,7 +84,6 @@ export async function fetchAllPoster(
   const queryString = new URLSearchParams(queryParams).toString();
 
   url = `http://localhost:4000/poster?${queryString}`;
-  console.log(url);
 
   try {
     const resData = await fetch(url, {
@@ -441,4 +441,42 @@ export async function fetchMemberPosterStats(
   );
   const bookings = await resData.json();
   return bookings;
+}
+
+export async function updateCart(
+  userId: string,
+  posterId: string,
+  bodyData: any
+) {
+  const respData = await fetch(
+    `http://localhost:4000/cart/${userId}/${posterId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...bodyData }),
+    }
+  );
+  const updatedData = await respData.json();
+  console.log(updatedData);
+
+  if (!respData.ok) {
+    throw new Error("Cart cant updated.");
+  } else {
+    return { message: "Cart Successfully updated." };
+  }
+}
+
+export async function fetchCartData(userId: string) {
+  const cartRes = await fetch(`http://localhost:4000/cart?userId=${userId}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  const cartData = await cartRes.json();
+  if (!cartRes.ok) {
+    throw new Error("Failed to fetch cart data.");
+  }
+  return cartData;
 }

@@ -15,8 +15,9 @@ const SearchBar: React.FC = () => {
   const address = params.get("address") || "";
   const state = params.get("state") || "";
   const city = params.get("city") || "";
+  const isPopularClicked = params.get("isPopularClicked") === "true";
   const [showbtn, setShowBtn] = useState(false);
-  const [isPopularClicked, setIsPopularClicked] = useState(false);
+  const [isPopular, setIsPopular] = useState(isPopularClicked);
   const [formValues, setFormValues] = useState({
     location: address,
     state: state,
@@ -31,16 +32,16 @@ const SearchBar: React.FC = () => {
   });
 
   useEffect(() => {
-    setFormValues({
-      location: address,
-      state: state,
-      city: city,
-      mediatype: category,
-    });
+    // setFormValues({
+    //   location: address,
+    //   state: state,
+    //   city: city,
+    //   mediatype: category,
+    // });
 
     const paramsObj = qs.parse(params.toString());
     const hasParams = Object.keys(paramsObj).some((key) =>
-      ["address", "state", "city"].includes(key)
+      ["address", "state", "city", "popular"].includes(key)
     );
     setShowBtn(hasParams);
   }, [params]);
@@ -62,6 +63,7 @@ const SearchBar: React.FC = () => {
       state: formValues?.state,
       address: formValues?.location,
       category: formValues?.mediatype,
+      isPopularClicked: isPopular.toString(),
     };
 
     const url = qs.stringifyUrl(
@@ -81,13 +83,12 @@ const SearchBar: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
-    console.log(value, name);
 
     setFormValues({ ...formValues, [name]: value });
   };
 
   function handleClearBtn() {
-    setIsPopularClicked(false);
+    setIsPopular(false);
     window.history.replaceState({}, document.title, "/outdoorAd");
     router.replace("/outdoorAd", undefined);
     setFormValues({
@@ -106,12 +107,32 @@ const SearchBar: React.FC = () => {
   }
 
   const handleToggle = () => {
-    setIsPopularClicked(!isPopularClicked);
+    const newIsPopular = !isPopular;
+    setIsPopular(newIsPopular);
+
+    let currentQuery = {};
+    if (params) {
+      currentQuery = qs.parse(params.toString());
+    }
+
+    const updatedQuery = {
+      ...currentQuery,
+      isPopularClicked: newIsPopular ? "true" : "false",
+    };
+
+    const url = qs.stringifyUrl(
+      {
+        url: "/outdoorAd/",
+        query: updatedQuery,
+      },
+      { skipNull: true }
+    );
+    router.push(url);
   };
 
   return (
     <>
-      <div className="md:flex justify-center">
+      <div className="md:flex justify-center" data-testid="SearchBar">
         <form
           onSubmit={handleFormSubmit}
           className=" md:flex justify-center items-center font-inter pt-5 md:mr-6"
@@ -152,7 +173,10 @@ const SearchBar: React.FC = () => {
                 onToggle={handleToggle}
               />
             </div>
-            <button className="flex w-full md:w-[60px] mr-[4px] mt-[5px] md:h-14 h-[50px] items-center justify-center  text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600">
+            <button
+              type="submit"
+              className="flex w-full md:w-[60px] mr-[4px] mt-[5px] md:h-14 h-[50px] items-center justify-center  text-white pt-2 bg-red-600 rounded-full px-6 py-2 transition-all duration-250 ease-in-out hover:bg-red-500 active:bg-red-600"
+            >
               <div>
                 <FaSearch size={22} />
               </div>
@@ -172,10 +196,10 @@ const SearchBar: React.FC = () => {
         </div>
       </div>
 
-      <PosterGrid
+      {/* <PosterGrid
         key={JSON.stringify(search)}
         isPopularClicked={isPopularClicked ? "true" : "false"}
-      />
+      /> */}
     </>
   );
 };

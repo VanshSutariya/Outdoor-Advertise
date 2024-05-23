@@ -17,6 +17,7 @@ const authorizedUsers: AuthorizedUsers = {
   "/outdoorAd/dashboard": ["member"],
   "/outdoorAd/createPoster": ["admin", "member"],
   "/outdoorAd/account/orders": ["admin", "member", "user"],
+  "/outdoorAd/cart": ["admin", "member", "user"],
 };
 
 export default function middleware(req: NextRequest) {
@@ -61,6 +62,12 @@ export default function middleware(req: NextRequest) {
         ) {
           return NextResponse.next();
         }
+        if (
+          userRole === "user" &&
+          requestedRoute.startsWith("/outdoorAd/cart/editPoster")
+        ) {
+          return NextResponse.next();
+        }
         if (userRole !== "admin" && userRole !== "member") {
           const loginUrl = new URL("/outdoorAd/login", req.nextUrl.origin);
           return NextResponse.redirect(loginUrl.toString());
@@ -76,7 +83,7 @@ export default function middleware(req: NextRequest) {
         }
       }
     } catch (error) {
-      console.error("Warning decoding token:");
+      // console.error("Warning decoding token:");
     }
   } else if (
     protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))

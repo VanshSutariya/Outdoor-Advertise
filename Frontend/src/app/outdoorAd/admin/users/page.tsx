@@ -2,7 +2,6 @@
 import Sidebar from "@/components/admincomponents/sidebar";
 import { fetchUsers } from "@/utils/http";
 import React, { useEffect, useState } from "react";
-import { parseCookies } from "nookies";
 import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 const UserTable = () => {

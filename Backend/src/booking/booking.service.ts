@@ -246,7 +246,7 @@ export class BookingService {
     const yourPosters = await this.posterModel.aggregate([
       {
         $match: {
-          createdBy: new mongoose.Types.ObjectId(id),
+          createdBy: id,
         },
       },
       {

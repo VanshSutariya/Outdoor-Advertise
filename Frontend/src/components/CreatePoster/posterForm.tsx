@@ -40,7 +40,6 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
   const [editImg, setEditImg] = useState<boolean>(false);
   const [imgUrl, setImgUrl] = useState<string | null>("");
   const [newaddress, setAddress] = useState("");
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const {
     userId,
@@ -69,6 +68,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
     const fetchPosterDetails = async () => {
       try {
         const response = await fetchOnePoster(id);
+
         if (response) {
           setFormValues((prev) => {
             setImgUrl(response?.image);
@@ -85,15 +85,10 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
             newdata.perDayPrice = response.price;
             newdata.minQty = response.minQty;
             newdata.maxQty = response.maxQty;
-            const [heightStr, widthStr] = response?.size
-              .split("X")
-              .map((str: any) => str.trim());
+            newdata.height = parseInt(response.size.split("X")[0].trim());
+            newdata.width = parseInt(response.size.split("X")[1].trim());
+            setAddress(response.address);
 
-            // Extract numbers from the strings
-            const height = parseInt(heightStr);
-            const width = parseInt(widthStr);
-            newdata.height = height;
-            newdata.width = width;
             return newdata;
           });
         }
@@ -121,9 +116,16 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
     ),
     address: Yup.string().required("Address should not empty."),
     city: Yup.string()
-      .matches(/^[A-Za-z]+$/, "City must contain only letters")
-      .required("City is required")
+      .matches(
+        /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+        "City must contain only letters and spaces between words"
+      )
+      .required("City must be required")
       .max(20, "City must be at most 20 characters"),
+    state: Yup.string()
+      .matches(/^[A-Za-z]+$/, "State must contain only letters")
+      .required("State must be required")
+      .max(20, "State must be at most 20 characters"),
     mindays: Yup.number()
       .min(2, "Minimum days must be at least 2")
       .max(365, "Minimum days must be at most 365"),
@@ -194,44 +196,29 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
       const googleLatLng = await getLatLng(results[0]);
       const latLng = [googleLatLng.lat, googleLatLng.lng];
 
-      if (id) {
-        const resData = await fetch(`http://localhost:4000/poster/${id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ ...postdata, latLng }),
-        });
-        const response = await resData.json();
-        if (!resData.ok) {
-          throw new Error(response.message || "enter valid data");
-        }
-        toastFunction("success", "Poster Created Successfully!");
-        if (userRole === "member") {
-          router.push("/outdoorAd/dashboard/posters");
-        } else {
-          router.push("/outdoorAd/admin/posters");
-        }
-      } else {
-        const resData = await fetch("http://localhost:4000/poster/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ ...postdata, latLng }),
-        });
-        const response = await resData.json();
-
-        if (!resData.ok) {
-          throw new Error(response.message || "enter valid data");
-        }
-
-        toastFunction("success", "Poster Created Successfully!");
-
-        router.push("/outdoorAd/account");
-      }
+      const method = id ? "PATCH" : "POST";
+      const url = id
+        ? `http://localhost:4000/poster/${id}`
+        : "http://localhost:4000/poster/add";
+      const resData = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...postdata, latLng }),
+      });
+      const response = await resData.json();
+      if (!resData.ok) throw new Error(response.message || "Enter valid data.");
+      toastFunction(
+        "success",
+        `Poster ${id ? "updated" : "created"} successfully!`
+      );
+      router.push(
+        userRole === "member"
+          ? "/outdoorAd/dashboard/posters"
+          : "/outdoorAd/admin/posters"
+      );
     } catch (error: any) {
       if (error.inner) {
         const newErrors: { [key: string]: string } = {};
@@ -243,7 +230,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
         setErrors(newErrors);
       } else {
         setErrors({});
-        console.log(error.message);
+        // console.log(error.message);
         if (error.message === undefined) {
           toastFunction("warning", "Address is not valid.");
         } else {
@@ -341,6 +328,31 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
     });
   };
 
+  const handleSelect = (address: any) => {
+    setAddress(address);
+
+    geocodeByAddress(address).then((results) => {
+      const addressComponents = results[0].address_components;
+      let city = "";
+      let state = "";
+
+      addressComponents.forEach((component) => {
+        if (component.types.includes("locality")) {
+          city = component.long_name;
+        }
+        if (component.types.includes("administrative_area_level_1")) {
+          state = component.long_name;
+        }
+      });
+
+      setFormValues({
+        ...formValues,
+        ["city"]: city,
+        ["state"]: state,
+      });
+    });
+  };
+
   return (
     <>
       <div>
@@ -356,6 +368,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
       <main className=" pb-5">
         <div className=" flex justify-center items-center mb-6">
           <form
+            data-testid="createPosterForm"
             className="w-[800px] border-[2px] border-gray-100 shadow-xl rounded-xl md:p-4 "
             onSubmit={handleSubmit}
           >
@@ -466,7 +479,8 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
                 <PlacesAutocomplete
                   value={newaddress}
                   onChange={handlePlaceAutoChange}
-                  // onSelect={handleSelect}
+                  googleCallbackName="initMap"
+                  onSelect={handleSelect}
                 >
                   {({
                     getInputProps,
@@ -482,6 +496,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
                         Address
                       </label>
                       <input
+                        data-testid="addressTest"
                         {...getInputProps({
                           placeholder: "vesu cross road",
                         })}
@@ -529,6 +544,11 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
                   placeholder="gujarat"
                   label="State"
                 />
+                {errors.state && (
+                  <span className="text-red-500 ml-2 text-sm ">
+                    {errors.state}
+                  </span>
+                )}
               </div>
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                 <Input

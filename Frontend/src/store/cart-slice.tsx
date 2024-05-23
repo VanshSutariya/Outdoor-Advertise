@@ -136,6 +136,23 @@ const cartSlice = createSlice({
         console.error(error);
       }
     },
+    updateCartData(state, action) {
+      const updatedData = action.payload;
+      const itemIndex = state.items.findIndex(
+        (item) => updatedData.id === item.posterId
+      );
+      console.log(itemIndex, "itemindexxxxxxxxxxxxxxxxxxxxxxxxxx-----");
+
+      if (itemIndex !== -1) {
+        console.log(state.items, "itemssss");
+
+        state.items[itemIndex].bookingDate = updatedData.bookingDates;
+        state.items[itemIndex].customerPosterImage =
+          updatedData.customerPosterImage;
+        state.items[itemIndex].totalPrice = updatedData.finalTotalPrice;
+      }
+      console.log(state.items, "||||||||||||||||||||||||||||||||||");
+    },
   },
 });
 

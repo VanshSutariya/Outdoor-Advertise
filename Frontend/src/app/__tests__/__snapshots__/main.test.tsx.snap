@@ -1,0 +1,591 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CreatePoster Page renders the CreatePoster form 1`] = `
+<div>
+   
+  <div>
+    <a
+      class=" text-lg md:px-[60px] pt-3 flex text-blue-600 hover:text-blue-700 active:text-blue-500 "
+      href="/outdoorAd/account"
+    >
+      <p
+        class="hover:scale-110 active:scale-95 duration-150 flex"
+      >
+        <svg
+          fill="currentColor"
+          height="30"
+          stroke="currentColor"
+          stroke-width="0"
+          viewBox="0 0 512 512"
+          width="30"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M216.4 163.7c5.1 5 5.1 13.3.1 18.4L155.8 243h231.3c7.1 0 12.9 5.8 12.9 13s-5.8 13-12.9 13H155.8l60.8 60.9c5 5.1 4.9 13.3-.1 18.4-5.1 5-13.2 5-18.3-.1l-82.4-83c-1.1-1.2-2-2.5-2.7-4.1-.7-1.6-1-3.3-1-5 0-3.4 1.3-6.6 3.7-9.1l82.4-83c4.9-5.2 13.1-5.3 18.2-.3z"
+          />
+        </svg>
+         Back
+      </p>
+    </a>
+  </div>
+  <main
+    class=" pb-5"
+  >
+    <div
+      class=" flex justify-center items-center mb-6"
+    >
+      <form
+        class="w-[800px] border-[2px] border-gray-100 shadow-xl rounded-xl md:p-4 "
+        data-testid="createPosterForm"
+      >
+        <div
+          class="flex justify-center items-center pb-[5px] md:-mt-3 "
+        >
+          <h1
+            class="text-4xl mt-3 tracking-wide md:pl-5 font-inter text-center md:w-full "
+          >
+            Create Your Poster
+          </h1>
+          <div
+            class=" flex  justify-end md:pr-12"
+          >
+            <img
+              alt=""
+              class="h-20 w-20   "
+              src="/billboard.png"
+            />
+          </div>
+        </div>
+        <div
+          class=" flex flex-wrap -mx-3 mb-6"
+        >
+          <div
+            class="w-full md:w-2/5 px-3"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="title"
+            >
+              Title
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="title"
+              min="1"
+              name="title"
+              placeholder="shivranjini, ahmedabad"
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="w-full md:w-[240px] px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block tracking-wide font-poppins text-sm font-bold mb-2"
+              for="mediatype"
+            >
+              MediaType
+            </label>
+            <div
+              class="relative"
+            >
+              <select
+                class="appearance-none font-poppins block w-full bg-slate-100 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+                id="mediatype"
+                name="mediatype"
+              >
+                <option
+                  value="Poles"
+                >
+                  Poles
+                </option>
+                <option
+                  value="Airports"
+                >
+                  Airports
+                </option>
+                <option
+                  value="RailwayPlatforms"
+                >
+                  RailwayPlatforms
+                </option>
+                <option
+                  value="Rickshaws"
+                >
+                  Rickshaws
+                </option>
+                <option
+                  value="Billboard"
+                >
+                  Billboard
+                </option>
+                <option
+                  value="BusStands"
+                >
+                  BusStands
+                </option>
+                <option
+                  value="ShoppingMalls"
+                >
+                  ShoppingMalls
+                </option>
+                <option
+                  value="Footoverbridges"
+                >
+                  Footoverbridges
+                </option>
+                <option
+                  value="Buildings"
+                >
+                  Buildings
+                </option>
+                <option
+                  value="Buses"
+                >
+                  Buses
+                </option>
+              </select>
+              <div
+                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black"
+              >
+                <svg
+                  class="fill-current h-4 w-4"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div
+            class="w-full md:w-[230px] px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block tracking-wide font-poppins text-sm font-bold mb-2"
+              for="lightingType"
+            >
+              LightingType
+            </label>
+            <div
+              class="relative"
+            >
+              <select
+                class="appearance-none font-poppins block w-full bg-slate-100 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+                id="lightingType"
+                name="lightingType"
+              >
+                <option
+                  value="FRONT-LIGHTING"
+                >
+                  FRONT-LIGHTING
+                </option>
+                <option
+                  value="BACK-LIGHTING"
+                >
+                  BACK-LIGHTING
+                </option>
+                <option
+                  value="LED-SCREEN"
+                >
+                  LED-SCREEN
+                </option>
+                <option
+                  value="NO-LIGHTING"
+                >
+                  NO-LIGHTING
+                </option>
+              </select>
+              <div
+                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black"
+              >
+                <svg
+                  class="fill-current h-4 w-4"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class=" flex flex-wrap -mx-3 mb-6"
+        >
+          <div
+            class="w-full md:w-1/2 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="minQty"
+            >
+              Minimum Poles
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="minQty"
+              min="1"
+              name="minQty"
+              placeholder="1"
+              type="number"
+              value="1"
+            />
+          </div>
+          <div
+            class="w-full md:w-1/2 px-3"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="maxQty"
+            >
+              Maximum Poles
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="maxQty"
+              min="1"
+              name="maxQty"
+              placeholder="10"
+              type="number"
+              value="1"
+            />
+          </div>
+        </div>
+        <div
+          class=" flex flex-wrap -mx-3 mb-6"
+        >
+          <div
+            class="w-full md:w-2/3 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="landmark"
+            >
+              Landmark
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="landmark"
+              min="1"
+              name="landmark"
+              placeholder="vesu cross road"
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="w-full md:w-1/3 px-3"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="facingFrom"
+            >
+              Facing Form
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="facingFrom"
+              min="1"
+              name="facingFrom"
+              placeholder="phonewala"
+              type="text"
+              value=""
+            />
+          </div>
+        </div>
+        <div
+          class="flex flex-wrap -mx-3 mb-3"
+        >
+          <div
+            class="w-full px-3"
+          >
+            <div>
+              <label
+                class="block tracking-wide font-poppins text-sm font-bold mb-2"
+                for="Address"
+              >
+                Address
+              </label>
+              <input
+                aria-autocomplete="list"
+                aria-expanded="false"
+                autocomplete="off"
+                class="appearance-none font-poppins block w-full hover:bg-slate-200 bg-slate-100 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-100 focus:border-gray-100"
+                data-testid="addressTest"
+                disabled=""
+                placeholder="vesu cross road"
+                role="combobox"
+                type="text"
+                value=""
+              />
+              <div
+                class="relative"
+              >
+                <div
+                  class="absolute top-full left-0 right-0 bg-white border border-gray-300 z-10 max-h-52 overflow-y-auto"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex flex-wrap -mx-3 mb-6"
+        >
+          <div
+            class="w-full md:w-1/3 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="state"
+            >
+              State
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="state"
+              min="1"
+              name="state"
+              placeholder="gujarat"
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="w-full md:w-1/3 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="city"
+            >
+              City
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="city"
+              min="1"
+              name="city"
+              placeholder="ahmedabad"
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="w-full md:w-1/3 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="mindays"
+            >
+              Min Days
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="mindays"
+              min="1"
+              name="mindays"
+              placeholder="5"
+              type="number"
+              value="2"
+            />
+          </div>
+        </div>
+        <div
+          class="flex flex-wrap -mx-3 mb-6"
+        >
+          <div
+            class="w-full md:w-1/3 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="perDayPrice"
+            >
+              Per Day Price
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="perDayPrice"
+              min="1"
+              name="perDayPrice"
+              placeholder="5000"
+              type="number"
+              value="1"
+            />
+          </div>
+          <div
+            class="w-full md:w-1/3 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="height"
+            >
+              Height In Foot
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="height"
+              min="1"
+              name="height"
+              placeholder="30"
+              type="number"
+              value="1"
+            />
+          </div>
+          <div
+            class="w-full md:w-1/3 px-3 mb-6 md:mb-0"
+          >
+            <label
+              class="block  tracking-wide font-poppins text-sm font-bold mb-2"
+              for="width"
+            >
+              Width In Foot
+            </label>
+            <input
+              class="appearance-none font-poppins block w-full bg-slate-100 hover:bg-slate-200 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:bg-slate-200 focus:border-gray-100"
+              id="width"
+              min="1"
+              name="width"
+              placeholder="30"
+              type="number"
+              value="1"
+            />
+          </div>
+        </div>
+        <div
+          class="flex  items-center font-poppins "
+        >
+          <div
+            class="w-full md:w-3/4 justify-center mb-3 md:mb-0"
+          >
+            <div
+              class="flex justify-center"
+            >
+              <input
+                class="w-full hidden "
+                id="file-upload"
+                type="file"
+              />
+              <label
+                class="bg-orange-400  cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2  rounded-lg "
+                for="file-upload"
+              >
+                Choose file
+              </label>
+            </div>
+          </div>
+          <div
+            class="w-full md:w-1/4 flex justify-end pr-10 mb-3 md:mb-0"
+          >
+            <button
+              class="px-5 py-2 rounded-xl text-xl text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+              type="submit"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+`;
+
+exports[`Main Home Page renders Header Page 1`] = `
+<div>
+   
+  <nav
+    class="flex justify-between items-center px-4 pb-2 tracking-wide border-b-[1px]"
+  >
+    <div
+      class="flex items-center"
+      data-testid="headertest"
+    >
+      <a
+        class="flex items-center"
+        href="/outdoorAd"
+      >
+        <img
+          alt="logo"
+          class="w-full md:w-[130px] h-[60px]"
+          src="/logo.png"
+        />
+        <span
+          class=" w-full px-3 mr-5 font-bold md:text-xl text-blue-950"
+        >
+          OutdoorAdvertise
+        </span>
+      </a>
+    </div>
+    <div
+      class="md:hidden flex cursor-pointer max-w-sm"
+    >
+      <div
+        class="flex-1 ml-auto"
+      >
+        <span
+          class="text-black text-4xl"
+        >
+          ☰
+        </span>
+      </div>
+    </div>
+    <div
+      class="container hidden mx-auto md:flex justify-between items-center"
+    >
+      <div
+        class="flex items-center space-x-2"
+      >
+        <div
+          class="hidden md:flex pt-1 font-inter  text-lg space-x-4"
+        >
+          <a
+            href="/outdoorAd"
+          >
+            <span
+              class="text-black"
+            >
+              Home
+            </span>
+          </a>
+          <a
+            href="/outdoorAd/contactUs"
+          >
+            <span
+              class="text-black"
+            >
+              Contact
+            </span>
+          </a>
+        </div>
+      </div>
+      <div
+        class="md:flex hidden items-center font-semibold space-x-4"
+      >
+        <a
+          href="/outdoorAd/login"
+        >
+          <button
+            class="text-black  border-2 border-black hover:bg-gray-200 active:bg-gray-300 px-4 py-2 rounded-3xl"
+          >
+            Login
+          </button>
+        </a>
+        <a
+          href="/outdoorAd/register"
+        >
+          <button
+            class="text-black  border-2 border-black hover:bg-gray-200 active:bg-gray-300 px-4 py-2 rounded-3xl"
+          >
+            Register
+          </button>
+        </a>
+      </div>
+    </div>
+  </nav>
+</div>
+`;

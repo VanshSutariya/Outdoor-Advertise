@@ -41,7 +41,6 @@ export class StripeService {
       success_url: 'http://localhost:3000/outdoorAd/success',
       cancel_url: 'http://localhost:3000/outdoorAd/cart',
     });
-    // console.log('session', session);
 
     return session.url;
   }

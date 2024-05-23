@@ -7,34 +7,26 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import useFindWidth from "../hooks/useWidth";
 import { useSelector } from "react-redux";
-import Billing from "./billing";
 import { RootState } from "@/store";
+import BillingPoster from "./billingPoster";
 
 interface DatePickerProps {
   id: string;
-  image: string;
-  title: string;
-  address: string;
   price: number;
   minDays: number;
   mediatype: string | boolean;
   minQty: number;
   maxQty: number;
   bookingDate: string[];
-  createdBy: string;
 }
-const DatePicker: React.FC<DatePickerProps> = ({
+const DatePickerCart: React.FC<DatePickerProps> = ({
   id,
-  image,
-  title,
-  address,
   price,
   minDays,
   mediatype,
   minQty,
   maxQty,
   bookingDate,
-  createdBy,
 }) => {
   const windowWidth = useFindWidth();
   const [diffInDays, setDiffInDays] = useState<number>(0);
@@ -44,6 +36,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const { isLoggedIn }: { isLoggedIn: boolean } = useSelector(
     (state: RootState) => state.auth
   );
+
+  const { items } = useSelector((state: RootState) => state.cart);
+
+  const existingItem = items.find((item) => item.posterId === id);
+  let matchingItems: any;
+  if (existingItem) {
+    matchingItems = items.filter((item) => item.posterId === id);
+  }
 
   const calculateMinDate = (): Date => {
     let nextAvailableDate = new Date();
@@ -79,6 +79,24 @@ const DatePicker: React.FC<DatePickerProps> = ({
       key: "selection",
     },
   ]);
+
+  useEffect(() => {
+    if (existingItem) {
+      const newCartStartDate = matchingItems[0].bookingDate;
+
+      const parsedStartDate = new Date(newCartStartDate[0]);
+      const parsedEndDate = new Date(
+        newCartStartDate[newCartStartDate.length - 1]
+      );
+      setState([
+        {
+          startDate: parsedStartDate,
+          endDate: parsedEndDate,
+          key: "selection",
+        },
+      ]);
+    }
+  }, [existingItem]);
 
   const NextAvailableDate = (): Date => {
     let nextAvailableDate = new Date();
@@ -149,16 +167,12 @@ const DatePicker: React.FC<DatePickerProps> = ({
             </button>
           </div>
         </div>
-        <Billing
+        <BillingPoster
           id={id}
-          title={title}
-          image={image}
           price={price}
           state={state}
           maxQty={maxQty}
           minQty={minQty}
-          createdBy={createdBy}
-          address={address}
           minDays={minDays}
           noOfAuto={noOfAuto}
           mediatype={mediatype}
@@ -173,4 +187,4 @@ const DatePicker: React.FC<DatePickerProps> = ({
   );
 };
 
-export default DatePicker;
+export default DatePickerCart;

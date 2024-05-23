@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { FaUserLarge } from "react-icons/fa6";
 import { RootState } from "@/store";
@@ -40,11 +40,11 @@ const Header: React.FC = () => {
   return (
     <>
       <nav className="flex justify-between items-center px-4 pb-2 tracking-wide border-b-[1px]">
-        <div className="flex items-center">
+        <div data-testid="headertest" className="flex items-center">
           <Link href="/outdoorAd" className="flex items-center">
             <img
               src="/logo.png"
-              alt="Logo"
+              alt="logo"
               className="w-full md:w-[130px] h-[60px]"
             />
 
@@ -58,12 +58,12 @@ const Header: React.FC = () => {
           onClick={handleMobileMenuToggle}
         >
           {isLoggedIn && userId && (
-            <div className="  sm:flex mr-4 md:hidden items-center font-semibold space-x-4">
+            <div className="sm:flex mr-4 md:hidden items-center font-semibold space-x-4">
               <div className='flex flex-col items-center justify-center w-full"'>
                 <Link href="/outdoorAd/cart">
                   <img
                     src="/shopping-cart.png"
-                    alt="Logo"
+                    alt="shoppingCart"
                     className=" h-[35px]"
                   />
                 </Link>

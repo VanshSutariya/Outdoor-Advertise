@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -10,8 +10,9 @@ import { useDispatch } from "react-redux";
 import { decode } from "jsonwebtoken";
 import ForgotPassword from "./forgetPasswordPopUp";
 import toastFunction from "../reactToast/toast";
-import fetchUser from "@/utils/http";
+import fetchUser, { fetchCartData } from "@/utils/http";
 import { loginIn } from "@/store/auth-slice";
+import { cartActions } from "@/store/cart-slice";
 
 const SignIn: React.FC = () => {
   const router = useRouter();
@@ -50,7 +51,10 @@ const SignIn: React.FC = () => {
         const fetchUserFunc = async () => {
           const userDetail = await fetchUser(decodedToken.id);
           const data = { userDetail, resData };
+          const userId = decodedToken.id;
           dispatch(loginIn(data));
+          const cartData = await fetchCartData(userId);
+          dispatch(cartActions.setCartItems(cartData));
 
           toastFunction("success", "Login Successful!");
           if (userDetail?.role === "admin") {
@@ -86,6 +90,7 @@ const SignIn: React.FC = () => {
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
+          data-testid="loginSubmit"
           className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2"
         >
           <div className="flex flex-col ">
@@ -93,6 +98,7 @@ const SignIn: React.FC = () => {
             <input
               {...register("email")}
               name="email"
+              data-testid="emailtest"
               placeholder="name@mail.com"
               className=" p-2 mb-2 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
             />
@@ -104,6 +110,7 @@ const SignIn: React.FC = () => {
               {...register("password")}
               name="password"
               type="password"
+              data-testid="passwordtest"
               placeholder="*******"
               className=" p-2 mb-2 rounded-lg bg-slate-100 border-gray-500 focus:!border-t-gray-900"
             />
@@ -134,13 +141,10 @@ const SignIn: React.FC = () => {
         </form>
       </div>
       <div className="w-2/5 h-full hidden lg:block">
-        <Image
+        <img
           src="/pattern3.png"
           alt="signin image"
-          className="rounded-3xl"
-          width={600}
-          height={800}
-          priority
+          className="rounded-3xl w-[600px] h-[800px]"
         />
         {showForgotpassword && (
           <ForgotPassword onClose={closeForgotPasswordPopup} />

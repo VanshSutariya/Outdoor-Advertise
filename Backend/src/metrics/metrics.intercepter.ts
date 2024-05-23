@@ -31,7 +31,7 @@ export class HttpMetricsInterceptor implements NestInterceptor {
         5,
         10,
         Infinity,
-      ], // Adjust as needed
+      ],
     });
 
     this.httpRequestCounter = new Counter({
@@ -40,7 +40,6 @@ export class HttpMetricsInterceptor implements NestInterceptor {
       labelNames: ['method', 'status_code', 'path'],
     });
 
-    // Register the metrics with the default registry
     register.registerMetric(this.httpRequestDurationSeconds);
     register.registerMetric(this.httpRequestCounter);
   }
@@ -48,7 +47,7 @@ export class HttpMetricsInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const method = request.method;
-    const path = request.route?.path || request.url; // Fallback to URL if route is not defined
+    const path = request.route?.path || request.url;
 
     const end = this.httpRequestDurationSeconds.startTimer({ method, path });
 

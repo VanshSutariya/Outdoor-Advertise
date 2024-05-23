@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
 
+import React, { useEffect, useState } from "react";
 import { BsCurrencyRupee } from "react-icons/bs";
 import { LuCreditCard } from "react-icons/lu";
 import { GiReceiveMoney } from "react-icons/gi";
@@ -9,11 +9,7 @@ import numeral from "numeral";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import { RootState } from "@/store";
-import {
-  fetchAllUsers,
-  fetchMemberPosterStats,
-  fetchMonthlyData,
-} from "@/utils/http";
+import { fetchMemberPosterStats, fetchMonthlyData } from "@/utils/http";
 import Sidebar from "@/components/admincomponents/sidebar";
 import ProfileDropDown from "@/components/admincomponents/profileDropDown";
 import BarGraph from "@/components/admincomponents/barChart";
@@ -55,6 +51,7 @@ export default function DashboardPage() {
         if (userId) {
           const id = userId;
           const data = await fetchMemberPosterStats(id, token);
+
           setMemberStats((prev) => {
             const newState = { ...prev };
             newState.totalRevenue = data.currentYearTotalRevenue;
@@ -113,7 +110,7 @@ export default function DashboardPage() {
               <p className="text-2xl ml-1 font-medium ">
                 {memberStats.totalRevenue && memberStats.totalRevenue !== null
                   ? formatRevenue(memberStats.totalRevenue)
-                  : "₹ 0"}
+                  : "Loading..."}
               </p>
             </div>
 
@@ -129,7 +126,7 @@ export default function DashboardPage() {
                 {memberStats.currentMonthRevenue &&
                 memberStats.currentMonthRevenue !== null
                   ? formatRevenue(memberStats.currentMonthRevenue)
-                  : "₹0"}
+                  : "Loading..."}
               </p>
             </div>
 
@@ -141,7 +138,7 @@ export default function DashboardPage() {
               <p className="text-2xl ml-2 tracking-wider font-medium ">
                 {memberStats.todayEarning && memberStats.todayEarning !== null
                   ? formatRevenue(memberStats.todayEarning)
-                  : "₹0"}
+                  : "Loading..."}
               </p>
             </div>
 
@@ -155,8 +152,8 @@ export default function DashboardPage() {
               </div>
               <p className="text-2xl font-medium ml-2">
                 {memberStats.totalPosters && memberStats.totalPosters !== null
-                  ? `+${memberStats.totalPosters}`
-                  : "+0"}
+                  ? `${memberStats.totalPosters}`
+                  : "Loading..."}
               </p>
             </div>
           </div>
