@@ -9,14 +9,14 @@ import toastFunction from "../reactToast/toast";
 import SelectInput from "./elements/selectInput";
 import { RootState } from "@/store";
 import { fetchOnePoster } from "@/utils/http";
-import { FaRegEdit } from "react-icons/fa";
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
 } from "react-places-autocomplete";
+import ImageUploaderForm from "./elements/imageUploadForm";
 
 interface PosterFormProps {
-  id?: string; // Make id optional
+  id?: string;
 }
 interface FormValues {
   title: string;
@@ -37,7 +37,6 @@ interface FormValues {
 
 const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
   const router = useRouter();
-  const [editImg, setEditImg] = useState<boolean>(false);
   const [imgUrl, setImgUrl] = useState<string | null>("");
   const [newaddress, setAddress] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -286,40 +285,6 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
     return null;
   };
 
-  const handlEditImage = () => {
-    setEditImg((prev) => !prev);
-    setImgUrl("");
-  };
-  const GenerateImage: any = async (e: { target: { files: any[] } }) => {
-    toastFunction("info", "Image uploading...");
-    const file: File | null = e.target.files?.[0];
-    const formData = new FormData();
-    if (file) {
-      formData.append("image", file);
-    }
-
-    try {
-      const response = await fetch(`http://localhost:4000/poster/upload`, {
-        method: "POST",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: formData,
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toastFunction("success", "Image Uploaded Successfully.");
-        setImgUrl(data.secure_url);
-        setEditImg(true);
-      } else {
-        toastFunction("warning", "Image upload failed!. Try again");
-        console.error("Failed To Fetch Image", data.errors);
-      }
-    } catch (error: any) {
-      toastFunction("error", error);
-    }
-  };
-
   const handlePlaceAutoChange = (address: string) => {
     setAddress(address);
     setFormValues({
@@ -351,6 +316,9 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
         ["state"]: state,
       });
     });
+  };
+  const handleImageUpload = (url: string | null) => {
+    setImgUrl(url);
   };
 
   return (
@@ -418,8 +386,8 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
                   label="MediaType"
                 />
               </div>
-              {/* lightingtype ------------------------- */}
 
+              {/* lightingtype ------------------------- */}
               <div className="w-full md:w-[230px] px-3 mb-6 md:mb-0">
                 <SelectInput
                   name="lightingType"
@@ -632,40 +600,7 @@ const PosterForm: React.FC<PosterFormProps> = ({ id }) => {
             {/* upload button  */}
             <div className="flex  items-center font-poppins ">
               <div className="w-full md:w-3/4 justify-center mb-3 md:mb-0">
-                {!editImg && (
-                  <div className="flex justify-center">
-                    <input
-                      type="file"
-                      id="file-upload"
-                      onChange={GenerateImage}
-                      className="w-full hidden "
-                    />
-                    <label
-                      htmlFor="file-upload"
-                      className="bg-orange-400  cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2  rounded-lg "
-                    >
-                      Choose file
-                    </label>
-                  </div>
-                )}
-                {editImg && (
-                  <>
-                    <div className=" text-center text-xl  transition-all font-semibold text-green-500 ">
-                      Image Uploaded Successfully
-                    </div>
-                    <div className="flex justify-center">
-                      <p className="pt-[4px] items-center text-red-500  font-medium text-lg">
-                        Edit Image
-                      </p>
-                      <button
-                        onClick={handlEditImage}
-                        className="ml-3 hover:text-orange-600"
-                      >
-                        <FaRegEdit size={28} />
-                      </button>
-                    </div>
-                  </>
-                )}
+                <ImageUploaderForm onImageUpload={handleImageUpload} />
               </div>
               <div className="w-full md:w-1/4 flex justify-end pr-10 mb-3 md:mb-0">
                 <button

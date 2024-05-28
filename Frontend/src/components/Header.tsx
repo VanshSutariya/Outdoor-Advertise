@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import { FaUserLarge } from "react-icons/fa6";
@@ -48,7 +49,7 @@ const Header: React.FC = () => {
               className="w-full md:w-[130px] h-[60px]"
             />
 
-            <span className=" w-full px-3 mr-5 font-bold md:text-xl text-blue-950">
+            <span className="hidden font-poppins font-semibold xs:block w-full px-3 mr-5  md:text-xl text-blue-950">
               OutdoorAdvertise
             </span>
           </Link>

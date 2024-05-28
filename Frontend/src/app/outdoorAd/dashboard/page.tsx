@@ -84,6 +84,7 @@ export default function DashboardPage() {
       return "₹" + numeral(revenue).format("0,0.00");
     }
   }
+  console.log(memberStats);
 
   return (
     <>
@@ -93,7 +94,7 @@ export default function DashboardPage() {
             <p>Dashboard</p>
             <Link
               href="/outdoorAd"
-              className="md:ml-20 md: mt-1 text-xl font-normal font-poppins"
+              className="md:ml-20 md: mt-1 text-xl font-medium font-poppins"
             >
               Home
             </Link>
@@ -136,7 +137,7 @@ export default function DashboardPage() {
                 <LuCreditCard className="md:ml-20 text-gray-400 mt-1" />
               </div>
               <p className="text-2xl ml-2 tracking-wider font-medium ">
-                {memberStats.todayEarning && memberStats.todayEarning !== null
+                {memberStats
                   ? formatRevenue(memberStats.todayEarning)
                   : "Loading..."}
               </p>
@@ -151,17 +152,16 @@ export default function DashboardPage() {
                 />
               </div>
               <p className="text-2xl font-medium ml-2">
-                {memberStats.totalPosters && memberStats.totalPosters !== null
+                {memberStats.totalPosters !== null
                   ? `${memberStats.totalPosters}`
                   : "Loading..."}
               </p>
             </div>
           </div>
 
-          <div className="mt-8 md:flex md:gap-3 ">
+          <div className="mt-8 grid  md:grid-cols-2 md:gap-3 ">
             <BarGraph monthlyData={monthlyData} />
-
-            <div className=" border-[2px] border-gray-200  p-3 rounded-xl md:w-full">
+            <div className=" border-[2px] border-gray-200  p-3 rounded-xl ">
               <div className="mb-4">
                 <h1 className="text-lg">Recent Sales</h1>
                 <p className="text-sm text-gray-400">
@@ -174,9 +174,9 @@ export default function DashboardPage() {
                   topPayment.topMonthlyPayment?.map((item, index) => (
                     <li
                       key={index}
-                      className="md:flex items-center justify-between py-2 border-b mb-3"
+                      className="flex items-center justify-between py-2 border-b mb-3"
                     >
-                      <div className="md:flex items-center">
+                      <div className="flex items-center">
                         <img
                           src={item.userImage ? item.userImage : "/profile.png"}
                           alt="Avatar"

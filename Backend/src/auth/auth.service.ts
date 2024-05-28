@@ -114,6 +114,32 @@ export class AuthService {
 
     return { token };
   }
+  async googleLogin(token: string): Promise<{ token: string }> {
+    const respLogin = await fetch(
+      `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    const response = await respLogin.json();
+
+    let user = await this.userModel.findOne({ email: response.email });
+
+    if (!user) {
+      throw new UnauthorizedException('Please register first to login.');
+    }
+
+    const jwtToken = this.jwtService.sign(
+      { id: user._id, role: user.role, name: user.name },
+      { expiresIn: process.env.JWT_EXPIRES, secret: process.env.JWT_SECRET },
+    );
+
+    return { token: jwtToken };
+  }
 
   async resetToken(
     userid: number,

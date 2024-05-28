@@ -383,12 +383,15 @@ export async function sendRoleChangeRequest(_id?: string) {
   return newRoleChangeReq;
 }
 
-export async function UserRoleChangeStatus(userId: any) {
+export async function UserRoleChangeStatus(userId: any, token: string) {
   const data = await fetch(
     `http://localhost:4000/userRoleChange?user=${userId}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   const newData = await data.json();

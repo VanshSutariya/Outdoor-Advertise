@@ -5,9 +5,21 @@ import { fetchAllBookingsOrders } from "@/utils/http";
 import Sidebar from "@/components/admincomponents/sidebar";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { differenceInDays } from "date-fns";
 
+interface Orders {
+  _id: string;
+  title: string;
+  image: string;
+  address: string;
+  bookingDate: string[];
+  totalPrice: number;
+  posterId: {
+    price: number;
+  };
+}
 const OrderAdminPage = () => {
-  const [orders, setOrders] = useState<any[]>();
+  const [orders, setOrders] = useState<Orders[]>();
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -70,6 +82,15 @@ const OrderAdminPage = () => {
       return "₹" + numeral(revenue).format("0,0.00");
     }
   }
+  function calculateQuantity(
+    totalPrice: number,
+    price: number,
+    EndDate: Date,
+    StartDate: Date
+  ) {
+    const noOfDays = differenceInDays(EndDate, StartDate) + 1;
+    return Math.round(totalPrice / (price * 1.05 * noOfDays));
+  }
   return (
     <Sidebar>
       <div className="overflow-x-auto">
@@ -82,8 +103,11 @@ const OrderAdminPage = () => {
           <table className="table-auto min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 w-2/3 font-poppins text-left text-md font-medium text-gray-500 tracking-wider">
+                <th className="px-6 py-3 w-[750px] font-poppins text-left text-md font-medium text-gray-500 tracking-wider">
                   Product
+                </th>
+                <th className="px-6 py-3 font-poppins text-left text-md font-medium text-gray-500 tracking-wider">
+                  Quantity
                 </th>
                 <th className="px-6 py-3 font-poppins text-left text-md font-medium text-gray-500 tracking-wider">
                   BookingDates
@@ -111,6 +135,14 @@ const OrderAdminPage = () => {
                           </p>
                         </span>
                       </div>
+                    </td>
+                    <td className="text-[21px] font-semibold text-center">
+                      {calculateQuantity(
+                        item.totalPrice,
+                        item.posterId.price,
+                        new Date(item.bookingDate[item.bookingDate.length - 1]),
+                        new Date(item.bookingDate[0])
+                      )}
                     </td>
                     <td>
                       {item.bookingDate[0] +

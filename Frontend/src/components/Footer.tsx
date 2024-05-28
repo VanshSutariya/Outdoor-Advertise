@@ -7,8 +7,12 @@ const Footer: React.FC = () => {
       <div className="container px-5 pt-20 -mt-10 mx-auto flex md:items-center lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
         <div className="w-64 md:pl-3 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
           <div className="flex title-font  items-center md:justify-start justify-center ">
-            <img src="/logo.png" alt="logo" className="w-auto h-[60px]" />
-            <p className="title-font tracking-widest text-sm mb-2 mx-5 font-bold ">
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-[60px] h-[60px] -mt-4 mr-2"
+            />
+            <p className=" title-font tracking-widest text-sm mb-2  font-bold ">
               Outdoor Advertise
             </p>
           </div>

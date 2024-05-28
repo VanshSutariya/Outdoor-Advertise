@@ -82,6 +82,7 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
         }
 
         setTotalPages(Math.ceil(resData.totalLength / per_page));
+        setLoading(false);
         setPosterData(resData.resData);
         setAvgBooking(resData.averageBooking);
 
@@ -93,7 +94,6 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
           }
         }
         setPageNumbers(pageNumbers);
-        setLoading(false);
       } catch (error: any) {
         setLoading(false);
         setError(error.message);
@@ -106,8 +106,8 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
 
   if (error || loading) {
     return (
-      <div className="flex justify-center text-3xl font-poppins h-[260px] mt-16">
-        {error ? "Something Went Wrong" : ""}
+      <div className="flex justify-center text-3xl font-poppins h-screen mt-16">
+        {error ? "Something Went Wrong. Please Try Again Later." : ""}
         {loading && (
           <div className="rounded-full h-10 w-10 bg-gray-700 animate-ping"></div>
         )}

@@ -153,7 +153,7 @@ export default function CartPage() {
               <div className="bg-slate-100 rounded-lg shadow-md p-6">
                 <h2 className="text-lg font-semibold mb-4">Summary</h2>
                 <div className="flex justify-between mb-2">
-                  <span>No. Of Posters </span>
+                  <span>No. Of Cart Items </span>
                   <span> {items ? items.length : 0}</span>
                 </div>
 

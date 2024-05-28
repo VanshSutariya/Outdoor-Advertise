@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import DatePicker from "./date-range-picker";
 import { CiLocationOn } from "react-icons/ci";
@@ -18,6 +19,7 @@ interface PosterData {
   lightingType: string;
   address: string;
   facingFrom: string;
+  landmark: string;
   minimumDays: number;
   mediatype: string;
   minQty: number;
@@ -136,6 +138,12 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                 {posterData.address?.toLocaleLowerCase()},
                 {posterData.city?.toLocaleLowerCase()},
                 {posterData.state?.toLocaleLowerCase()}
+              </p>
+              <p className=" text-slate-600 md:ml-5">
+                Landmark : {posterData.landmark.toLocaleLowerCase()}{" "}
+                {posterData?.facingFrom
+                  ? ` | FacingFrom :  ${posterData.facingFrom} `
+                  : ""}
               </p>
             </div>
             {/* specification */}

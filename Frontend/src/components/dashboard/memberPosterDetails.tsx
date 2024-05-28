@@ -3,11 +3,9 @@ import { fetchOnePoster } from "../../utils/http";
 import { useEffect, useState } from "react";
 import { CiLocationOn } from "react-icons/ci";
 import { LiaTagSolid } from "react-icons/lia";
-
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Link from "next/link";
 import Buttons from "./buttons";
-import DeletePopUp from "./deletePopUp";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
@@ -20,6 +18,7 @@ interface PosterData {
   sft: number;
   lightingType: string;
   address: string;
+  landmark: string;
   facingFrom: string;
   minimumDays: number;
   mediatype: string;
@@ -47,7 +46,6 @@ const MemberPosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
     const fetchData = async () => {
       try {
         const resData: PosterData = await fetchOnePoster(id);
-        // Simulate loading for 1 second
         setPosterData(resData);
         setTimeout(() => {
           setLoading(false);
@@ -90,9 +88,6 @@ const MemberPosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   if (!posterData) {
     return <div>Error: Failed to fetch poster data</div>;
   }
-  const lat: number = 23.02436884189762;
-  const lng: number = 72.53198504447938;
-  const url: string = `https://maps.google.com/maps?q=${lat},${lng}&output=embed`;
 
   const excludeFields = [
     "_id",
@@ -149,6 +144,12 @@ const MemberPosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                 {posterData.address?.toLocaleLowerCase()},
                 {posterData.city?.toLocaleLowerCase()},
                 {posterData.state?.toLocaleLowerCase()}
+              </p>
+              <p className=" text-slate-600 md:ml-5">
+                Landmark : {posterData.landmark.toLocaleLowerCase()}{" "}
+                {posterData?.facingFrom
+                  ? ` | FacingFrom :  ${posterData.facingFrom} `
+                  : ""}
               </p>
             </div>
             {/* specification */}

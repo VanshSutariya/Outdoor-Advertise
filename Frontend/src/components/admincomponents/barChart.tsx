@@ -1,15 +1,15 @@
-import React from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart, registerables } from 'chart.js';
-import { defaults } from 'chart.js/auto';
-import numeral from 'numeral';
+import React from "react";
+import { Bar } from "react-chartjs-2";
+import { Chart, registerables } from "chart.js";
+import { defaults } from "chart.js/auto";
+import numeral from "numeral";
 
 Chart.register(...registerables);
 
 defaults.responsive = true;
 defaults.maintainAspectRatio = false;
-defaults.plugins.title.align = 'start';
-defaults.plugins.title.color = 'black';
+defaults.plugins.title.align = "start";
+defaults.plugins.title.color = "black";
 
 interface BarData {
   monthlyData: number[] | [];
@@ -23,10 +23,10 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
       },
       title: {
         display: true,
-        text: 'Overview',
+        text: "Overview",
         font: {
           size: 25,
-          weight: 'bold' as 'bold',
+          weight: "bold" as "bold",
         },
         padding: {
           bottom: 20,
@@ -39,7 +39,6 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
     },
     layout: {
       padding: {
-        // Adjust the padding to match your needs
         left: 10,
         right: 10,
         top: 10,
@@ -55,20 +54,20 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
         ticks: {
           font: {
             size: 14,
-            weight: 'bold' as 'bold',
+            weight: "bold" as "bold",
           },
         },
         drawBorder: false,
       },
       y: {
-        type: 'linear',
+        type: "linear",
         grid: {
           display: false,
         },
         ticks: {
           font: {
             size: 14,
-            weight: 'bold' as 'bold',
+            weight: "bold" as "bold",
           },
           callback: function (value: number) {
             return formatRevenue(value);
@@ -79,18 +78,18 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
     },
   };
   const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
   const labels = months;
 
@@ -98,7 +97,7 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
     labels,
     datasets: [
       {
-        backgroundColor: 'rgba(0, 0, 0, 1)',
+        backgroundColor: "rgba(0, 0, 0, 1)",
         data: monthlyData,
         barPercentage: 0.9,
         borderRadius: 3,
@@ -108,7 +107,7 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
   };
 
   return (
-    <div className=" md:w-[1700px] md:h-[475px] border-[2px] border-gray-200 p-3 rounded-xl">
+    <div className="overflow-auto  h-[475px] border-[2px] border-gray-200 xs:p-3 rounded-xl">
       <Bar data={data} options={options} />
     </div>
   );
@@ -117,14 +116,14 @@ const BarGraph: React.FC<BarData> = ({ monthlyData }) => {
 export default BarGraph;
 
 function formatRevenue(revenue: any) {
-  const crore = 10000000; // 1 crore = 10,000,000
-  const lakh = 100000; // 1 lakh = 100,000
+  const crore = 10000000;
+  const lakh = 100000;
 
   if (revenue >= crore) {
     return `₹${(revenue / crore).toFixed(2)} CR`;
   } else if (revenue >= lakh) {
     return `₹${(revenue / lakh).toFixed(2)} L`;
   } else {
-    return '₹' + numeral(revenue).format('0,0.00');
+    return "₹" + numeral(revenue).format("0,0.00");
   }
 }

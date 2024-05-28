@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/store";
 import { cartActions } from "@/store/cart-slice";
 import { FaRegEdit } from "react-icons/fa";
+import ImageGenerator from "./ImageGenerater";
 
 interface BillingType {
-  handleAutoChange: () => void;
   id: string;
   price: number;
   image: string;
@@ -18,35 +18,30 @@ interface BillingType {
   minQty: number;
   minDays: number;
   createdBy: string;
-  totalPrice: number;
   diffInDays: number;
-  autoInputError: string | undefined;
   mediatype: string | boolean;
   isLoggedIn: boolean;
-  noOfAuto: React.RefObject<HTMLInputElement>;
   state: { startDate: Date; endDate: Date; key: string }[];
 }
 
 const Billing: React.FC<BillingType> = ({
-  handleAutoChange,
   id,
-  totalPrice,
   diffInDays,
   maxQty,
   minQty,
   minDays,
-  autoInputError,
   price,
   mediatype,
   state,
   image,
   title,
   address,
-  noOfAuto,
   createdBy,
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [autoInputError, setAutoInputError] = useState<string>();
+  const [bookingQuantity, setBookingQuantity] = useState<number>(1);
   const [editImg, setEditImg] = useState<boolean>(false);
   const [customerPosterImage, setCustomerPosterImage] = useState<string>();
 
@@ -95,10 +90,9 @@ const Billing: React.FC<BillingType> = ({
         mediatype === "Poles" ||
         mediatype === "Buses"
       ) {
-        const qty = Number(noOfAuto.current?.value);
-        if (qty < minQty || qty > maxQty) {
+        if (bookingQuantity < minQty || bookingQuantity > maxQty) {
           handleBookingQuantityError(
-            qty < minQty
+            bookingQuantity < minQty
               ? `Booking Quantity should be greater or equal to ${minQty}`
               : `Booking Quantity should be less than ${maxQty}`
           );
@@ -118,35 +112,23 @@ const Billing: React.FC<BillingType> = ({
     setCustomerPosterImage("");
   };
 
-  const GenerateImage: any = async (e: { target: { files: any[] } }) => {
-    toastFunction("info", "Image uploading...");
-    const file: File | null = e.target.files?.[0];
-    const formData = new FormData();
-    if (file) {
-      formData.append("image", file);
-    }
-
-    try {
-      const response = await fetch(`http://localhost:4000/cart/upload`, {
-        method: "POST",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: formData,
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toastFunction("success", "Image Uploaded Successfully.");
-        setCustomerPosterImage(data.secure_url);
-        setEditImg(true);
-      } else {
-        toastFunction("warning", "Image upload failed!. Try again");
-        console.error("Failed To Fetch Image", data.errors);
-      }
-    } catch (error: any) {
-      toastFunction("error", error);
+  const handleAutoChange = (e: any) => {
+    const inputValue = parseInt(e.target.value, 10);
+    setBookingQuantity(inputValue);
+    if (inputValue < minQty || inputValue > maxQty) {
+      setAutoInputError(
+        `Book minimum ${minQty} and maximum ${maxQty} Quantity.`
+      );
+    } else {
+      setAutoInputError("");
     }
   };
+
+  const totalPrice = mediatype
+    ? bookingQuantity > 0
+      ? bookingQuantity * price * diffInDays
+      : 1 * price * diffInDays
+    : price * diffInDays;
 
   const extraCharges = Math.round(totalPrice * 0.05);
   const finalTotalPrice = Math.round(totalPrice * 1.05);
@@ -184,9 +166,10 @@ const Billing: React.FC<BillingType> = ({
             <input
               type="number"
               className="bg-transparent border-2"
-              ref={noOfAuto}
               onChange={handleAutoChange}
+              value={bookingQuantity}
               min={1}
+              required
             />
           </div>
         )}
@@ -223,11 +206,9 @@ const Billing: React.FC<BillingType> = ({
           <div className=" flex mt-5 p-2 text-lg rounded-lg  font-inter ">
             <div className="w-full">
               <p>
-                {noOfAuto.current === undefined
+                {!mediatype
                   ? `₹${price} X ${diffInDays}days`
-                  : ` ₹${price} x ${
-                      noOfAuto?.current?.value ? noOfAuto.current.value : 1
-                    } ${
+                  : ` ₹${price} x ${bookingQuantity ? bookingQuantity : 1} ${
                       mediatype === "Rickshaws"
                         ? "auto"
                         : mediatype === "Poles"
@@ -285,18 +266,10 @@ const Billing: React.FC<BillingType> = ({
               <div className="mt-6 md:mb-3 font-poppins text-lg ">
                 Upload your Advertise image
               </div>
-              <input
-                type="file"
-                id="file-upload"
-                onChange={GenerateImage}
-                className="w-full hidden"
+              <ImageGenerator
+                setImage={setCustomerPosterImage}
+                setEditImg={setEditImg}
               />
-              <label
-                htmlFor="file-upload"
-                className="bg-orange-400 cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2 mt-4 rounded-lg "
-              >
-                {editImg ? "Uploading......." : "Choose file"}
-              </label>
             </>
           )}
         </div>

@@ -24,7 +24,7 @@ export class CartService {
       DBQuery['userId'] = query?.userId;
     }
 
-    const resData = await this.cartModal.find(DBQuery);
+    const resData = await this.cartModal.find(DBQuery).sort({ createdAt: -1 });
     if (!resData) throw new HttpException('No Data in db.', 404);
     return resData;
   }

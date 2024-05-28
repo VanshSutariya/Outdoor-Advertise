@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
+import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { differenceInDays } from "date-fns";
 import { IoIosArrowRoundBack } from "react-icons/io";
-import { RootState } from "@/store";
 import NavBar from "@/components/Header";
 
 interface Orders {
@@ -13,6 +14,9 @@ interface Orders {
   address: string;
   bookingDate: string[];
   totalPrice: number;
+  posterId: {
+    price: number;
+  };
 }
 export default function OrderPage() {
   const [orders, setOrders] = useState<Orders[]>();
@@ -44,25 +48,42 @@ export default function OrderPage() {
     func();
   }, [userId]);
 
+  function calculateQuantity(
+    totalPrice: number,
+    price: number,
+    EndDate: Date,
+    StartDate: Date
+  ) {
+    const noOfDays = differenceInDays(EndDate, StartDate) + 1;
+    return Math.round(totalPrice / (price * 1.05 * noOfDays));
+  }
   return (
     <>
       <NavBar />
-      <div className="py-6">
-        <div className="mx-auto px-4">
+      <div className="py-6 overflow-x-auto">
+        <div className=" px-4">
           <div className="flex justify-center font-inter text-2xl font-semibold mb-4 ">
             Orders History
           </div>
-          <div className="flex flex-col justify-center md:flex-row gap-4">
-            <div className="md:w-3/4 ">
-              <div className="bg-slate-100 rounded-lg shadow-md p-6 mb-4">
-                <table className="w-full font-poppins">
+          <div className=" flex flex-col justify-center md:flex-row gap-4">
+            <div className="md:w-4/5 ">
+              <div className="overflow-hidden bg-slate-100 rounded-lg shadow-md p-6 mb-4">
+                <table className="table-auto min-w-full divide-y font-poppins">
                   <thead>
-                    <tr className="text-left  border-b-[2px] border-b-gray-300">
-                      <th className=" font-semibold pl-8  ">Product</th>
-                      <th className="text-left font-semibold ">
+                    <tr className="text-left  border-b-[2px] border-b-gray-300 ">
+                      <th className=" font-semibold pl-8 tracking-widest">
+                        Product
+                      </th>
+                      <th className=" font-semibold pr-2 tracking-widest">
+                        Quantity
+                      </th>
+                      <th className="sm:px-2 tracking-widest font-semibold md:w-[200px]">
                         Booking Dates
                       </th>
-                      <th className="text-left font-semibold ">Price</th>
+
+                      <th className="text-left font-semibold tracking-widest">
+                        Price
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -79,20 +100,30 @@ export default function OrderPage() {
                                 src={item.image}
                                 alt="Product image"
                               />
-                              <span className="flex-col font-semibold text-lg">
+                              <span className="flex-col font-semibold text-lg md:mr-4">
                                 {item.title}
-                                <p className="text-[15px] font-normal">
+                                <p className="text-[15px] font-normal ">
                                   {item.address}
                                 </p>
                               </span>
                             </div>
+                          </td>
+                          <td className="text-[21px] font-semibold sm:pl-2">
+                            {calculateQuantity(
+                              item.totalPrice,
+                              item.posterId.price,
+                              new Date(
+                                item.bookingDate[item.bookingDate.length - 1]
+                              ),
+                              new Date(item.bookingDate[0])
+                            )}
                           </td>
                           <td>
                             {item.bookingDate[0] +
                               "  -  " +
                               item.bookingDate[item.bookingDate.length - 1]}
                           </td>
-                          <td className="text-[21px] font-semibold">
+                          <td className="text-[21px] font-semibold ">
                             ₹{item.totalPrice}
                           </td>
                         </tr>

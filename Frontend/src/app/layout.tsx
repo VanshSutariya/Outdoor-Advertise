@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Providers from "@/store/provider";
 import { Metadata } from "next";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata: Metadata = {
   title: "OutdoorAd",
@@ -21,15 +22,17 @@ export default function RootLayout({
         <script
           async
           defer
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GMAPS_KEY}&libraries=places&callback=Function.prototype`}
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GMAPS_KEY}&loading=async&libraries=places&callback=Function.prototype`}
         ></script>
       </head>
 
       <body>
-        <Providers>
-          {children}
-          <ToastContainer />
-        </Providers>
+        <GoogleOAuthProvider clientId={`${process.env.GOOGLE_CLIENT_ID}`}>
+          <Providers>
+            {children}
+            <ToastContainer />
+          </Providers>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

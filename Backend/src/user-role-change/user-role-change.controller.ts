@@ -22,7 +22,7 @@ export class UserRoleChangeController {
 
   @Get()
   @UseGuards(RolesGuard)
-  @HasRoles(Roles.admin)
+  @HasRoles(Roles.admin, Roles.user)
   async getAllRequests(@Query() query: ExpressQuery) {
     const requests = await this.roleChangeService.getAllRequests(query);
     if (!requests) throw new HttpException('No requests for role change.', 404);

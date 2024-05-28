@@ -36,6 +36,7 @@ export class PosterDetailsService {
       }
       if (query?.address) {
         DBQuery['address'] = { $regex: query?.address, $options: 'i' };
+        DBQuery['title'] = { $regex: query?.address, $options: 'i' };
       }
       if (query?.mediatype) {
         DBQuery['mediatype'] = query?.mediatype;

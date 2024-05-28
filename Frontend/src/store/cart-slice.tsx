@@ -29,9 +29,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     setCartItems(state, action) {
-      // Update state with fetched cart items
       state.items = action.payload || [];
-      // Recalculate final total
       state.finalTotal = state.items.reduce(
         (total, item) => total + item.totalPrice,
         0
@@ -126,10 +124,9 @@ const cartSlice = createSlice({
       const userId = action.payload;
       try {
         const result = async () => {
-          const resp = await deleteAllCartData(userId);
-          console.log(resp);
-          // state.items = [];
-          // state.finalTotal = 0;
+          await deleteAllCartData(userId);
+          state.items = [];
+          state.finalTotal = 0;
         };
         result();
       } catch (error) {
@@ -141,17 +138,13 @@ const cartSlice = createSlice({
       const itemIndex = state.items.findIndex(
         (item) => updatedData.id === item.posterId
       );
-      console.log(itemIndex, "itemindexxxxxxxxxxxxxxxxxxxxxxxxxx-----");
 
       if (itemIndex !== -1) {
-        console.log(state.items, "itemssss");
-
         state.items[itemIndex].bookingDate = updatedData.bookingDates;
         state.items[itemIndex].customerPosterImage =
           updatedData.customerPosterImage;
         state.items[itemIndex].totalPrice = updatedData.finalTotalPrice;
       }
-      console.log(state.items, "||||||||||||||||||||||||||||||||||");
     },
   },
 });

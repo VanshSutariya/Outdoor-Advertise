@@ -12,11 +12,17 @@ import { UserRoleChangeModule } from './user-role-change/user-role-change.module
 import { GatewayModule } from './gateway/gateway.module';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { HttpMetricsInterceptor } from './metrics/metrics.intercepter';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ContactUsModule } from './contact-us/contact-us.module';
-
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
@@ -55,6 +61,10 @@ import { ContactUsModule } from './contact-us/contact-us.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpMetricsInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
   controllers: [],

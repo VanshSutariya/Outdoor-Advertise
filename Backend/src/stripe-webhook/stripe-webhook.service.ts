@@ -6,6 +6,7 @@ import { PosterDetailsService } from 'src/poster-details/poster-details.service'
 import { Stripe } from 'stripe';
 import { EmailService } from './bookingEmail.service';
 import { BookingService } from 'src/booking/booking.service';
+import { log } from 'console';
 
 @Injectable()
 export class StripeWebhookService {
@@ -24,6 +25,10 @@ export class StripeWebhookService {
   }
 
   async handleEvent(event: any) {
+    console.log(event);
+
+    console.log(event.type, '/////////////////');
+
     switch (event.type) {
       case 'checkout.session.completed':
         // Handle successful payment

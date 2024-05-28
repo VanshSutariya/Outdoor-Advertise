@@ -1,20 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import Link from "next/link";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { decode } from "jsonwebtoken";
+import { FieldValues, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import ForgotPassword from "./forgetPasswordPopUp";
-import toastFunction from "../reactToast/toast";
-import fetchUser, { fetchCartData } from "@/utils/http";
-import { loginIn } from "@/store/auth-slice";
-import { cartActions } from "@/store/cart-slice";
+import { useGoogleLogin } from "@react-oauth/google";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { handleGoogleLoginSuccess, handleLogin } from "./handleLogin";
 
-const SignIn: React.FC = () => {
+const LogIn: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [showForgotpassword, setShowForgotPassword] = useState(false);
@@ -28,49 +25,6 @@ const SignIn: React.FC = () => {
   const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  async function onSubmit(data: { email: string; password: string }) {
-    const { email, password } = data;
-    try {
-      const response = await fetch("http://localhost:4000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const resData = await response.json();
-
-      if (!response.ok)
-        throw new Error(resData.message || "Invalid Credentials");
-
-      document.cookie = `jwt=${resData.token}; expires=${new Date(
-        new Date().getTime() + 12 * 60 * 60 * 1000
-      )}; path=/; secure;`;
-
-      const decodedToken = decode(resData.token) as { id: string };
-
-      if (decodedToken) {
-        const fetchUserFunc = async () => {
-          const userDetail = await fetchUser(decodedToken.id);
-          const data = { userDetail, resData };
-          const userId = decodedToken.id;
-          dispatch(loginIn(data));
-          const cartData = await fetchCartData(userId);
-          dispatch(cartActions.setCartItems(cartData));
-
-          toastFunction("success", "Login Successful!");
-          if (userDetail?.role === "admin") {
-            router.push("/outdoorAd/admin");
-          } else {
-            router.push("/outdoorAd");
-          }
-        };
-
-        fetchUserFunc();
-      }
-    } catch (error: any) {
-      toastFunction("error", error.message);
-    }
-  }
-
   const handleForgotPasswordClick = () => {
     setShowForgotPassword(true);
   };
@@ -79,9 +33,14 @@ const SignIn: React.FC = () => {
     setShowForgotPassword(false);
   };
 
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: (codeResponse) =>
+      handleGoogleLoginSuccess(codeResponse, dispatch, router),
+    onError: (error) => console.log("Login Failed:", error),
+  });
   return (
     <section className="m-8 flex gap-4">
-      <div className="w-full lg:w-3/5 mt-16">
+      <div className="w-full lg:w-3/5 mt-10">
         <div className="text-center">
           <div className="font-bold mb-4 text-4xl">LogIn</div>
           <div className="text-lg font-normal">
@@ -89,9 +48,15 @@ const SignIn: React.FC = () => {
           </div>
         </div>
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit((data: FieldValues) =>
+            handleLogin(
+              data as { email: string; password: string },
+              dispatch,
+              router
+            )
+          )}
           data-testid="loginSubmit"
-          className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2"
+          className="mt-8 mb-2 mx-auto w-full xs:w-80 max-w-screen-lg lg:w-1/2"
         >
           <div className="flex flex-col ">
             <label className="font-medium mb-2">Your email</label>
@@ -131,14 +96,31 @@ const SignIn: React.FC = () => {
           <button className="rounded-lg font-bold font-poppins p-3 bg-slate-200 w-full hover:bg-slate-300 active:bg-slate-200">
             LogIn
           </button>
-
-          <div className="text-center text-blue-500 font-medium mt-4">
-            Not registered?
-            <Link href="/outdoorAd/register" className="text-gray-900 ml-1">
-              Create account
-            </Link>
-          </div>
         </form>
+        <div className=" grid grid-cols-3 mt-4 mb-2 mx-auto w-full xs:w-80 max-w-screen-lg lg:w-1/2 items-center text-gray-500">
+          <hr className="border-gray-500" />
+          <p className="text-center text-sm">OR</p>
+          <hr className="border-gray-500" />
+        </div>
+
+        <button
+          onClick={() => handleGoogleLogin()}
+          className="bg-white border py-2  mt-4 mb-2 mx-auto w-full xs:w-80 max-w-screen-lg lg:w-1/2 rounded-xl  flex justify-center items-center text-sm hover:scale-105 duration-300 "
+        >
+          <img
+            className="w-6 h-6"
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            loading="lazy"
+            alt="google logo"
+          />
+          <span className="ml-4 font-poppins">Login with Google</span>
+        </button>
+        <div className="text-center text-blue-500 font-medium mt-4">
+          Not registered?
+          <Link href="/outdoorAd/register" className="text-gray-900 ml-1">
+            Create account
+          </Link>
+        </div>
       </div>
       <div className="w-2/5 h-full hidden lg:block">
         <img
@@ -158,4 +140,4 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+export default LogIn;

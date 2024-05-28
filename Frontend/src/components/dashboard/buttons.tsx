@@ -3,9 +3,8 @@ import DeletePopUp from "./deletePopUp";
 
 interface ButtonsProps {
   id: string;
-  handleDelete?: () => void;
 }
-const Buttons: React.FC<ButtonsProps> = ({ id, handleDelete }) => {
+const Buttons: React.FC<ButtonsProps> = ({ id }) => {
   return (
     <div className="flex items-center rounded-md shadow-sm justify-center p-3 ">
       <Link href={`edit/${id}`}>

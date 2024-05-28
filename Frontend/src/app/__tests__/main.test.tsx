@@ -6,12 +6,12 @@ import {
   RenderResult,
   waitFor,
 } from "@testing-library/react";
-import SignIn from "@/components/auth-login-regis/login";
 import Providers from "@/store/provider";
 import { describe, it } from "@jest/globals";
 import Header from "@/components/Header";
 import PosterForm from "@/components/CreatePoster/posterForm";
 import fetchMock from "jest-fetch-mock";
+import LogIn from "@/components/auth-login-regis/login";
 
 const sendComponent = (component: ReactElement): RenderResult =>
   render(<Providers> {component}</Providers>);
@@ -31,14 +31,14 @@ describe("Main Home Page", () => {
 });
 
 // login page test cases
-describe("SignIn Component", () => {
+describe("Login Component", () => {
   it("renders the login form", () => {
-    sendComponent(<SignIn />);
+    sendComponent(<LogIn />);
     expect(screen.getByTestId("emailtest")).toBeInTheDocument();
   });
 
   it("redirects on successful login", async () => {
-    sendComponent(<SignIn />);
+    sendComponent(<LogIn />);
     expect(screen.getByTestId("emailtest")).toBeInTheDocument();
     expect(screen.getByTestId("passwordtest")).toBeInTheDocument();
     expect(screen.getByTestId("loginSubmit")).toBeEnabled();
@@ -56,7 +56,7 @@ describe("SignIn Component", () => {
   });
 
   it("displays validation errors for empty fields", async () => {
-    sendComponent(<SignIn />);
+    sendComponent(<LogIn />);
     fireEvent.submit(screen.getByTestId("loginSubmit"));
 
     await waitFor(() => {
@@ -66,7 +66,7 @@ describe("SignIn Component", () => {
   });
 
   it("displays validation error for invalid email format", async () => {
-    sendComponent(<SignIn />);
+    sendComponent(<LogIn />);
     fireEvent.change(screen.getByTestId("emailtest"), {
       target: { value: "invalidemail" },
     });

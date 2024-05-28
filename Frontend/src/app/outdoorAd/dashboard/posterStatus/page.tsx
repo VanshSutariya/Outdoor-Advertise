@@ -10,6 +10,7 @@ import {
 import Sidebar from "@/components/admincomponents/sidebar";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import ProfileDropDown from "@/components/admincomponents/profileDropDown";
 
 const PosterStatusPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -82,12 +83,15 @@ const PosterStatusPage = () => {
   return (
     <Sidebar>
       <div className="overflow-x-auto">
-        <div>
-          <h1 className="text-2xl font-inter p-3 md:mb-3 font-semibold ">
-            Poster Approve Status
-          </h1>
+        <div className="flex items-center">
+          <div className="w-full text-4xl md:ml-6 mt-3 font-medium font-poppins">
+            Poster Requests Status
+          </div>
+          <div className="flex  justify-end  w-full mr-6 items-center">
+            <ProfileDropDown />
+          </div>
         </div>
-        <div className="rounded-lg overflow-hidden border border-gray-300">
+        <div className="rounded-lg overflow-hidden border border-gray-300 mt-4">
           <table className="table-auto min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

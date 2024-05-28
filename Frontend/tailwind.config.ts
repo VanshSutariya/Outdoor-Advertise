@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
-import { withUt } from "uploadthing/tw";
-const config: Config = withUt({
+const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -29,7 +28,7 @@ const config: Config = withUt({
         // => @media (max-width: 1535px) { ... }
         mxl: { max: "1279px" },
         // => @media (max-width: 1279px) { ... }
-        mlg: { max: "1023px" },
+        mlg: { min: "1023px" },
         // => @media (max-width: 1023px) { ... }
         mmd: { max: "767px" },
         // => @media (max-width: 767px) { ... }
@@ -46,5 +45,5 @@ const config: Config = withUt({
   daisyui: {
     themes: ["light"],
   },
-});
+};
 export default config;

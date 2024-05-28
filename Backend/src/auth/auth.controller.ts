@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -26,6 +27,7 @@ import { RolesGuard } from 'src/RoleGuard/role.guard';
 import { HasRoles } from 'src/RoleGuard/roles.decorater';
 import { Roles } from './roles.constants';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -51,6 +53,7 @@ export class AuthController {
     return this.authService.signUp(signUpDto);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('/login')
   async login(
     @Body() loginDto: LoginDto,
@@ -65,6 +68,17 @@ export class AuthController {
       expires: expirationTime,
     });
     return response.json({ ...token });
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Post('google-login')
+  async googleLogin(@Body('token') token: string) {
+    if (!token) {
+      throw new BadRequestException('Token is required');
+    }
+
+    const result = await this.authService.googleLogin(token);
+    return result;
   }
 
   @Post('/forget-password')

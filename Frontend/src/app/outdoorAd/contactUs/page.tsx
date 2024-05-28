@@ -1,10 +1,11 @@
 "use client";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import toastFunction from "@/components/reactToast/toast";
-import { useState } from "react";
 
 import * as Yup from "yup";
+import { useState } from "react";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { useRouter } from "next/navigation";
+import toastFunction from "@/components/reactToast/toast";
 
 interface FormValues {
   email: string;
@@ -12,6 +13,7 @@ interface FormValues {
   description: string;
 }
 export default function ContactUs() {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<FormValues>({
     email: "",
@@ -52,6 +54,7 @@ export default function ContactUs() {
         throw new Error(response.message || "enter valid data");
       }
       toastFunction("success", "Message Send Successfully!");
+      router.push("/outdoorAd");
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
@@ -74,12 +77,12 @@ export default function ContactUs() {
     <>
       <Header />
 
-      <div className="bg-white">
-        <div className="py-3 px-4 mx-auto max-w-screen-md">
-          <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-center text-gray-900">
+      <div className="bg-white ">
+        <div className="py-3 mb-100 px-4 mx-auto max-w-screen-sm">
+          <h2 className="mb-4 text-3xl font-inter tracking-tight font-extrabold text-center text-gray-900">
             Contact Us
           </h2>
-          <p className="mb-8 lg:mb-16 font-light text-center text-gray-500 sm:text-xl">
+          <p className="mb-8 text-xl lg:mb-16 font-light text-center text-gray-500 sm:text-xl ">
             Got a technical issue? Want to send feedback about a beta feature?
             Need details about our Business plan? Let us know.
           </p>
@@ -153,7 +156,7 @@ export default function ContactUs() {
             </div>
             <button
               type="submit"
-              className="block rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="block rounded-md bg-indigo-600 px-2 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {loading ? "Sending...." : "Send Message"}
             </button>

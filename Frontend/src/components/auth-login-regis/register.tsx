@@ -1,14 +1,13 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import Link from "next/link";
+import Image from "next/image";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import toastFunction from "../reactToast/toast";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-const SignUp: React.FC = () => {
+const RegisterComp: React.FC = () => {
   const router = useRouter();
   const validationSchema = Yup.object().shape({
     username: Yup.string().required("First Name is required"),
@@ -43,7 +42,6 @@ const SignUp: React.FC = () => {
           name,
           email,
           password,
-          confirmPassword,
         }),
       });
       const data = await response.json();
@@ -66,10 +64,9 @@ const SignUp: React.FC = () => {
           className=" rounded-3xl"
           width={600}
           height={800}
-          // priority
         />
       </div>
-      <div className="w-full lg:w-3/5 mt-24">
+      <div className="w-full lg:w-3/5 mt-5">
         <div className="text-center">
           <div className="font-bold mb-4 text-4xl">Join Us Today</div>
           <div className="text-lg font-normal">
@@ -145,4 +142,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+export default RegisterComp;

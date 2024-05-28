@@ -1,13 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+
 import { addDays } from "date-fns";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { differenceInDays } from "date-fns";
 import { DateRange } from "react-date-range";
+import useFindWidth from "../hooks/useWidth";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import useFindWidth from "../hooks/useWidth";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import BillingPoster from "./billingPoster";
 
 interface DatePickerProps {
@@ -30,20 +31,10 @@ const DatePickerCart: React.FC<DatePickerProps> = ({
 }) => {
   const windowWidth = useFindWidth();
   const [diffInDays, setDiffInDays] = useState<number>(0);
-  const noOfAuto = useRef<HTMLInputElement>(undefined!);
-  const [autoInputError, setAutoInputError] = useState<string>();
 
   const { isLoggedIn }: { isLoggedIn: boolean } = useSelector(
     (state: RootState) => state.auth
   );
-
-  const { items } = useSelector((state: RootState) => state.cart);
-
-  const existingItem = items.find((item) => item.posterId === id);
-  let matchingItems: any;
-  if (existingItem) {
-    matchingItems = items.filter((item) => item.posterId === id);
-  }
 
   const calculateMinDate = (): Date => {
     let nextAvailableDate = new Date();
@@ -80,24 +71,6 @@ const DatePickerCart: React.FC<DatePickerProps> = ({
     },
   ]);
 
-  useEffect(() => {
-    if (existingItem) {
-      const newCartStartDate = matchingItems[0].bookingDate;
-
-      const parsedStartDate = new Date(newCartStartDate[0]);
-      const parsedEndDate = new Date(
-        newCartStartDate[newCartStartDate.length - 1]
-      );
-      setState([
-        {
-          startDate: parsedStartDate,
-          endDate: parsedEndDate,
-          key: "selection",
-        },
-      ]);
-    }
-  }, [existingItem]);
-
   const NextAvailableDate = (): Date => {
     let nextAvailableDate = new Date();
     const arr = bookingDate;
@@ -123,26 +96,9 @@ const DatePickerCart: React.FC<DatePickerProps> = ({
     setDiffInDays(diff);
   }, [state]);
 
-  const handleAutoChange = () => {
-    const inputValue = parseInt(noOfAuto.current.value, 10);
-    if (inputValue < minQty || inputValue > maxQty) {
-      setAutoInputError(
-        `Book minimum ${minQty} and maximum ${maxQty} Quantity.`
-      );
-    } else {
-      setAutoInputError("");
-    }
-  };
-
-  const totalPrice = mediatype
-    ? parseInt(noOfAuto.current?.value, 10) > 0
-      ? parseInt(noOfAuto.current.value, 10) * price * diffInDays
-      : 1 * price * diffInDays
-    : price * diffInDays;
   const convertedBookingDates = bookingDate.map(
     (dateString) => new Date(dateString)
   );
-
   return (
     <>
       <div className="md:flex">
@@ -174,13 +130,9 @@ const DatePickerCart: React.FC<DatePickerProps> = ({
           maxQty={maxQty}
           minQty={minQty}
           minDays={minDays}
-          noOfAuto={noOfAuto}
           mediatype={mediatype}
-          totalPrice={totalPrice}
           diffInDays={diffInDays}
           isLoggedIn={isLoggedIn}
-          autoInputError={autoInputError}
-          handleAutoChange={handleAutoChange}
         />
       </div>
     </>

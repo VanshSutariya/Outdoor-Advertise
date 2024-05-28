@@ -16,6 +16,7 @@ import NotificationPopUp from "@/components/admincomponents/notificationPopUp";
 import ProfileDropDown from "@/components/admincomponents/profileDropDown";
 import BarGraph from "@/components/admincomponents/barChart";
 import toastFunction from "@/components/reactToast/toast";
+import Link from "next/link";
 interface MonthlyPayment {
   userId: string;
   totalPrice: number;
@@ -57,7 +58,6 @@ export default function AdminHomePage() {
         // count member
         const memberrole = "member";
         const memberCount = await fetchAllUsers(memberrole, token);
-        console.log(memberCount);
         setTotalMembers(memberCount);
         const data = await fetchAllBookingsData(token);
         setTodayEarning(data.todayRevenue);
@@ -91,11 +91,17 @@ export default function AdminHomePage() {
   return (
     <>
       <Sidebar>
-        <div className="container mx-auto font-poppins ">
+        <div className=" font-poppins ">
           <div className="text-3xl xs:flex items-center font-semibold -mt-5 mb-3 font-poppins">
-            <p>Dashboard</p>
+            <p className="hidden md:block">Dashboard</p>
+            <Link
+              href="/outdoorAd"
+              className="md:ml-20 md: mt-1 text-xl font-medium font-poppins"
+            >
+              Home
+            </Link>
             <div className="flex justify-end w-full items-center">
-              <div className="relative m-6 w-fit items-end ">
+              <div className="relative xs:m-6 w-fit items-end ">
                 <NotificationPopUp />
               </div>
               <ProfileDropDown />
@@ -120,7 +126,7 @@ export default function AdminHomePage() {
                 <LuCreditCard className="md:ml-20 text-gray-400 mt-1" />
               </div>
               <p className="text-2xl tracking-wider font-medium ">
-                {todayEarning && todayEarning !== null
+                {todayEarning !== null
                   ? formatRevenue(todayEarning)
                   : "Loading..."}
               </p>
@@ -150,10 +156,10 @@ export default function AdminHomePage() {
             </div>
           </div>
 
-          <div className="mt-8 md:flex md:gap-3 ">
+          <div className="mt-8 grid  md:grid-cols-2  md:gap-3 ">
             <BarGraph monthlyData={monthlyData} />
 
-            <div className=" border-[2px] border-gray-200  p-3 rounded-xl md:w-full">
+            <div className="overflow-auto border-[2px] border-gray-200  p-3 rounded-xl  ">
               <div className="mb-4">
                 <h1 className="text-lg">Recent Sales</h1>
                 <p className="text-sm text-gray-400">
@@ -167,9 +173,9 @@ export default function AdminHomePage() {
                   topPayment?.topMonthlyPayment.map((item, index) => (
                     <li
                       key={index}
-                      className="md:flex items-center justify-between py-2 border-b mb-3"
+                      className="xs:flex items-center justify-between py-2 border-b mb-3"
                     >
-                      <div className="md:flex items-center">
+                      <div className="xs:flex items-center">
                         <img
                           src={item.userImage ? item.userImage : "/profile.png"}
                           alt="Avatar"

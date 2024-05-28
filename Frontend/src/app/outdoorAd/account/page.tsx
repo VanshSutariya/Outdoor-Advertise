@@ -12,7 +12,8 @@ import { useRouter } from "next/navigation";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import PopUpModal from "@/components/account/popupModal";
-import toastFunction from "@/components/reactToast/toast";
+import ImageUploader from "@/components/account/imageUploader";
+
 interface UserDetails {
   image: string;
   name: string;
@@ -27,9 +28,9 @@ export default function AccountPage() {
   const {
     userId,
     userRole,
-    isLoggedIn,
-  }: { isLoggedIn: boolean; userId: string | null; userRole: string | null } =
-    useSelector((state: RootState) => state.auth);
+  }: { userId: string | null; userRole: string | null } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   useEffect(() => {
     const user = async () => {
@@ -50,7 +51,7 @@ export default function AccountPage() {
     return (
       <>
         <NavBar />
-        <div className="flex justify-center text-3xl font-poppins h-[260px] mt-32">
+        <div className="flex justify-center text-3xl font-poppins h-screen mt-32">
           <div className="rounded-full h-10 w-10 bg-gray-700 animate-ping"></div>
         </div>
       </>
@@ -65,39 +66,6 @@ export default function AccountPage() {
   };
   const handlEditImage = () => {
     setEditImg((prev) => !prev);
-  };
-
-  const GenerateImage: any = async (e: { target: { files: any[] } }) => {
-    toastFunction("info", "Image uploading...");
-    const file: File | null = e.target.files?.[0];
-    const formData = new FormData();
-    if (file) {
-      formData.append("image", file);
-    }
-
-    try {
-      const response = await fetch(
-        `http://localhost:4000/auth/upload/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
-          body: formData,
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        toastFunction("success", "Image Uploaded Successfully.");
-        setImage(data.secure_url);
-        setEditImg(false);
-      } else {
-        toastFunction("warning", "Image upload failed!. Try again");
-        console.error("Failed To Fetch Image", data.errors);
-      }
-    } catch (error: any) {
-      toastFunction("error", error);
-    }
   };
 
   return (
@@ -132,20 +100,11 @@ export default function AccountPage() {
               )}
 
               {editImg && (
-                <div className="justify-center md:ml-6 mt-2  ">
-                  <input
-                    type="file"
-                    id="file-upload"
-                    onChange={GenerateImage}
-                    className="w-full hidden "
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className="bg-orange-400 cursor-pointer text-center hover:bg-orange-600  transition-all duration-500 font-bold text-lg text-white p-2 mt-4 rounded-lg "
-                  >
-                    Choose file
-                  </label>
-                </div>
+                <ImageUploader
+                  userId={userId}
+                  setImage={setImage}
+                  setEditImg={setEditImg}
+                />
               )}
             </div>
             <button

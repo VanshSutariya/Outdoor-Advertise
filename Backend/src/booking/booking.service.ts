@@ -1,11 +1,11 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Query } from 'express-serve-static-core';
 import { Booking } from './schema/booking.schema';
-import { CreateBookingDto } from './dto/createBooking.dto';
 import { User } from 'src/auth/schemas/user.schema';
+import { CreateBookingDto } from './dto/createBooking.dto';
 import { Posters } from 'src/poster-details/schemas/posters.schema';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class BookingService {
@@ -33,7 +33,7 @@ export class BookingService {
     const resData = await this.bookingModel
       .find(DBQuery)
       .populate({ path: 'userId', select: 'name email' })
-      .populate({ path: 'posterId', select: 'title address' })
+      .populate({ path: 'posterId', select: 'title address price' })
       .populate({ path: 'createdBy', select: 'name email' })
       .limit(resPerPage)
       .skip(skip)

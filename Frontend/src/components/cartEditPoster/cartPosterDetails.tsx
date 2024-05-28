@@ -17,6 +17,7 @@ interface PosterData {
   sft: number;
   lightingType: string;
   address: string;
+  landmark: string;
   facingFrom: string;
   minimumDays: number;
   mediatype: string;
@@ -136,6 +137,12 @@ const CartPosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                 {posterData.address?.toLocaleLowerCase()},
                 {posterData.city?.toLocaleLowerCase()},
                 {posterData.state?.toLocaleLowerCase()}
+              </p>
+              <p className=" text-slate-600 md:ml-5">
+                Landmark : {posterData.landmark.toLocaleLowerCase()}{" "}
+                {posterData?.facingFrom
+                  ? ` | FacingFrom :  ${posterData.facingFrom} `
+                  : ""}
               </p>
             </div>
             {/* specification */}
