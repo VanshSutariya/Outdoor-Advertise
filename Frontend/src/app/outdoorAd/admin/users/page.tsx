@@ -19,7 +19,7 @@ const UserTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resData: any = await fetchUsers({ page, per_page, token });
+        const resData: any = await fetchUsers({ page, per_page });
         setTotalPages(Math.ceil(resData.totalLength / per_page));
         setUsers([...resData.result]);
 

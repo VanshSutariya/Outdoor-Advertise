@@ -32,13 +32,6 @@ const SearchBar: React.FC = () => {
   });
 
   useEffect(() => {
-    // setFormValues({
-    //   location: address,
-    //   state: state,
-    //   city: city,
-    //   mediatype: category,
-    // });
-
     const paramsObj = qs.parse(params.toString());
     const hasParams = Object.keys(paramsObj).some((key) =>
       ["address", "state", "city", "popular"].includes(key)
@@ -195,11 +188,6 @@ const SearchBar: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* <PosterGrid
-        key={JSON.stringify(search)}
-        isPopularClicked={isPopularClicked ? "true" : "false"}
-      /> */}
     </>
   );
 };

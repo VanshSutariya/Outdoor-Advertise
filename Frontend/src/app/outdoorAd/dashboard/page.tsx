@@ -39,10 +39,8 @@ export default function DashboardPage() {
 
   const {
     userId,
-    token,
   }: {
     userId: string | null;
-    token: string;
   } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -50,7 +48,7 @@ export default function DashboardPage() {
       const data = async () => {
         if (userId) {
           const id = userId;
-          const data = await fetchMemberPosterStats(id, token);
+          const data = await fetchMemberPosterStats(id);
 
           setMemberStats((prev) => {
             const newState = { ...prev };
@@ -62,7 +60,7 @@ export default function DashboardPage() {
           });
           setMonthlyData(data.yearlyRevenue);
 
-          const monthlydata = await fetchMonthlyData(token, userId);
+          const monthlydata = await fetchMonthlyData(userId);
           setTopPayments(monthlydata);
         }
       };

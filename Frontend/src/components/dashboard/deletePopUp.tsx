@@ -1,21 +1,16 @@
 import { deletePosterById } from "@/utils/http";
 import toastFunction from "../reactToast/toast";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 
 interface DeleteProps {
   id: string;
 }
 const DeletePopUp: React.FC<DeleteProps> = ({ id }) => {
   const router = useRouter();
-  const { token }: { token: string } = useSelector(
-    (state: RootState) => state.auth
-  );
 
   async function handleDeleteBtn() {
     try {
-      const response = await deletePosterById(id, token);
+      const response = await deletePosterById(id);
 
       const deleteSuccess = await response.json();
       toastFunction("success", "Poster Deleted Success.");

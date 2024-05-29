@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import numeral from "numeral";
 import { fetchAllBookingsOrders } from "@/utils/http";
 import Sidebar from "@/components/admincomponents/sidebar";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { differenceInDays } from "date-fns";
 
 interface Orders {
@@ -23,9 +21,6 @@ const OrderAdminPage = () => {
   const [page, setPage] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const { token }: { token: string } = useSelector(
-    (state: RootState) => state.auth
-  );
 
   let per_page: number = 8;
 
@@ -35,7 +30,6 @@ const OrderAdminPage = () => {
         const newOrders: any = await fetchAllBookingsOrders({
           page,
           per_page,
-          token,
         });
         setTotalPages(Math.ceil(newOrders.totalLength / per_page));
 

@@ -25,10 +25,6 @@ export class StripeWebhookService {
   }
 
   async handleEvent(event: any) {
-    console.log(event);
-
-    console.log(event.type, '/////////////////');
-
     switch (event.type) {
       case 'checkout.session.completed':
         // Handle successful payment

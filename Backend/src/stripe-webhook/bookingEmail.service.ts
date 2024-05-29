@@ -17,7 +17,6 @@ export class EmailService {
       },
     };
 
-    // Check if the email configuration is provided
     if (emailConfig.auth.user && emailConfig.auth.pass) {
       this.transporter = nodemailer.createTransport(emailConfig);
     } else {

@@ -38,12 +38,12 @@ const NotFound = () => {
               >
                 <stop
                   offset="0"
-                  stop-color="#fefefd"
+                  stopColor="#fefefd"
                   className="stopColorfefefd svgShape"
                 />
                 <stop
                   offset="1"
-                  stop-color="#ebf3ff"
+                  stopColor="#ebf3ff"
                   className="stopColorebf3ff svgShape"
                 />
               </linearGradient>
@@ -61,12 +61,12 @@ const NotFound = () => {
               >
                 <stop
                   offset="0"
-                  stop-color="#fefefd"
+                  stopColor="#fefefd"
                   className="stopColorfefefd svgShape"
                 />
                 <stop
                   offset=".84"
-                  stop-color="#ebf3ff"
+                  stopColor="#ebf3ff"
                   className="stopColorebf3ff svgShape"
                 />
               </linearGradient>
@@ -114,12 +114,12 @@ const NotFound = () => {
               >
                 <stop
                   offset="0"
-                  stop-color="#14336d"
+                  stopColor="#14336d"
                   className="stopColor14336d svgShape"
                 />
                 <stop
                   offset="1"
-                  stop-color="#0e2253"
+                  stopColor="#0e2253"
                   className="stopColor0e2253 svgShape"
                 />
               </linearGradient>
@@ -148,12 +148,12 @@ const NotFound = () => {
               >
                 <stop
                   offset="0"
-                  stop-color="#14336d"
+                  stopColor="#14336d"
                   className="stopColor14336d svgShape"
                 />
                 <stop
                   offset="1"
-                  stop-color="#0e2253"
+                  stopColor="#0e2253"
                   className="stopColor0e2253 svgShape"
                 />
               </linearGradient>
@@ -191,12 +191,12 @@ const NotFound = () => {
               >
                 <stop
                   offset="0"
-                  stop-color="#3162df"
+                  stopColor="#3162df"
                   className="stopColor3162df svgShape"
                 />
                 <stop
                   offset=".965"
-                  stop-color="#173db8"
+                  stopColor="#173db8"
                   className="stopColor173db8 svgShape"
                 />
               </linearGradient>
@@ -214,12 +214,12 @@ const NotFound = () => {
               >
                 <stop
                   offset="0"
-                  stop-color="#3162df"
+                  stopColor="#3162df"
                   className="stopColor3162df svgShape"
                 />
                 <stop
                   offset=".965"
-                  stop-color="#173db8"
+                  stopColor="#173db8"
                   className="stopColor173db8 svgShape"
                 />
               </linearGradient>
@@ -237,12 +237,12 @@ const NotFound = () => {
               >
                 <stop
                   offset="0"
-                  stop-color="#3162df"
+                  stopColor="#3162df"
                   className="stopColor3162df svgShape"
                 />
                 <stop
                   offset=".965"
-                  stop-color="#173db8"
+                  stopColor="#173db8"
                   className="stopColor173db8 svgShape"
                 />
               </linearGradient>

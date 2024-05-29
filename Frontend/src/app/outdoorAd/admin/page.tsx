@@ -35,8 +35,8 @@ export default function AdminHomePage() {
   const [totalRevenue, setTotalRevenue] = useState<number>(0);
   const [todayEarning, setTodayEarning] = useState<number>(0);
   const [monthlyData, setMonthlyData] = useState<number[]>([]);
-  const [totalUsers, setTotalUsers] = useState<number>(0);
-  const [totalMembers, setTotalMembers] = useState<number>(0);
+  const [totalUsers, setTotalUsers] = useState<number | undefined>(0);
+  const [totalMembers, setTotalMembers] = useState<number | undefined>(0);
 
   const {
     userId,
@@ -51,20 +51,19 @@ export default function AdminHomePage() {
       const data = async () => {
         // Countusers
         const role = "user";
-        const userCount = await fetchAllUsers(role, token);
-        console.log(userCount);
+        const userCount = await fetchAllUsers(role);
 
         setTotalUsers(userCount);
         // count member
         const memberrole = "member";
-        const memberCount = await fetchAllUsers(memberrole, token);
+        const memberCount = await fetchAllUsers(memberrole);
         setTotalMembers(memberCount);
-        const data = await fetchAllBookingsData(token);
-        setTodayEarning(data.todayRevenue);
-        setTotalRevenue(data.totalRevenue);
-        setMonthlyData(data.yearlyRevenue);
+        const data = await fetchAllBookingsData();
+        setTodayEarning(data?.todayRevenue);
+        setTotalRevenue(data?.totalRevenue);
+        setMonthlyData(data?.yearlyRevenue);
 
-        const monthlydata = await fetchMonthlyData(token);
+        const monthlydata = await fetchMonthlyData();
 
         setTopPayments(monthlydata);
       };

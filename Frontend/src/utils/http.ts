@@ -1,3 +1,5 @@
+import fetchWrapper from "./fetchWrapper";
+
 export default async function fetchUser(id: string): Promise<any> {
   const resData = await fetch(`http://localhost:4000/auth/${id}`, {
     method: "GET",
@@ -11,21 +13,15 @@ export default async function fetchUser(id: string): Promise<any> {
   return user;
 }
 
-export async function deletePosterById(
-  id: string,
-  token: string
-): Promise<any> {
-  const resData = await fetch(
-    `http://localhost:4000/poster/deletePoster/${id}`,
-    {
+export async function deletePosterById(id: string): Promise<any> {
+  try {
+    const result = await fetchWrapper(`/poster/deletePoster/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return resData;
+    });
+    return result;
+  } catch (error) {
+    console.error("Error on deleting data:", error);
+  }
 }
 
 export async function fetchAllPosters(id?: string): Promise<any[]> {
@@ -178,20 +174,18 @@ export async function ManagePoster(
 
 export async function updatePosterStatus(
   id: string,
-  status: string,
-  token: string
+  status: string
 ): Promise<any> {
-  const resData = await fetch(`http://localhost:4000/poster/status/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ status: status }),
-  });
-  if (!resData.ok) throw new Error("Poster doesn't Exists .");
-  const poster = await resData.json();
-  return poster;
+  try {
+    const result = await fetchWrapper(`/poster/status/${id}`, {
+      method: "PATCH",
+      body: { status: status },
+    });
+    return result;
+  } catch (error) {
+    console.error("Error on deleting data:", error);
+    throw new Error("Poster doesn't Exists .");
+  }
 }
 
 export async function fetchOnePoster(id: string | undefined): Promise<any> {
@@ -225,91 +219,57 @@ export async function deleteAllCartData(userId: string): Promise<String> {
   return resp;
 }
 
-export async function fetchAllBookingsData(token: string): Promise<{
-  totalRevenue: number;
-  todayRevenue: number;
-  yearlyRevenue: number[];
-}> {
-  const resData = await fetch(`http://localhost:4000/booking/data`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const bookings = await resData.json();
-  return bookings;
+export async function fetchAllBookingsData(): Promise<any> {
+  try {
+    const result = await fetchWrapper("/booking/data", {
+      method: "GET",
+    });
+    return result;
+  } catch (error) {
+    console.error("Some error on getting booking data:", error);
+  }
 }
 
-export async function fetchMonthlyData(token: string, id?: string) {
-  let url = "http://localhost:4000/booking/currMonthData/";
+export async function fetchMonthlyData(id?: string) {
+  let url = "/booking/currMonthData/";
   if (id) {
     url += id;
   }
-  const resData = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const bookings = await resData.json();
-  return bookings;
+  try {
+    const result = await fetchWrapper(url, {
+      method: "GET",
+    });
+    return result;
+  } catch (error) {
+    console.error("Some error while getting monthly data:", error);
+  }
 }
 
-export async function fetchAllUsers(
-  role: string,
-  token: string
-): Promise<number> {
-  const resData = await fetch(`http://localhost:4000/auth?role=${role}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const users = await resData.json();
-  let countUsers = users.result.length;
-  // if (countUsers === undefined) {
-  //   countUsers = 0;
-  // }
-  return countUsers;
+export async function fetchAllUsers(role: string): Promise<number | undefined> {
+  try {
+    const result = await fetchWrapper(`/auth?role=${role}`, {
+      method: "GET",
+    });
+    return result.result?.length;
+  } catch (error) {
+    console.error("Some error while getting monthly data:", error);
+  }
 }
-
 export async function fetchUsers({
   page,
   per_page,
-  token,
 }: {
   page: number;
   per_page: number;
-  token: string;
 }): Promise<any[]> {
   try {
-    const resData = await fetch(
-      `http://localhost:4000/auth?page=${page}&per_page=${per_page}`,
+    const result = await fetchWrapper(
+      `/auth?page=${page}&per_page=${per_page}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
       }
     );
-
-    if (!resData.ok) {
-      let errorMessage = "Failed to fetch users";
-      try {
-        const errorResponse = await resData.json();
-        if (errorResponse && errorResponse.message) {
-          errorMessage = errorResponse.message;
-        }
-      } catch {}
-      throw new Error(`${errorMessage}`);
-    }
-
-    const users = await resData.json();
-    return users;
+    return result;
   } catch (error: any) {
     console.error("Error in fetchUsers:", error);
     throw new Error(
@@ -318,57 +278,35 @@ export async function fetchUsers({
   }
 }
 
-export async function fetchRoleChangeRequests(token: string) {
-  const data = await fetch(
-    `http://localhost:4000/userRoleChange?status=pending`,
-    {
+export async function fetchRoleChangeRequests() {
+  try {
+    const result = await fetchWrapper("/userRoleChange?status=pending", {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const newData = await data.json();
-  return newData;
+    });
+    return result;
+  } catch (error) {
+    console.error("Some error while getting monthly data:", error);
+  }
 }
 
-export async function fetchAllRoleChanges(token: string) {
+export async function fetchAllRoleChanges() {
   try {
-    const data = await fetch(
-      `http://localhost:4000/userRoleChange?status=pending`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const newData = await data.json();
-    return newData.length;
+    const result = await fetchWrapper("/userRoleChange?status=pending", {
+      method: "GET",
+    });
+    return result.length;
   } catch (error) {
     console.error(error);
   }
 }
 
-export async function updateUserRole(
-  id: string,
-  status: string,
-  token: string
-) {
-  const data = await fetch(`http://localhost:4000/userRoleChange/${id}`, {
+export async function updateUserRole(id: string, status: string) {
+  const data = await fetchWrapper(`/userRoleChange/${id}`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ status }),
+    body: { status },
   });
-  const userRoleUpdates = await data.json();
-  console.log(userRoleUpdates);
 
-  return userRoleUpdates;
+  return data;
 }
 
 export async function sendRoleChangeRequest(_id?: string) {
@@ -383,67 +321,47 @@ export async function sendRoleChangeRequest(_id?: string) {
   return newRoleChangeReq;
 }
 
-export async function UserRoleChangeStatus(userId: any, token: string) {
-  const data = await fetch(
-    `http://localhost:4000/userRoleChange?user=${userId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const newData = await data.json();
-  return newData;
+export async function UserRoleChangeStatus(userId: any) {
+  const data = await fetchWrapper(`/userRoleChange?user=${userId}`, {
+    method: "GET",
+  });
+
+  return data;
 }
 
 export async function fetchAllBookingsOrders({
   page,
   per_page,
-  token,
 }: {
   page: number;
   per_page: number;
-  token: string;
 }): Promise<any[]> {
-  const resData = await fetch(
-    `http://localhost:4000/booking?page=${page}&per_page=${per_page}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const orders = await resData.json();
-  if (!resData.ok) throw new Error("Please place some orders.");
-  return orders;
+  try {
+    const resData = await fetchWrapper(
+      `/booking?page=${page}&per_page=${per_page}`,
+      {
+        method: "GET",
+      }
+    );
+    return resData;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Please place some orders.");
+  }
 }
 
-export async function fetchMemberPosterStats(
-  id: string,
-  token: string
-): Promise<{
+export async function fetchMemberPosterStats(id: string): Promise<{
   currentYearTotalRevenue: number;
   yearlyRevenue: number[];
   todayEarning: number;
   currentMonthEarning: number;
   totalPosters: number;
 }> {
-  const resData = await fetch(
-    `http://localhost:4000/booking/memberStats/${id}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const bookings = await resData.json();
-  return bookings;
+  const resData = await fetchWrapper(`/booking/memberStats/${id}`, {
+    method: "GET",
+  });
+
+  return resData;
 }
 
 export async function updateCart(

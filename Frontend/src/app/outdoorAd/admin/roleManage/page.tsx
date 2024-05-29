@@ -1,22 +1,16 @@
 "use client";
 import Sidebar from "@/components/admincomponents/sidebar";
-import { RootState } from "@/store";
 import { fetchRoleChangeRequests, updateUserRole } from "@/utils/http";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 
 const AssignRole = () => {
   const [users, setUsers] = useState<any[]>([]);
-  const { token }: { token: string } = useSelector(
-    (state: RootState) => state.auth
-  );
 
   const socket = io("http://localhost:4040");
 
   useEffect(() => {
     socket.on("roleReq", (val) => {
-      console.log("call data", val, val[0]);
       const data = val[0];
       setUsers((prev) => [...prev, data]);
     });
@@ -31,7 +25,7 @@ const AssignRole = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resData = await fetchRoleChangeRequests(token);
+        const resData = await fetchRoleChangeRequests();
         setUsers(resData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -43,7 +37,7 @@ const AssignRole = () => {
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
-      await updateUserRole(id, status, token);
+      await updateUserRole(id, status);
       setUsers(
         users.map((user) => {
           if (user._id === id) {

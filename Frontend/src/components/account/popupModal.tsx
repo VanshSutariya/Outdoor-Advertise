@@ -8,12 +8,13 @@ import { changeRole } from "@/store/auth-slice";
 const PopUpModal: React.FC = () => {
   const dispatch = useDispatch();
   const [status, setStatus] = useState<string | null>(null);
-  const { userId, token }: { userId: string | null; token: string | null } =
-    useSelector((state: RootState) => state.auth);
+  const { userId }: { userId: string | null } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   useEffect(() => {
     const data = async () => {
-      const statusRes = await UserRoleChangeStatus(userId, token);
+      const statusRes = await UserRoleChangeStatus(userId);
       if (statusRes[0]) {
         setStatus(statusRes[0].status);
       }

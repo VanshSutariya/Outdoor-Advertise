@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useState } from "react";
 import { RootState } from "../../store";
 import { FiUsers } from "react-icons/fi";
 import { useSelector } from "react-redux";

@@ -2,18 +2,10 @@ import { useEffect, useState } from "react";
 import { CiBellOn } from "react-icons/ci";
 import { ManagePoster, fetchAllRoleChanges } from "../../utils/http";
 import { io, Socket } from "socket.io-client";
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
-import toastFunction from "../reactToast/toast";
 
 const NotificationPopUp: React.FC = () => {
   const [roleNotification, setRoleNotification] = useState<boolean>(false);
   const [postereNotification, setPosterNotification] = useState<boolean>(false);
-  const {
-    token,
-  }: {
-    token: string;
-  } = useSelector((state: RootState) => state.auth);
 
   const socket = io("http://localhost:4040");
 
@@ -44,7 +36,7 @@ const NotificationPopUp: React.FC = () => {
   useEffect(() => {
     const data = async () => {
       try {
-        const alerts = await fetchAllRoleChanges(token);
+        const alerts = await fetchAllRoleChanges();
         const status = "pending";
         const resData = await ManagePoster(status);
 
@@ -60,7 +52,7 @@ const NotificationPopUp: React.FC = () => {
       }
     };
     data();
-  }, [token]);
+  }, []);
 
   return (
     <>

@@ -1,8 +1,6 @@
 import toastFunction from "@/components/reactToast/toast";
-import { RootState } from "@/store";
 import { updatePosterStatus } from "@/utils/http";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
 
 interface ButtonsProp {
   id: string;
@@ -10,12 +8,9 @@ interface ButtonsProp {
 const ManageButtons: React.FC<ButtonsProp> = (props) => {
   const router = useRouter();
 
-  const { token }: { token: string } = useSelector(
-    (state: RootState) => state.auth
-  );
   async function handlebtnClick(status: string) {
     try {
-      await updatePosterStatus(props.id, status, token);
+      await updatePosterStatus(props.id, status);
       router.push("/outdoorAd/admin/managePoster");
     } catch (error: any) {
       toastFunction("error", error);

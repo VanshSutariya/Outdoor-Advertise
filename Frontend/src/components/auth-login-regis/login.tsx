@@ -56,7 +56,7 @@ const LogIn: React.FC = () => {
             )
           )}
           data-testid="loginSubmit"
-          className="mt-8 mb-2 mx-auto w-full xs:w-80 max-w-screen-lg lg:w-1/2"
+          className="mt-8 mb-2 mx-auto w-full xs:w-100 max-w-screen-lg lg:w-1/2"
         >
           <div className="flex flex-col ">
             <label className="font-medium mb-2">Your email</label>
@@ -97,7 +97,7 @@ const LogIn: React.FC = () => {
             LogIn
           </button>
         </form>
-        <div className=" grid grid-cols-3 mt-4 mb-2 mx-auto w-full xs:w-80 max-w-screen-lg lg:w-1/2 items-center text-gray-500">
+        <div className=" grid grid-cols-3 mt-4 mb-2 mx-auto w-full xs:w-100 max-w-screen-lg lg:w-1/2 items-center text-gray-500">
           <hr className="border-gray-500" />
           <p className="text-center text-sm">OR</p>
           <hr className="border-gray-500" />
@@ -105,7 +105,7 @@ const LogIn: React.FC = () => {
 
         <button
           onClick={() => handleGoogleLogin()}
-          className="bg-white border py-2  mt-4 mb-2 mx-auto w-full xs:w-80 max-w-screen-lg lg:w-1/2 rounded-xl  flex justify-center items-center text-sm hover:scale-105 duration-300 "
+          className="bg-white border py-2  mt-4 mb-2 mx-auto w-full xs:w-100 max-w-screen-lg lg:w-1/2 rounded-xl  flex justify-center items-center text-sm hover:scale-105 duration-300 "
         >
           <img
             className="w-6 h-6"

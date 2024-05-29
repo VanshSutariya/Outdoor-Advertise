@@ -22,6 +22,7 @@ export class BookingController {
   constructor(private bookingService: BookingService) {}
 
   @Get()
+  @HasRoles(Roles.member, Roles.admin, Roles.user)
   async getAll(@Query() query: ExpressQuery) {
     return await this.bookingService.getAll(query);
   }

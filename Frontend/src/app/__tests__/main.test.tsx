@@ -10,12 +10,15 @@ import Providers from "@/store/provider";
 import { describe, it } from "@jest/globals";
 import Header from "@/components/Header";
 import PosterForm from "@/components/CreatePoster/posterForm";
-import fetchMock from "jest-fetch-mock";
 import LogIn from "@/components/auth-login-regis/login";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const sendComponent = (component: ReactElement): RenderResult =>
-  render(<Providers> {component}</Providers>);
-
+  render(
+    <GoogleOAuthProvider clientId={`${process.env.GOOGLE_CLIENT_ID}`}>
+      <Providers> {component}</Providers>
+    </GoogleOAuthProvider>
+  );
 jest.mock("next/router", () => require("next-router-mock"));
 jest.mock("node-fetch", () => require("jest-fetch-mock"));
 jest.mock("next/navigation", () => ({

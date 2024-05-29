@@ -126,7 +126,6 @@ export class AuthController {
     @Body() updatedto: UpdateDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(file);
     const imageUrl: any = await this.authService.uploadImage(file.buffer);
     updatedto.image = imageUrl.secure_url;
     await this.authService.updateUserDetails(id, updatedto);

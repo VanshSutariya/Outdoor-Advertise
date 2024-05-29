@@ -1,12 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import numeral from "numeral";
-import {
-  ManagePoster,
-  fetchAllBookingsOrders,
-  fetchAllPoster,
-  fetchAllPosterStatus,
-} from "@/utils/http";
+import { fetchAllPosterStatus } from "@/utils/http";
 import Sidebar from "@/components/admincomponents/sidebar";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -20,7 +15,7 @@ const PosterStatusPage = () => {
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const { token, userId }: { token: string; userId: string } = useSelector(
+  const { userId }: { userId: string } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -54,7 +49,7 @@ const PosterStatusPage = () => {
     };
 
     fetchData();
-  }, [page, totalPages]);
+  }, [page, totalPages, userId]);
 
   const handlePrevClick = () => {
     setPage(page - 1);
@@ -69,9 +64,8 @@ const PosterStatusPage = () => {
   };
 
   function formatRevenue(revenue: any) {
-    const crore = 10000000; // 1 crore = 10,000,000
-    const lakh = 100000; // 1 lakh = 100,000
-
+    const crore = 10000000;
+    const lakh = 100000;
     if (revenue >= crore) {
       return `₹${(revenue / crore).toFixed(2)} CR`;
     } else if (revenue >= lakh) {
@@ -79,6 +73,16 @@ const PosterStatusPage = () => {
     } else {
       return "₹" + numeral(revenue).format("0,0.00");
     }
+  }
+  if (error || loading) {
+    return (
+      <div className="flex justify-center text-3xl font-poppins h-screen mt-16">
+        {error ? "Something Went Wrong. Please Try Again Later." : ""}
+        {loading && (
+          <div className="rounded-full h-10 w-10 bg-gray-700 animate-ping"></div>
+        )}
+      </div>
+    );
   }
   return (
     <Sidebar>
@@ -137,7 +141,9 @@ const PosterStatusPage = () => {
       </div>
       <div className="flex justify-center gap-2 mb-5 ">
         {page > totalPages ? (
-          <div>No more pages...</div>
+          <div className="flex justify-center text-3xl font-poppins h-screen mt-16">
+            You Dont have any pending or rejected posters.
+          </div>
         ) : (
           <div className="flex justify-center items-center mt-16">
             <div className="flex border-[2px] gap-4 rounded-[10px] border-black p-2">

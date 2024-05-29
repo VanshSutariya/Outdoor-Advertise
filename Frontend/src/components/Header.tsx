@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import cookie from "cookie";
 import Link from "next/link";
-import { FaUserLarge } from "react-icons/fa6";
 import { RootState } from "@/store";
-import { logout } from "@/store/auth-slice";
+import { decode } from "jsonwebtoken";
+import React, { useEffect, useState } from "react";
+import { loginIn, logout } from "@/store/auth-slice";
 import { useRouter } from "next/navigation";
+import { FaUserLarge } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
+import fetchUser from "@/utils/http";
+
+interface DecodedToken {
+  id: string;
+}
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -24,6 +31,21 @@ const Header: React.FC = () => {
     isLoggedIn: boolean;
     userRole: string | null;
   } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    const cookies = cookie.parse(document.cookie);
+    if (cookies.jwt) {
+      const decodedToken = decode(cookies.jwt) as DecodedToken;
+      if (decodedToken) {
+        const func = async () => {
+          const userDetail = await fetchUser(decodedToken.id);
+          const token = cookies.jwt;
+          dispatch(loginIn({ userDetail, token }));
+        };
+        func();
+      }
+    }
+  }, []);
 
   const handleLogout = async () => {
     document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
