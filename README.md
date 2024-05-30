@@ -35,6 +35,12 @@
 
 ![Screenshot (60)](https://github.com/VanshSutariya/Outdoor-Advertise/assets/119673252/56986264-8fe8-4e95-9d45-05e3cffc6d91)
 
+
+https://github.com/VanshSutariya/Outdoor-Advertise/assets/119673252/60f298e6-4c52-4b07-8246-a22bd66479a4
+
+
+
+
 ## Installation
 1. Clone the repository
 ```bash
