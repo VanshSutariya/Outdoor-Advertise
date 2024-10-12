@@ -8,7 +8,8 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { MEDIA_PLAN } from '../constants/mediaPlan.constants';
+import { MEDIA_PLAN, PosterStatus } from '../constants/mediaPlan.constants';
+import { Transform } from 'class-transformer';
 
 export class CreatePosterDto {
   @IsNotEmpty()
@@ -28,6 +29,11 @@ export class CreatePosterDto {
   @IsString()
   @IsEnum(MEDIA_PLAN)
   mediatype: MEDIA_PLAN;
+
+  @IsEnum(PosterStatus)
+  @IsNotEmpty()
+  @Transform(() => PosterStatus.PENDING, { toClassOnly: true })
+  status: PosterStatus = PosterStatus.PENDING;
 
   @IsNotEmpty()
   @IsString()
@@ -79,6 +85,10 @@ export class CreatePosterDto {
   @IsOptional()
   @IsNumber()
   maxAutos?: number;
+
+  @IsNotEmpty()
+  @IsString()
+  createdBy: string;
 
   @IsArray()
   @IsOptional()

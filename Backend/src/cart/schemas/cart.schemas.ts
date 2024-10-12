@@ -15,7 +15,13 @@ export class Cart {
   image: string;
 
   @Prop({ required: true })
+  customerPosterImage: string;
+
+  @Prop({ required: true })
   address: string;
+
+  @Prop({ required: false })
+  createdBy: string;
 
   @Prop({ required: true })
   totalPrice: number;

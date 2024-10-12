@@ -8,18 +8,26 @@ import { CartModule } from './cart/cart.module';
 import { StripeModule } from './stripe/stripe.module';
 import { StripeWebhookModule } from './stripe-webhook/stripe-webhook.module';
 import { BookingModule } from './booking/booking.module';
-import { UserRoleChangeController } from './user-role-change/user-role-change.controller';
-import { UserRoleChangeService } from './user-role-change/user-role-change.service';
 import { UserRoleChangeModule } from './user-role-change/user-role-change.module';
+import { GatewayModule } from './gateway/gateway.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { HttpMetricsInterceptor } from './metrics/metrics.intercepter';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ContactUsModule } from './contact-us/contact-us.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.DB_URL),
-    AuthModule,
-    PosterDetailsModule,
+    MongooseModule.forRoot(process.env.Mongodb_Cluster),
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,
@@ -31,13 +39,34 @@ import { UserRoleChangeModule } from './user-role-change/user-role-change.module
         },
       },
     }),
+    AuthModule,
+    PosterDetailsModule,
     CartModule,
     StripeModule,
     StripeWebhookModule,
     BookingModule,
     UserRoleChangeModule,
+    GatewayModule,
+    PrometheusModule.register({
+      defaultLabels: {
+        application: 'outdoorAd',
+      },
+      defaultMetrics: {
+        enabled: true,
+      },
+    }),
+    ContactUsModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpMetricsInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}

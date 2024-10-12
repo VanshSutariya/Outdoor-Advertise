@@ -12,8 +12,8 @@ import { LoginDto, UpdateDto } from './dto/login.dto';
 import { UpdatePassDto, resetDto } from './dto/resetPass.dto';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
-import { ConfigService } from '@nestjs/config';
 import { Query } from 'express-serve-static-core';
+import { v2 } from 'cloudinary';
 
 @Injectable()
 export class AuthService {
@@ -21,25 +21,47 @@ export class AuthService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     private jwtService: JwtService,
-  ) {}
+  ) {
+    v2.config({
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.CLOUDNERY_KEY,
+      api_secret: process.env.CLOUDNERY_SECRET_KEY,
+    });
+  }
 
   async getAllUsers(query: Query) {
-    let DBQuery = {};
+    try {
+      let DBQuery: any = {};
 
-    if (query?.role) {
-      DBQuery['role'] = {
-        $regex: '^' + query?.role,
-        $options: 'i',
-      };
+      if (query?.role) {
+        DBQuery['role'] = {
+          $regex: '^' + query?.role,
+          $options: 'i',
+        };
+      }
+
+      const resPerPage = Number(query?.per_page) || 0;
+      const currPage = Number(query?.page) || 1;
+      const skip = resPerPage * (currPage - 1);
+
+      const result = await this.userModel
+        .find(DBQuery)
+        .limit(resPerPage)
+        .skip(skip)
+        .select('_id name email role image');
+
+      const totalLength = await this.userModel.countDocuments(DBQuery);
+
+      return { totalLength, result };
+    } catch (error: any) {
+      console.error('Error in getAllUsers:', error);
     }
-    const resPerPage = Number(query?.per_page) || 0;
-    const currPage = Number(query.page) || 1;
-    const skip = resPerPage * (currPage - 1);
-    return await this.userModel.find(DBQuery).limit(resPerPage).skip(skip);
   }
 
   async getUsersById(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel
+      .findById(id)
+      .select('_id name email role image');
     if (!user) throw new HttpException('enter valid Userid.', 404);
     return user;
   }
@@ -86,11 +108,37 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password.');
     }
     const token = this.jwtService.sign(
-      { id: user._id },
+      { id: user._id, role: user.role, name: user.name },
       { expiresIn: process.env.JWT_EXPIRES, secret: process.env.JWT_SECRET },
     );
 
     return { token };
+  }
+  async googleLogin(token: string): Promise<{ token: string }> {
+    const respLogin = await fetch(
+      `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    const response = await respLogin.json();
+
+    let user = await this.userModel.findOne({ email: response.email });
+
+    if (!user) {
+      throw new UnauthorizedException('Please register first to login.');
+    }
+
+    const jwtToken = this.jwtService.sign(
+      { id: user._id, role: user.role, name: user.name },
+      { expiresIn: process.env.JWT_EXPIRES, secret: process.env.JWT_SECRET },
+    );
+
+    return { token: jwtToken };
   }
 
   async resetToken(
@@ -112,7 +160,6 @@ export class AuthService {
 
   async resetpass(resetinfo: resetDto) {
     try {
-      // Verify reset token
       const checkResetToken = jwt.verify(
         resetinfo.reset_token,
         process.env.JWT_SECRET,
@@ -120,10 +167,8 @@ export class AuthService {
 
       const id: number = checkResetToken['id'] as unknown as number;
 
-      // Hash the new password
       const hash = await bcrypt.hash(resetinfo.password, 10);
 
-      // Update user password in the database
       const updatePassword = await this.userModel.findByIdAndUpdate(
         id,
         { password: hash },
@@ -133,13 +178,11 @@ export class AuthService {
       if (!updatePassword)
         throw new HttpException('Password is not updated. ', 404);
 
-      // Return success message
       return {
         success: true,
         message: 'Successfully password has been updated',
       };
     } catch (error) {
-      // Handle errors and return failure message
       console.error('Password reset failed:', error.message);
       return {
         success: false,
@@ -174,5 +217,21 @@ export class AuthService {
       console.error('Password reset failed:', error.message);
       throw error;
     }
+  }
+
+  async uploadImage(filepath: Buffer) {
+    return new Promise((resolve, reject) => {
+      v2.uploader
+        .upload_stream(
+          { folder: 'UserProfileImages', resource_type: 'auto' },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          },
+        )
+        .end(filepath);
+    });
   }
 }

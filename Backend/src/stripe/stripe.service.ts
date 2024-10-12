@@ -38,10 +38,9 @@ export class StripeService {
       line_items: lineItems,
       mode: 'payment',
       metadata: metadata,
-      success_url: 'http://localhost:3000/success',
-      cancel_url: 'http://localhost:3000/cart',
+      success_url: 'http://localhost:3000/outdoorAd/success',
+      cancel_url: 'http://localhost:3000/outdoorAd/cart',
     });
-    // console.log('session', session);
 
     return session.url;
   }

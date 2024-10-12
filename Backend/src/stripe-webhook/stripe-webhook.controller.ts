@@ -19,22 +19,18 @@ export class StripeWebhookController {
     @Req() req: RawBodyRequest<Request>,
     @Res() res: Response,
   ) {
-    // Verify webhook signature
     let event: Stripe.Event;
     try {
-      // console.log(typeof body, body);
       event = Stripe.webhooks.constructEvent(
         req.rawBody,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET,
       );
 
-      // Handle webhook event
       await this.webhookService.handleEvent(event);
 
       return { received: true };
     } catch (error) {
-      // If verification fails, respond with error
       console.error(error);
 
       throw new BadRequestException('Webhook signature verification failed');

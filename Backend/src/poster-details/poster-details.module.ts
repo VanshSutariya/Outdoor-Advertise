@@ -4,6 +4,7 @@ import { PosterDetailsService } from './poster-details.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Posters, PostersSchema } from './schemas/posters.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AuthModule } from 'src/auth/auth.module';
     MongooseModule.forFeature([{ name: Posters.name, schema: PostersSchema }]),
   ],
   controllers: [PosterDetailsController],
-  providers: [PosterDetailsService],
+  providers: [PosterDetailsService, RoleChangeGateway],
+  exports: [PosterDetailsModule, RoleChangeGateway, PosterDetailsService],
 })
 export class PosterDetailsModule {}

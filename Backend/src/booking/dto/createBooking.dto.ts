@@ -25,11 +25,19 @@ export class CreateBookingDto {
 
   @IsString()
   @IsNotEmpty()
+  customerPosterImage: string;
+
+  @IsString()
+  @IsNotEmpty()
   address: string;
 
   @IsNumber()
   @IsNotEmpty()
   totalPrice: number;
+
+  @IsString()
+  @IsNotEmpty()
+  createdBy: string;
 
   @IsOptional()
   @IsArray()

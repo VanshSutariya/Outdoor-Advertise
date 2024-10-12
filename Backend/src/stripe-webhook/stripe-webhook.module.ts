@@ -4,7 +4,6 @@ import { StripeWebhookService } from './stripe-webhook.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Cart, CartSchema } from 'src/cart/schemas/cart.schemas';
 import { CartService } from 'src/cart/cart.service';
-import { BookingService } from 'src/booking/booking.service';
 import { Booking, BookingSchema } from 'src/booking/schema/booking.schema';
 import { PosterDetailsService } from 'src/poster-details/poster-details.service';
 import {
@@ -12,6 +11,9 @@ import {
   PostersSchema,
 } from 'src/poster-details/schemas/posters.schema';
 import { User, UserSchema } from 'src/auth/schemas/user.schema';
+import { EmailService } from './bookingEmail.service';
+import { BookingService } from 'src/booking/booking.service';
+import { RoleChangeGateway } from 'src/gateway/role-change-gateway';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { User, UserSchema } from 'src/auth/schemas/user.schema';
     CartService,
     BookingService,
     PosterDetailsService,
+    EmailService,
+    RoleChangeGateway,
   ],
 })
 export class StripeWebhookModule {}
