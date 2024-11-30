@@ -1,5 +1,5 @@
 [build]
-  functions = "Backend/functions"
+  functions = "Backend/*"
 
 [master]
   functions = "Backend/functions"
