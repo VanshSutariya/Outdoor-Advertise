@@ -1,0 +1,6 @@
+[build]
+  functions = "backend/functions"
+  publish = "frontend/build"  # This can be left out if you're not deploying frontend
+
+[dev]
+  functions = "backend/functions"

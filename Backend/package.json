@@ -37,8 +37,10 @@
     "class-validator": "^0.14.1",
     "cloudinary": "^2.2.0",
     "cookie-parser": "^1.4.6",
+    "express": "^4.21.1",
     "helmet": "^7.1.0",
     "mongoose": "^8.2.4",
+    "netlify-cli": "^17.37.2",
     "nodemailer": "^6.9.13",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -46,6 +48,7 @@
     "prom-client": "^15.1.2",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "serverless-http": "^3.2.0",
     "stripe": "^15.3.0",
     "vercel": "^37.8.0"
   },
