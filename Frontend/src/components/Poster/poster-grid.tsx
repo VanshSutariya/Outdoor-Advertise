@@ -4,6 +4,7 @@ import PosterItem from "./poster-item";
 import { useSearchParams } from "next/navigation";
 import { fetchAllPoster } from "@/utils/http";
 import { io } from "socket.io-client";
+import data from '../../utils/data.json'
 
 interface Poster {
   _id: string;
@@ -36,6 +37,7 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageNumbers, setPageNumbers] = useState<number[]>([]);
 
+  const dummydata: any = data;
   const per_page: number = 6;
 
   const socket = io("http://localhost:4040");
@@ -78,13 +80,21 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
             city,
             mediatype,
             isPopularClicked
-          );
-        }
+          ).catch(error => {
+            setTotalPages(5)
+            setPosterData(getObjectsByPage(page, dummydata, mediatype));
+            setLoading(false);
 
-        setTotalPages(Math.ceil(resData.totalLength / per_page));
-        setLoading(false);
-        setPosterData(resData.resData);
-        setAvgBooking(resData.averageBooking);
+          })
+        }
+        if (resData) {
+
+          setTotalPages(Math.ceil(resData.totalLength / per_page));
+          setLoading(false);
+
+          setPosterData(resData.resData);
+          setAvgBooking(resData.averageBooking);
+        }
 
         let pageNumbers: number[] = [];
         const offsetNumber: number = 2;
@@ -113,6 +123,17 @@ const PosterGrid: React.FC<PosterGridProps> = (props) => {
         )}
       </div>
     );
+  }
+  function getObjectsByPage(page: number, dataArray: any[], mediatype: string | undefined) {
+    const pageSize = 6;
+    const startIndex = (page - 1) * pageSize;
+    let arr = dataArray.slice(startIndex, startIndex + pageSize);
+    if (mediatype) {
+      arr = arr.filter(data => data.mediatype === mediatype)
+    }
+
+    return arr
+
   }
   const handlePrevClick = () => {
     setPage(page - 1);

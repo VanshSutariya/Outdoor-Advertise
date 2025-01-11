@@ -8,6 +8,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { fetchOnePoster } from "@/utils/http";
 import GoogleMaps from "./googleMap";
+import dummyData from '../../utils/data.json'
 
 interface PosterData {
   id: number;
@@ -44,9 +45,17 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resData: PosterData = await fetchOnePoster(id);
-        setPosterData(resData);
-        setLoading(false);
+        const resData: PosterData = await fetchOnePoster(id).catch(error => {
+          const data: any = dummyData.find(obj => obj._id === id)
+          if (data) {
+            setPosterData(data);
+            setLoading(false);
+          }
+        })
+        if (resData) {
+          setPosterData(resData);
+          setLoading(false);
+        }
       } catch (error: any) {
         setError(error.message);
         console.error("Error fetching data:", error);
@@ -194,10 +203,10 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
                   {posterData.mediatype === "Rickshaws"
                     ? `₹${posterData.price}/ auto`
                     : posterData.mediatype === "Poles"
-                    ? `₹${posterData.price}/ pole`
-                    : posterData.mediatype === "Buses"
-                    ? `₹${posterData.price}/ bus`
-                    : `₹${posterData.price}/ day`}
+                      ? `₹${posterData.price}/ pole`
+                      : posterData.mediatype === "Buses"
+                        ? `₹${posterData.price}/ bus`
+                        : `₹${posterData.price}/ day`}
                 </span>
               </p>
             </div>
@@ -216,8 +225,8 @@ const PosterDetails: React.FC<PosterDetailsProps> = ({ id }) => {
           minDays={posterData.minimumDays}
           mediatype={
             posterData.mediatype === "Rickshaws" ||
-            posterData.mediatype === "Poles" ||
-            posterData.mediatype === "Buses"
+              posterData.mediatype === "Poles" ||
+              posterData.mediatype === "Buses"
               ? posterData.mediatype
               : false
           }
